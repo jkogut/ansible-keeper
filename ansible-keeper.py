@@ -62,6 +62,34 @@ def oParser():
     return {'addMode':opts.A, 'deleteMode':opts.D, 'updateMode':opts.U, 'showMode':opts.S, 'inventoryMode':opts.I}
                                                                     
 
+# def hostVarsShow(name):
+#     '''
+#     Show hostvars for a given name of host or group.
+    
+#     Returns a JSON dump.
+#     '''
+
+#     zk = KazooClient(hosts=cfg.zkServers, read_only = True)
+#     zk.start()
+
+#     groupList = zk.get_children("{}/groups".format(cfg.aPath))
+# #    groupDict = {}
+
+#     if name in groupList:
+#         pass   
+    
+#     for group in groupList:
+#         path     = "{0}/groups/{1}".format(cfg.aPath,group)
+#         children = zk.get_children(path)
+#         tmpDict  = {}
+#         tmpDict['hosts'] = children
+#         tmpDict['vars']  = {"a":"b"}
+#         groupDict[group] = tmpDict
+    
+#     zk.stop()
+
+#     return json.dumps(groupDict)
+
 
 def inventoryDump():
     '''
@@ -77,7 +105,7 @@ def inventoryDump():
     groupDict = {}
     
     for group in groupList:
-        path = "{}/groups/".format(cfg.aPath) + group
+        path     = "{0}/groups/{1}".format(cfg.aPath, group)
         children = zk.get_children(path)
         groupDict[group] = children
     
@@ -100,9 +128,9 @@ def ansibleInventoryDump():
     groupDict = {}
     
     for group in groupList:
-        path = "{}/groups/".format(cfg.aPath) + group
+        path     = "{0}/groups/{1}".format(cfg.aPath, group)
         children = zk.get_children(path)
-        tmpDict = {}
+        tmpDict  = {}
         tmpDict['hosts'] = children
         tmpDict['vars']  = {"a":"b"}
         groupDict[group] = tmpDict
