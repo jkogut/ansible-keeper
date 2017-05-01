@@ -55,9 +55,8 @@ def oParser():
     
     
     if (opts.A or opts.D or opts.U or opts.I or opts.S) == None:
+
         parser.print_help()
-        print "\nAll options are obligatory. Please supply datasource and segment range (-B start -E end).\n"
-        
         exit(-1)
         
     return {'addMode':opts.A, 'deleteMode':opts.D, 'updateMode':opts.U, 'showMode':opts.S, 'inventoryMode':opts.I}
@@ -66,7 +65,7 @@ def oParser():
 
 def inventoryDump():
     '''
-    Dumps inventory for a given list of zookeeper servers and ansible-keeper path.
+    Inventory dump for a given list of zookeeper servers and ansible-keeper path.
     
     Returns a JSON dump.
     '''
@@ -74,7 +73,6 @@ def inventoryDump():
     zk = KazooClient(hosts=cfg.zkServers, read_only = True)
     zk.start()
 
-    hostList = zk.get_children("{}/hosts".format(cfg.aPath))
     groupList = zk.get_children("{}/groups".format(cfg.aPath))
     groupDict = {}
     
@@ -86,18 +84,46 @@ def inventoryDump():
     zk.stop()
 
     return json.dumps(groupDict)
-        
 
+
+def ansibleInventoryDump():
+    '''
+    Ansible compliant inventory dump for a given list of zookeeper servers and ansible-keeper path.
+    
+    Returns a JSON dump.
+    '''
+
+    zk = KazooClient(hosts=cfg.zkServers, read_only = True)
+    zk.start()
+
+    groupList = zk.get_children("{}/groups".format(cfg.aPath))
+    groupDict = {}
+    
+    for group in groupList:
+        path = "{}/groups/".format(cfg.aPath) + group
+        children = zk.get_children(path)
+        tmpDict = {}
+        tmpDict['hosts'] = children
+        tmpDict['vars']  = {"a":"b"}
+        groupDict[group] = tmpDict
+    
+    zk.stop()
+
+    return json.dumps(groupDict)
+        
 
 def main():
     '''
     Main logic
     '''
     
-    
     if oParser()['inventoryMode'] == 'true':
         print inventoryDump()
        
+    if oParser()['inventoryMode'] == 'ansible':
+        print ansibleInventoryDump()
+                   
 
+        
 if __name__ == "__main__":
     main()
