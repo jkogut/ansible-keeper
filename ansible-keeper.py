@@ -62,20 +62,26 @@ def oParser():
     return {'addMode':opts.A, 'deleteMode':opts.D, 'updateMode':opts.U, 'showMode':opts.S, 'inventoryMode':opts.I}
                                                                     
 
-def hostVarsShow(name):
+def hostVarsShow(name, dumpDict):
     '''
     Show hostvars for a given name of host or group.
     
     Returns a JSON dump.
     '''
-    pass
 
+    if name in tmpDict.keys():
+        for host in tmpDict[name]['hosts']:
+            print host  
+           
+    else:
+        pass
+ 
 
 def inventoryDump():
     '''
     Inventory dump for a given list of zookeeper servers and ansible-keeper path.
     
-    Returns a JSON dump.
+    Returns a dict.
     '''
 
     zk = KazooClient(hosts=cfg.zkServers, read_only = True)
@@ -98,7 +104,7 @@ def ansibleInventoryDump():
     '''
     Ansible compliant inventory dump for a given list of zookeeper servers and ansible-keeper path.
     
-    Returns a JSON dump.
+    Returns a dict.
     '''
 
     zk = KazooClient(hosts=cfg.zkServers, read_only = True)
@@ -130,7 +136,7 @@ def main():
        
     if oParser()['inventoryMode'] == 'ansible':
         print json.dumps(ansibleInventoryDump())
-                   
+                           
 
         
 if __name__ == "__main__":
