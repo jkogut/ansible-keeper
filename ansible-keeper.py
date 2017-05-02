@@ -62,33 +62,13 @@ def oParser():
     return {'addMode':opts.A, 'deleteMode':opts.D, 'updateMode':opts.U, 'showMode':opts.S, 'inventoryMode':opts.I}
                                                                     
 
-# def hostVarsShow(name):
-#     '''
-#     Show hostvars for a given name of host or group.
+def hostVarsShow(name):
+    '''
+    Show hostvars for a given name of host or group.
     
-#     Returns a JSON dump.
-#     '''
-
-#     zk = KazooClient(hosts=cfg.zkServers, read_only = True)
-#     zk.start()
-
-#     groupList = zk.get_children("{}/groups".format(cfg.aPath))
-# #    groupDict = {}
-
-#     if name in groupList:
-#         pass   
-    
-#     for group in groupList:
-#         path     = "{0}/groups/{1}".format(cfg.aPath,group)
-#         children = zk.get_children(path)
-#         tmpDict  = {}
-#         tmpDict['hosts'] = children
-#         tmpDict['vars']  = {"a":"b"}
-#         groupDict[group] = tmpDict
-    
-#     zk.stop()
-
-#     return json.dumps(groupDict)
+    Returns a JSON dump.
+    '''
+    pass
 
 
 def inventoryDump():
@@ -111,7 +91,7 @@ def inventoryDump():
     
     zk.stop()
 
-    return json.dumps(groupDict)
+    return groupDict
 
 
 def ansibleInventoryDump():
@@ -137,7 +117,7 @@ def ansibleInventoryDump():
     
     zk.stop()
 
-    return json.dumps(groupDict)
+    return groupDict
         
 
 def main():
@@ -146,10 +126,10 @@ def main():
     '''
     
     if oParser()['inventoryMode'] == 'true':
-        print inventoryDump()
+        print json.dumps(inventoryDump())
        
     if oParser()['inventoryMode'] == 'ansible':
-        print ansibleInventoryDump()
+        print json.dumps(ansibleInventoryDump())
                    
 
         
