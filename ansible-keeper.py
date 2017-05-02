@@ -69,42 +69,42 @@ def splitZnodeString(znodeString):
     Returns dict.
     '''
 
+    ## spliting example string into dictionary:
+    ## example string: groupname-hostname,var1:val1,var2:val2,var3:val3
+    ## desired dict  : {"groupname":{"hostname":{"var1":"val1", "var2":"val2", "var3":"val3"}}}
+
     varList = znodeString.split(',')
     varDict = {}
 
     for var in varList[1:]:
-       varDict[el.split(':')[0]] = el.split(':')[1]
+       varDict[var.split(':')[0]] = var.split(':')[1]
+       
+    groupName, hostName = varList[0].split('-')[0], varList[0].split('-')[1]
+    return { groupName : { hostName : varDict }}
 
-    return {varList[0]:varDict}
 
+# def addZnode(znodeDict):
+#     '''
+#     Adds new znode with hostvars.
+#     '''
 
-def addZnode(znodeDict):
-    '''
-    Adds new znode with optional hostvars.
+#     zk = KazooClient(hosts=cfg.zkServers)
+#     zk.start()
+
+#     hostName = znodeDict.keys()[0]
+#     hostPath = "{0}/groups/{1}".format(cfg.aPath, hostName)
+#     # print hostPath
+#     zk.create(hostPath)
+
+#     tmpDict = znodeDict[znodeDict.keys()[0]]
+
+#     for key in tmpDict:
+#        varPath = "{0}/groups/{1}/{2}".format(cfg.aPath, hostName,  key)
+#        varVal  = tmpDict[key]
+#        zk.create(varPath, varVal)
+#     zk.stop()
+
     
-    Returns dict.
-    '''
-
-    zk = KazooClient(hosts=cfg.zkServers)
-    zk.start()
-
-    
-
-    
-    groupList = zk.get_children("{}/groups".format(cfg.aPath))
-    groupDict = {}
-    
-    for group in groupList:
-       path     = "{0}/groups/{1}".format(cfg.aPath, group)
-       children = zk.get_children(path)
-       groupDict[group] = children
-    
-    zk.stop()
-
-    return groupDict
-
-
-
 def hostVarsShow(name, dumpDict):
     '''
     Show hostvars for a given name of host or group.
@@ -179,8 +179,11 @@ def main():
        
     if oParser()['inventoryMode'] == 'ansible':
        print json.dumps(ansibleInventoryDump())
-                           
 
+    if type(oParser()['addMode']) != 'NoneType':
+       znodeDict = splitZnodeString(oParser()['addMode'])
+       addZnode(znodeDict)
+                                  
         
 if __name__ == "__main__":
    main()
