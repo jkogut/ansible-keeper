@@ -40,7 +40,7 @@ def oParser():
     parser = OptionParser(usage="usage: %prog [opts] <args>",
                           version="%prog 0.0.1")
     parser.add_option("-A", nargs = 1,
-                      help="add host: newhost,var1:value1,var2:value2,var3:value3")
+                      help="add host: groupname:newhost1,var1:value1,var2:value2,var3:value3")
     parser.add_option("-D", nargs = 1,
                       help="delete host and its hostvars")
     parser.add_option("-U", nargs = 1,
@@ -70,8 +70,8 @@ def splitZnodeString(znodeString):
     '''
 
     ## spliting example string into dictionary:
-    ## example string: groupname:hostname,var1:val1,var2:val2,var3:val3
-    ## desired dict  : {"groupname":{"hostname":{"var1":"val1", "var2":"val2", "var3":"val3"}}}
+    ## example string: groupname:hostname1,var1:val1,var2:val2,var3:val3
+    ## desired dict  : {"groupname":{"hostname1":{"var1":"val1", "var2":"val2", "var3":"val3"}}}
 
     varList = znodeString.split(',')
     varDict = {}
@@ -83,26 +83,34 @@ def splitZnodeString(znodeString):
     return { groupName : { hostName : varDict }}
 
 
-# def addZnode(znodeDict):
-#     '''
-#     Adds new znode with hostvars.
-#     '''
+def addZnode(znodeDict):
+    '''
+    Adds new znode with hostvars.
+    '''
 
-#     zk = KazooClient(hosts=cfg.zkServers)
-#     zk.start()
+    zk = KazooClient(hosts=cfg.zkServers)
+    zk.start()
 
-#     hostName = znodeDict.keys()[0]
-#     hostPath = "{0}/groups/{1}".format(cfg.aPath, hostName)
-#     # print hostPath
-#     zk.create(hostPath)
+    groupName = znodeDict.keys()[0]
+    hostName  = znodeDict[groupName].keys()[0]
+    groupPath = "{0}/groups/{1}".format(cfg.aPath, groupName)
+    hostPath  = "{0}/{1}".format(groupPath, hostName)
 
-#     tmpDict = znodeDict[znodeDict.keys()[0]]
+    # print groupName, hostName, groupPath, hostPath
+    # for key in znodeDict[groupName][hostName]:
+    #     print "{0}/{1}".format(hostPath, key)
 
-#     for key in tmpDict:
-#        varPath = "{0}/groups/{1}/{2}".format(cfg.aPath, hostName,  key)
-#        varVal  = tmpDict[key]
-#        zk.create(varPath, varVal)
-#     zk.stop()
+    if zk.exists(groupPath):
+       zk.create(hostPath)
+    else:
+       zk.ensure_path(hostPath)
+
+    for key in znodeDict[groupName][hostName]:
+       varPath = "{0}/{1}".format(hostPath, key)
+       varVal  = znodeDict[groupName][hostName][key]
+       zk.create(varPath, varVal)
+
+    zk.stop()
 
     
 def hostVarsShow(name, dumpDict):
@@ -182,6 +190,7 @@ def main():
 
     if type(oParser()['addMode']) != 'NoneType':
        znodeDict = splitZnodeString(oParser()['addMode'])
+       print znodeDict
        addZnode(znodeDict)
                                   
         
