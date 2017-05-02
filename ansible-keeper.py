@@ -70,7 +70,7 @@ def splitZnodeString(znodeString):
     '''
 
     ## spliting example string into dictionary:
-    ## example string: groupname-hostname,var1:val1,var2:val2,var3:val3
+    ## example string: groupname:hostname,var1:val1,var2:val2,var3:val3
     ## desired dict  : {"groupname":{"hostname":{"var1":"val1", "var2":"val2", "var3":"val3"}}}
 
     varList = znodeString.split(',')
@@ -79,7 +79,7 @@ def splitZnodeString(znodeString):
     for var in varList[1:]:
        varDict[var.split(':')[0]] = var.split(':')[1]
        
-    groupName, hostName = varList[0].split('-')[0], varList[0].split('-')[1]
+    groupName, hostName = varList[0].split(':')[0], varList[0].split(':')[1]
     return { groupName : { hostName : varDict }}
 
 
