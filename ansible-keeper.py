@@ -34,13 +34,13 @@ def oParser():
     '''
     Commandline options parsing function.
 
-    Returns a dictionary (parsed options).
+    Returns dict (parsed options).
     '''
 
     parser = OptionParser(usage="usage: %prog [opts] <args>",
                           version="%prog 0.0.1")
     parser.add_option("-A", nargs = 1,
-                      help="add host: you can provide comma separated hostvars")
+                      help="add host: newhost,var1:value1,var2:value2,var3:value3")
     parser.add_option("-D", nargs = 1,
                       help="delete host and its hostvars")
     parser.add_option("-U", nargs = 1,
@@ -56,32 +56,75 @@ def oParser():
     
     if (opts.A or opts.D or opts.U or opts.I or opts.S) == None:
 
-        parser.print_help()
-        exit(-1)
+       parser.print_help()
+       exit(-1)
         
     return {'addMode':opts.A, 'deleteMode':opts.D, 'updateMode':opts.U, 'showMode':opts.S, 'inventoryMode':opts.I}
-                                                                    
+
+
+def splitZnodeString(znodeString):
+    '''
+    Znode string parser.
+
+    Returns dict.
+    '''
+
+    varList = znodeString.split(',')
+    varDict = {}
+
+    for var in varList[1:]:
+       varDict[el.split(':')[0]] = el.split(':')[1]
+
+    return {varList[0]:varDict}
+
+
+def addZnode(znodeDict):
+    '''
+    Adds new znode with optional hostvars.
+    
+    Returns dict.
+    '''
+
+    zk = KazooClient(hosts=cfg.zkServers)
+    zk.start()
+
+    
+
+    
+    groupList = zk.get_children("{}/groups".format(cfg.aPath))
+    groupDict = {}
+    
+    for group in groupList:
+       path     = "{0}/groups/{1}".format(cfg.aPath, group)
+       children = zk.get_children(path)
+       groupDict[group] = children
+    
+    zk.stop()
+
+    return groupDict
+
+
 
 def hostVarsShow(name, dumpDict):
     '''
     Show hostvars for a given name of host or group.
     
-    Returns a JSON dump.
+    Returns JSON dump.
     '''
 
     if name in tmpDict.keys():
-        for host in tmpDict[name]['hosts']:
-            print host  
+       for host in tmpDict[name]['hosts']:
+          print host  
            
     else:
-        pass
+       pass
  
 
 def inventoryDump():
     '''
     Inventory dump for a given list of zookeeper servers and ansible-keeper path.
     
-    Returns a dict.
+    Returns dict.
     '''
 
     zk = KazooClient(hosts=cfg.zkServers, read_only = True)
@@ -91,9 +134,9 @@ def inventoryDump():
     groupDict = {}
     
     for group in groupList:
-        path     = "{0}/groups/{1}".format(cfg.aPath, group)
-        children = zk.get_children(path)
-        groupDict[group] = children
+       path     = "{0}/groups/{1}".format(cfg.aPath, group)
+       children = zk.get_children(path)
+       groupDict[group] = children
     
     zk.stop()
 
@@ -104,7 +147,7 @@ def ansibleInventoryDump():
     '''
     Ansible compliant inventory dump for a given list of zookeeper servers and ansible-keeper path.
     
-    Returns a dict.
+    Returns dict.
     '''
 
     zk = KazooClient(hosts=cfg.zkServers, read_only = True)
@@ -114,12 +157,12 @@ def ansibleInventoryDump():
     groupDict = {}
     
     for group in groupList:
-        path     = "{0}/groups/{1}".format(cfg.aPath, group)
-        children = zk.get_children(path)
-        tmpDict  = {}
-        tmpDict['hosts'] = children
-        tmpDict['vars']  = {"a":"b"}
-        groupDict[group] = tmpDict
+       path     = "{0}/groups/{1}".format(cfg.aPath, group)
+       children = zk.get_children(path)
+       tmpDict  = {}
+       tmpDict['hosts'] = children
+       tmpDict['vars']  = {"a":"b"}
+       groupDict[group] = tmpDict
     
     zk.stop()
 
@@ -132,12 +175,12 @@ def main():
     '''
     
     if oParser()['inventoryMode'] == 'true':
-        print json.dumps(inventoryDump())
+       print json.dumps(inventoryDump())
        
     if oParser()['inventoryMode'] == 'ansible':
-        print json.dumps(ansibleInventoryDump())
+       print json.dumps(ansibleInventoryDump())
                            
 
         
 if __name__ == "__main__":
-    main()
+   main()
