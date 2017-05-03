@@ -214,12 +214,12 @@ def main():
     if oParser()['inventoryMode'] == 'ansible':
        print json.dumps(ansibleInventoryDump())
 
-    if type(oParser()['addMode']) != 'NoneType':
+    if oParser()['addMode'] is not None:
        znodeDict = splitZnodeString(oParser()['addMode'])
        print znodeDict
        addZnode(znodeDict)
 
-    if type(oParser()['deleteMode']) != 'NoneType':
+    if oParser()['deleteMode'] is not None:
        deleteZnode(oParser()['deleteMode'])
                                   
         
