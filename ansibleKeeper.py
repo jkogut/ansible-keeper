@@ -40,9 +40,9 @@ def oParser():
     parser = OptionParser(usage="usage: %prog [opts] <args>",
                           version="%prog 0.0.1")
     parser.add_option("-A", nargs = 1,
-                      help="add host: groupname:newhost1,var1:value1,var2:value2,var3:value3")
+                      help="add host: <groupname:newhost1,var1:value1,var2:value2,var3:value3>")
     parser.add_option("-D", nargs = 1,
-                      help="delete host and its hostvars")
+                      help="delete host recursively: <groupname:newhost1>")
     parser.add_option("-U", nargs = 1,
                       help="update host with comma separated hostvars")
     parser.add_option("-S", nargs = 1,
@@ -80,6 +80,7 @@ def splitZnodeString(znodeString):
        varDict[var.split(':')[0]] = var.split(':')[1]
        
     groupName, hostName = varList[0].split(':')[0], varList[0].split(':')[1]
+
     return { groupName : { hostName : varDict }}
 
 
@@ -112,6 +113,31 @@ def addZnode(znodeDict):
 
     zk.stop()
 
+
+def deleteZnode(znodeString):
+    '''
+    Deletes znode with hostvars for a given tuple of groupname:hostname.
+    '''
+
+    zk = KazooClient(hosts=cfg.zkServers)
+    zk.start()
+
+    groupName = znodeString.split(':')[0]
+    hostName  = znodeString.split(':')[1]
+    groupPath = "{0}/groups/{1}".format(cfg.aPath, groupName)
+    hostPath  = "{0}/{1}".format(groupPath, hostName)
+
+    # print groupName, hostName, groupPath, hostPath
+    # for key in znodeDict[groupName][hostName]:
+    #     print "{0}/{1}".format(hostPath, key)
+
+    if len(zk.get_children(groupPath)) == 1:
+       zk.delete(groupPath, recursive=True)
+    else:
+       zk.delete(hostPath, recursive=True)
+
+    zk.stop()
+    
     
 def hostVarsShow(name, dumpDict):
     '''
@@ -192,6 +218,9 @@ def main():
        znodeDict = splitZnodeString(oParser()['addMode'])
        print znodeDict
        addZnode(znodeDict)
+
+    if type(oParser()['deleteMode']) != 'NoneType':
+       deleteZnode(oParser()['deleteMode'])
                                   
         
 if __name__ == "__main__":
