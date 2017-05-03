@@ -1,5 +1,5 @@
 '''       
-Tests for migrate_druid_segments_hdfs2s3.py.
+Tests for ansibleKeeper
 '''
 
 __author__ = "Jan Kogut"
@@ -36,7 +36,6 @@ def test_zookeeperServerConnection():
     '''
 
     ## example server list string 'zoo1.dmz:2181,zoo2.dmz:2181,zoo3.dmz:2181'
-
     zkSrvList = cfg.zkServers.split(',')
     
     for srv in zkSrvList:
@@ -50,6 +49,26 @@ def test_zookeeperServerConnection():
 
         zk.stop()
 
+        
+def test_addZnode():
+    '''
+    Test if znode added with addZnode() exists.
+    '''
+
+    testDict = {"testgroupname1":{"testhostname1":{"var1":"val1", "var2":"val2", "var3":"val3"}}}
+
+    zk = KazooClient(hosts=cfg.zkServers)
+    zk.start()
+    
+    addZnode(testDict)
+    testHostPath = "{0}/groups/testgroupname1/testhostname1".format(cfg.aPath)
+    for key in testDict['testgroupname1']['testhostname1'].keys():
+        zkGet     = zk.get('{0}/{1}'.format(testHostPath,key))[0]
+        testValue = testDict['testgroupname1']['testhostname1'][key]
+        assert zkGet == testValue
+
+    zk.stop()
+            
         
 def test_splitZnodeString():
     '''
