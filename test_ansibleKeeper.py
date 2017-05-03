@@ -14,7 +14,7 @@ import pytest
 from ansibleKeeper import *
 from kazoo.client import KazooClient
 from kazoo.handlers.threading import *
-
+from kazoo.exceptions import *
 
 def test_zookeeperClusterConnection():
     '''
@@ -68,8 +68,26 @@ def test_addZnode():
         assert zkGet == testValue
 
     zk.stop()
+
+
+def test_deleteZnode():
+    '''
+    Test if znode added with addZnode() exists.
+    '''
+
+    testString = "testgroupname1:testhostname1"
+
+    zk = KazooClient(hosts=cfg.zkServers)
+    zk.start()
+    
+    deleteZnode(testString)
+    testHostPath = "{0}/groups/testgroupname1/testhostname1".format(cfg.aPath)
+    
+    assert zk.exists(testHostPath) == None
+    
+    zk.stop()
+
             
-        
 def test_splitZnodeString():
     '''
     Test for splitZnodeString() parser.
