@@ -16,6 +16,24 @@ from kazoo.client import KazooClient
 from kazoo.handlers.threading import *
 from kazoo.exceptions import *
 
+
+## START of TestVars: global vars for tests 
+##################################################
+
+class TestVars(object):
+    """ Test vars section """
+    pass
+            
+tst = TestVars()
+
+tst.testDict  = {"testgroupname1":{"testhostname1":{"var1":"val1", "var2":"val2", "var3":"val3"}}}
+tst.groupName = tst.testDict.keys()[0]
+tst.hostName  = tst.testDict[tst.groupName].keys()[0]
+
+#################################################
+## END of TestVars: global vars for tests 
+
+
 def test_zookeeperClusterConnection():
     '''
     Test if we can connect to zookeeper cluster servers.
@@ -55,16 +73,14 @@ def test_addZnode():
     Test if znode added with addZnode() exists.
     '''
 
-    testDict = {"testgroupname1":{"testhostname1":{"var1":"val1", "var2":"val2", "var3":"val3"}}}
-
     zk = KazooClient(hosts=cfg.zkServers)
     zk.start()
     
-    addZnode(testDict)
-    testHostPath = "{0}/groups/testgroupname1/testhostname1".format(cfg.aPath)
-    for key in testDict['testgroupname1']['testhostname1'].keys():
+    addZnode(tst.testDict)
+    testHostPath = "{0}/groups/{1}/{2}".format(cfg.aPath, tst.groupName, tst.hostName)
+    for key in tst.testDict[tst.groupName][tst.hostName].keys():
         zkGet     = zk.get('{0}/{1}'.format(testHostPath,key))[0]
-        testValue = testDict['testgroupname1']['testhostname1'][key]
+        testValue = tst.testDict[tst.groupName][tst.hostName][key]
         assert zkGet == testValue
 
     zk.stop()
