@@ -43,6 +43,8 @@ def oParser():
                       help="add host: <groupname:newhost1,var1:value1,var2:value2,var3:value3>")
     parser.add_option("-D", nargs = 1,
                       help="delete host recursively: <groupname:newhost1>")
+    parser.add_option("-G", nargs = 1,
+                      help="delete group recursively: <groupname>")
     parser.add_option("-U", nargs = 1,
                       help="update host with comma separated hostvars")
     parser.add_option("-S", nargs = 1,
@@ -54,19 +56,20 @@ def oParser():
     (opts, args) = parser.parse_args()
     
     
-    if (opts.A or opts.D or opts.U or opts.I or opts.S) == None:
+    if (opts.A or opts.D or opts.G or opts.U or opts.I or opts.S) == None:
 
        parser.print_help()
        exit(-1)
         
-    return {'addMode':opts.A, 'deleteMode':opts.D, 'updateMode':opts.U, 'showMode':opts.S, 'inventoryMode':opts.I}
+    return {'addMode':opts.A, 'deleteMode':opts.D, 'deleteGroupMode':opts.G, 'updateMode':opts.U,
+            'showMode':opts.S, 'inventoryMode':opts.I}
 
 
 def splitZnodeString(znodeString):
     '''
-    Znode string parser.
+    Parse string for commandline opts: <-A|-U>.
 
-    Returns dict.
+    Return dict.
     '''
 
     ## spliting example string into dictionary:
@@ -86,9 +89,9 @@ def splitZnodeString(znodeString):
 
 def addZnode(znodeDict):
     '''
-    Adds new znode with hostvars.
+    Add new znode with hostvars.
 
-    Returns a string (ADDED    ==> host: <hostname> to group: <groupname>)
+    Return a string (ADDED    ==> host: <hostname> to group: <groupname>).
     '''
 
     zk = KazooClient(hosts=cfg.zkServers)
@@ -114,15 +117,14 @@ def addZnode(znodeDict):
        zk.create(varPath, varVal)
 
     zk.stop()
-
     return "ADDED   ==> host: {0} to group: {1}".format(hostName, groupName)
     
 
 def deleteZnode(znodeString):
     '''
-    Deletes znode with hostvars for a given tuple of groupname:hostname.
+    Delete znode with hostvars for a given tuple of <groupname:hostname>.
 
-    Returns a string (DELETED  ==> host: <hostname> in group: <groupname>)
+    Return a string (DELETED||EXISTS  ==> host: <hostname> in group: <groupname>).
     '''
 
     zk = KazooClient(hosts=cfg.zkServers)
@@ -143,8 +145,28 @@ def deleteZnode(znodeString):
        zk.delete(hostPath, recursive=True)
 
     zk.stop()
-
     return "DELETED ==> host: {0} in group: {1}".format(hostName, groupName)
+
+
+def deleteGroupZnode(znodeGroupString):
+    '''
+    Delete group of znodes with hostvars for a given string: <groupname>.
+
+    Return a string (DELETED||EXISTS  ==> group: <groupname>).
+    '''
+
+    zk = KazooClient(hosts=cfg.zkServers)
+    zk.start()
+    
+    groupPath = "{0}/groups/{1}".format(cfg.aPath, znodeGroupString)
+
+    if zk.exists(groupPath) is None:
+       print "ERROR  ==> could not delete group: {0} that does not exist !!!".format(znodeGroupString)
+    else:
+       zk.delete(groupPath, recursive=True)
+
+    zk.stop()
+    return "DELETED ==> group: {0}".format(znodeGroupString)
 
 
 def hostVarsShow(name, dumpDict):
@@ -181,7 +203,6 @@ def inventoryDump():
        groupDict[group] = children
     
     zk.stop()
-
     return groupDict
 
 
@@ -207,7 +228,6 @@ def ansibleInventoryDump():
        groupDict[group] = tmpDict
     
     zk.stop()
-
     return groupDict
         
 
@@ -228,6 +248,9 @@ def main():
 
     if oParser()['deleteMode'] is not None:
        print deleteZnode(oParser()['deleteMode'])
+
+    if oParser()['deleteGroupMode'] is not None:
+       print deleteGroupZnode(oParser()['deleteGroupMode'])
                                   
         
 if __name__ == "__main__":
