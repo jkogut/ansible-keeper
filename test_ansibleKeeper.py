@@ -29,7 +29,8 @@ tst = TestVars()
 tst.testDict  = {"testgroupname1":{"testhostname1":{"var1":"val1", "var2":"val2", "var3":"val3"}}}
 tst.groupName = tst.testDict.keys()[0]
 tst.hostName  = tst.testDict[tst.groupName].keys()[0]
-tst.HostPath  = "{0}/groups/{1}/{2}".format(cfg.aPath, tst.groupName, tst.hostName)
+tst.hostPath  = "{0}/groups/{1}/{2}".format(cfg.aPath, tst.groupName, tst.hostName)
+tst.groupPath  = "{0}/groups/{1}".format(cfg.aPath, tst.groupName)
 tst.delString = "{0}:{1}".format(tst.groupName, tst.hostName)
 
 #################################################
@@ -74,13 +75,14 @@ def test_addZnode():
     '''
     Test if znode added with addZnode() exists.
     '''
+    
+    addZnode(tst.testDict)
 
     zk = KazooClient(hosts=cfg.zkServers)
     zk.start()
-    
-    addZnode(tst.testDict)
+
     for key in tst.testDict[tst.groupName][tst.hostName].keys():
-        zkGet     = zk.get('{0}/{1}'.format(tst.HostPath, key))[0]
+        zkGet     = zk.get('{0}/{1}'.format(tst.hostPath, key))[0]
         testValue = tst.testDict[tst.groupName][tst.hostName][key]
         assert zkGet == testValue
 
@@ -89,22 +91,23 @@ def test_addZnode():
 
 def test_deleteZnode():
     '''
-    Test if znode added with addZnode() exists.
+    Test that znode deleted with deleteZnode() does not exist.
     '''
 
-    zk = KazooClient(hosts=cfg.zkServers)
-    zk.start()
-
+    
     ## 1. run deleteZnode(var) function to delete given Znode provided in tst.delString 
     ## 2. check Znode path against that string 
     
     deleteZnode(tst.delString)
-    
-    assert zk.exists(tst.HostPath) == None
+
+    zk = KazooClient(hosts=cfg.zkServers)
+    zk.start()
+
+    assert zk.exists(tst.hostPath) == None
     
     zk.stop()
-
-            
+  
+       
 def test_splitZnodeString():
     '''
     Test for splitZnodeString() parser.
