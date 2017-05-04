@@ -87,6 +87,8 @@ def splitZnodeString(znodeString):
 def addZnode(znodeDict):
     '''
     Adds new znode with hostvars.
+
+    Returns a string (ADDED    ==> host: <hostname> to group: <groupname>)
     '''
 
     zk = KazooClient(hosts=cfg.zkServers)
@@ -113,10 +115,14 @@ def addZnode(znodeDict):
 
     zk.stop()
 
+    return "ADDED   ==> host: {0} to group: {1}".format(hostName, groupName)
+    
 
 def deleteZnode(znodeString):
     '''
     Deletes znode with hostvars for a given tuple of groupname:hostname.
+
+    Returns a string (DELETED  ==> host: <hostname> in group: <groupname>)
     '''
 
     zk = KazooClient(hosts=cfg.zkServers)
@@ -137,8 +143,10 @@ def deleteZnode(znodeString):
        zk.delete(hostPath, recursive=True)
 
     zk.stop()
-    
-    
+
+    return "DELETED ==> host: {0} in group: {1}".format(hostName, groupName)
+
+
 def hostVarsShow(name, dumpDict):
     '''
     Show hostvars for a given name of host or group.
@@ -216,11 +224,10 @@ def main():
 
     if oParser()['addMode'] is not None:
        znodeDict = splitZnodeString(oParser()['addMode'])
-       print znodeDict
-       addZnode(znodeDict)
+       print addZnode(znodeDict)
 
     if oParser()['deleteMode'] is not None:
-       deleteZnode(oParser()['deleteMode'])
+       print deleteZnode(oParser()['deleteMode'])
                                   
         
 if __name__ == "__main__":
