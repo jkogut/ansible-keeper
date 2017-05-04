@@ -94,7 +94,6 @@ def test_deleteZnode():
     Test that znode deleted with deleteZnode() does not exist.
     '''
 
-    
     ## 1. run deleteZnode(var) function to delete given Znode provided in tst.delString 
     ## 2. check Znode path against that string 
     
@@ -104,6 +103,26 @@ def test_deleteZnode():
     zk.start()
 
     assert zk.exists(tst.hostPath) == None
+    
+    zk.stop()
+
+    
+def test_deleteGroupZnode():
+    '''
+    Test that znode deleted with deleteGroupZnode() does not exist.
+    '''
+
+    ## 1. run addZnode(var) function to create given Znode provided in tst.testDict 
+    ## 2. run deleteGroupZnode(var) function to delete given Znode provided in tst.delString 
+    ## 3. check Znode path against that string 
+
+    addZnode(tst.testDict)
+    deleteGroupZnode(tst.groupName)
+
+    zk = KazooClient(hosts=cfg.zkServers)
+    zk.start()
+
+    assert zk.exists(tst.groupPath) == None
     
     zk.stop()
   
