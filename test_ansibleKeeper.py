@@ -42,7 +42,7 @@ def test_zookeeperClusterConnection():
     '''
 
     ## example server list string 'zoo1.dmz:2181,zoo2.dmz:2181,zoo3.dmz:2181'
-    zk = KazooClient(hosts=cfg.zkServers)
+    zk = KazooClient(hosts=cfg.zkServers, read_only = True)
     zk.start()
         
     assert type(zk).__name__ == 'KazooClient'
@@ -60,7 +60,7 @@ def test_zookeeperServerConnection():
     
     for srv in zkSrvList:
         try:
-            zk = KazooClient(hosts=srv)
+            zk = KazooClient(hosts=srv, read_only = True)
             zk.start()
         
             assert type(zk).__name__ == 'KazooClient'
