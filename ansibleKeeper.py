@@ -169,19 +169,31 @@ def deleteGroupZnode(znodeGroupString):
     return "DELETED ==> group: {0}".format(znodeGroupString)
 
 
-def hostVarsShow(name, dumpDict):
+def hostVarsShow(znodeString):
     '''
-    Show hostvars for a given name of host or group.
+    Show hostvars for a given <groupname:hostname>.
     
-    Returns JSON dump.
+    Return dict.
     '''
 
-    if name in tmpDict.keys():
-       for host in tmpDict[name]['hosts']:
-          print host  
-           
+    zk = KazooClient(hosts=cfg.zkServers)
+    zk.start()
+    
+    groupName = znodeString.split(':')[0]
+    hostName  = znodeString.split(':')[1]
+    groupPath = "{0}/groups/{1}".format(cfg.aPath, groupName)
+    hostPath  = "{0}/{1}".format(groupPath, hostName)
+
+    if zk.exists(hostPath) is None:
+       print "ERROR  ==> no such hostname: {0} in group {1} !!!".format(hostName, groupName)
     else:
-       pass
+       hostVarList = zk.get_children(hostPath)
+       elDict = {}
+       for host in hostVarList:
+          elDict[host] = zk.get('{0}/{1}'.format(groupPath,host))[0]
+       
+    zk.stop()
+    return elDict
  
 
 def inventoryDump():
