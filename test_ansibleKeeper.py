@@ -29,8 +29,9 @@ tst = TestVars()
 tst.testDict  = {"testgroupname1":{"testhostname1":{"var1":"val1", "var2":"val2", "var3":"val3"}}}
 tst.groupName = tst.testDict.keys()[0]
 tst.hostName  = tst.testDict[tst.groupName].keys()[0]
+tst.varDict   = tst.testDict[tst.groupName][tst.hostName]
 tst.hostPath  = "{0}/groups/{1}/{2}".format(cfg.aPath, tst.groupName, tst.hostName)
-tst.groupPath  = "{0}/groups/{1}".format(cfg.aPath, tst.groupName)
+tst.groupPath = "{0}/groups/{1}".format(cfg.aPath, tst.groupName)
 tst.delString = "{0}:{1}".format(tst.groupName, tst.hostName)
 
 #################################################
@@ -125,8 +126,29 @@ def test_deleteGroupZnode():
     assert zk.exists(tst.groupPath) == None
     
     zk.stop()
-  
-       
+
+
+def test_hostVarsShow():
+    '''
+    Test hostVarsShow() function.
+    '''
+
+    ## 1. run addZnode(var) function to create given Znode with vars provided in tst.testDict 
+    ## 2. test hostVarsShow() against vars and values provided in tst.testDict 
+    ## 3. run deleteGroupZnode(var) function to delete given Znode provided in tst.delString 
+
+    addZnode(tst.testDict)
+
+    zk = KazooClient(hosts=cfg.zkServers)
+    zk.start()
+
+    assert hostVarsShow(tst.delString) == tst.varDict
+    
+    zk.stop()
+    
+    deleteGroupZnode(tst.groupName)
+
+    
 def test_splitZnodeString():
     '''
     Test for splitZnodeString() parser.
