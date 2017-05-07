@@ -76,7 +76,18 @@ def test_addZnode():
     '''
     Test if znode added with addZnode() exists.
     '''
+
+    ## 1. check if Znode provided with tst.groupPath exists
+    ## 2. run addZnode() function
+    ## 2. check hostname vars values against testes values (from tst.testDict)
     
+    zk = KazooClient(hosts=cfg.zkServers)
+    zk.start()
+
+    if zk.exists(tst.groupPath) is not None:
+        zk.delete(tst.groupPath, recursive=True)
+    zk.stop()
+
     addZnode(tst.testDict)
 
     zk = KazooClient(hosts=cfg.zkServers)
