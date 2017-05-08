@@ -216,7 +216,7 @@ def hostVarsShow(znodeString):
           for host in valDict.keys():
              varDict = {}
              for var in valDict[host]:
-                varDict[var] = zk.get('{0}'.format(tmpHostPath))[0]
+                varDict[var] = zk.get('{0}/{1}'.format(tmpHostPath, var))[0]
                 valDict[host] = varDict
               
     zk.stop()
