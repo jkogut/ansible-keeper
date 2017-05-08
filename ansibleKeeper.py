@@ -192,8 +192,8 @@ def hostVarsShow(znodeString):
     else:
        hostVarList = zk.get_children(hostPath)
        elDict = {}
-       for host in hostVarList:
-          elDict[host] = zk.get('{0}/{1}'.format(groupPath,host))[0]
+       for var in hostVarList:
+          elDict[var] = zk.get('{0}/{1}'.format(hostPath, var))[0]
        
     zk.stop()
     return elDict
@@ -266,6 +266,9 @@ def main():
 
     if oParser()['deleteGroupMode'] is not None:
        print deleteGroupZnode(oParser()['deleteGroupMode'])
+
+    if oParser()['showMode'] is not None:
+       print hostVarsShow(oParser()['showMode'])
                                   
         
 if __name__ == "__main__":
