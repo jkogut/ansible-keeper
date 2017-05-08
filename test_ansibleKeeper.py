@@ -79,7 +79,7 @@ def test_addZnode():
 
     ## 1. check if Znode provided with tst.groupPath exists
     ## 2. run addZnode() function
-    ## 2. check hostname vars values against testes values (from tst.testDict)
+    ## 3. check hostname vars values against testes values (from tst.testDict)
     
     zk = KazooClient(hosts=cfg.zkServers)
     zk.start()
