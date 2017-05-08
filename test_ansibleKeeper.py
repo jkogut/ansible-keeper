@@ -153,7 +153,10 @@ def test_hostVarsShow():
     zk = KazooClient(hosts=cfg.zkServers)
     zk.start()
 
-    assert hostVarsShow(tst.delString) == tst.varDict
+    testList = [(tst.delString, tst.varDict),(tst.groupName, tst.testDict)]
+    
+    for val in testList:
+        assert hostVarsShow(val[0]) == val[1]
     
     zk.stop()
     
