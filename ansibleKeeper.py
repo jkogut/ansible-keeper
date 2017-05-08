@@ -48,7 +48,7 @@ def oParser():
     parser.add_option("-U", nargs = 1,
                       help="update host with comma separated hostvars")
     parser.add_option("-S", nargs = 1,
-                      help="show hostvars for a given hostname or groupname")
+                      help="show hostvars for a given hostname or groupname: <groupname:newhost1> or <groupname>")
     parser.add_option("-I", nargs = 1,
                       help="inventory mode: dumps inventory in json format from zookeeper")
 
@@ -174,30 +174,54 @@ def deleteGroupZnode(znodeGroupString):
 
 def hostVarsShow(znodeString):
     '''
-    Show hostvars for a given <groupname:hostname>.
+    Show hostvars for a given <groupname:hostname> or <groupname>.
     
     Return dict.
     '''
 
     zk = KazooClient(hosts=cfg.zkServers)
     zk.start()
-    
-    groupName = znodeString.split(':')[0]
-    hostName  = znodeString.split(':')[1]
-    groupPath = "{0}/groups/{1}".format(cfg.aPath, groupName)
-    hostPath  = "{0}/{1}".format(groupPath, hostName)
 
-    if zk.exists(hostPath) is None:
-       print "ERROR  ==> no such hostname: {0} in group {1} !!!".format(hostName, groupName)
-    else:
-       hostVarList = zk.get_children(hostPath)
-       elDict = {}
-       for var in hostVarList:
-          elDict[var] = zk.get('{0}/{1}'.format(hostPath, var))[0]
+    if ':' in znodeString:
+       groupName = znodeString.split(':')[0]
+       hostName  = znodeString.split(':')[1]
+       groupPath = "{0}/groups/{1}".format(cfg.aPath, groupName)
+       hostPath  = "{0}/{1}".format(groupPath, hostName)
        
+       if zk.exists(hostPath) is None:
+          print "ERROR  ==> no such hostname: {0} in group {1} !!!".format(hostName, groupName)
+
+       else:
+          hostVarList = zk.get_children(hostPath)
+          valDict = {}
+
+          for var in hostVarList:
+             valDict[var] = zk.get('{0}/{1}'.format(hostPath, var))[0]
+       
+    else:
+       groupName = znodeString
+       groupPath = "{0}/groups/{1}".format(cfg.aPath, groupName)
+
+       if zk.exists(groupPath) is None:
+          print "ERROR  ==> no such groupname: {0} !!!".format(groupName)
+
+       else:
+          hostList = zk.get_children(groupPath)
+          valDict = {}
+          
+          for host in hostList:
+             tmpHostPath    = '{0}/{1}'.format(groupPath, host)
+             valDict[host] = zk.get_children('{0}'.format(tmpHostPath))
+
+          for host in valDict.keys():
+             varDict = {}
+             for var in valDict[host]:
+                varDict[var] = zk.get('{0}'.format(tmpHostPath))[0]
+                valDict[host] = varDict
+              
     zk.stop()
-    return elDict
- 
+    return valDict
+
 
 def inventoryDump():
     '''
