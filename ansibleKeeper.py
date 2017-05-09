@@ -142,6 +142,10 @@ def deleteZnode(znodeString):
     # for key in znodeDict[groupName][hostName]:
     #     print "{0}/{1}".format(hostPath, key)
 
+    if zk.exists(hostPath) is None:
+       zk.stop()   
+       return "ERROR  ==> could not delete host: {0} that does not exist !!!".format(hostName)
+
     if len(zk.get_children(groupPath)) == 1:
        zk.delete(groupPath, recursive=True)
     else:
@@ -292,7 +296,7 @@ def main():
        print deleteGroupZnode(oParser()['deleteGroupMode'])
 
     if oParser()['showMode'] is not None:
-       print hostVarsShow(oParser()['showMode'])
+       print json.dumps(hostVarsShow(oParser()['showMode']))
                                   
         
 if __name__ == "__main__":
