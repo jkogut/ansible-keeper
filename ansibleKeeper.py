@@ -189,6 +189,8 @@ def hostVarsShow(znodeString):
     zk = KazooClient(hosts=cfg.zkServers)
     zk.start()
 
+
+
     if ':' in znodeString:
        groupName = znodeString.split(':')[0]
        hostName  = znodeString.split(':')[1]
@@ -225,6 +227,7 @@ def hostVarsShow(znodeString):
           for host in valDict.keys():
              varDict = {}
              for var in valDict[host]:
+                tmpHostPath    = '{0}/{1}'.format(groupPath, host)
                 varDict[var] = zk.get('{0}/{1}'.format(tmpHostPath, var))[0]
                 valDict[host] = varDict
               
