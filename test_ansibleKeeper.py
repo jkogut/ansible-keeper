@@ -113,11 +113,26 @@ def test_deleteZnode():
 
     zk = KazooClient(hosts=cfg.zkServers)
     zk.start()
-
-    assert zk.exists(tst.hostPath) == None
     
+    assert zk.exists(tst.hostPath) == None
+     
     zk.stop()
 
+
+def test_deleteZnodeExistance():
+    '''
+    Test that deleteZnode() will inform us that we want to delete nonexistent Znode.
+    '''
+
+    zk = KazooClient(hosts=cfg.zkServers)
+    zk.start()
+
+    errString = 'ERROR  ==> could not delete host: {} that does not exist !!!'.format(tst.hostName)
+    
+    assert deleteZnode(tst.delString) == errString
+     
+    zk.stop()
+    
     
 def test_deleteGroupZnode():
     '''
