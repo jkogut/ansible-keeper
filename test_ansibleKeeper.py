@@ -26,7 +26,14 @@ class TestVars(object):
             
 tst = TestVars()
 
-tst.testDict  = {"testgroupname1":{"testhostname1":{"var1":"val1", "var2":"val2", "var3":"val3"}}}
+tst.testDict  = {"testgroupname1":
+                 {
+                  "testhostname1":{"var1":"val1", "var2":"val2", "var3":"val3"},
+                  "testhostname2":{"var1":"val1", "var2":"val2", "var3":"val3"},
+                  "testhostname3":{"var1":"val1", "var2":"val2", "var3":"val3"}
+                 }
+}
+
 tst.groupName = tst.testDict.keys()[0]
 tst.hostName  = tst.testDict[tst.groupName].keys()[0]
 tst.varDict   = tst.testDict[tst.groupName][tst.hostName]
@@ -34,6 +41,7 @@ tst.hostPath  = "{0}/groups/{1}/{2}".format(cfg.aPath, tst.groupName, tst.hostNa
 tst.groupPath = "{0}/groups/{1}".format(cfg.aPath, tst.groupName)
 tst.delString = "{0}:{1}".format(tst.groupName, tst.hostName)
 
+tst.oneDict   = {tst.groupName:{tst.hostName:tst.varDict}}
 #################################################
 ## END of TestVars: global vars for tests 
 
@@ -154,21 +162,21 @@ def test_deleteGroupZnode():
     zk.stop()
 
 
-def test_hostVarsShow():
+def test_hostVarsShowOneHost():
     '''
-    Test hostVarsShow() function.
+    Test hostVarsShow() function for group with one host.
     '''
 
     ## 1. run addZnode(var) function to create given Znode with vars provided in tst.testDict 
     ## 2. test hostVarsShow() against vars and values provided in tst.testDict 
     ## 3. run deleteGroupZnode(var) function to delete given Znode provided in tst.delString 
 
-    addZnode(tst.testDict)
+    addZnode(tst.oneDict)
 
     zk = KazooClient(hosts=cfg.zkServers)
     zk.start()
 
-    testList = [(tst.delString, tst.varDict),(tst.groupName, tst.testDict[tst.groupName])]
+    testList = [(tst.delString, tst.varDict),(tst.groupName, tst.oneDict[tst.groupName])]
     
     for val in testList:
         assert hostVarsShow(val[0]) == val[1]
