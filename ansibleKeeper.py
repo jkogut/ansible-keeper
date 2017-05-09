@@ -168,7 +168,9 @@ def deleteGroupZnode(znodeGroupString):
     groupPath = "{0}/groups/{1}".format(cfg.aPath, znodeGroupString)
 
     if zk.exists(groupPath) is None:
-       print "ERROR  ==> could not delete group: {0} that does not exist !!!".format(znodeGroupString)
+       zk.stop()
+       return "ERROR  ==> could not delete group: {0} that does not exist !!!".format(znodeGroupString)
+
     else:
        zk.delete(groupPath, recursive=True)
 
