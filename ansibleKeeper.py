@@ -127,7 +127,7 @@ def deleteZnode(znodeString):
     '''
     Delete znode with hostvars for a given tuple of <groupname:hostname>.
 
-    Return a string (DELETED||EXISTS  ==> host: <hostname> in group: <groupname>).
+    Return a string (DELETED||ERROR  ==> host: <hostname> in group: <groupname>).
     '''
 
     zk = KazooClient(hosts=cfg.zkServers)
@@ -159,7 +159,7 @@ def deleteGroupZnode(znodeGroupString):
     '''
     Delete group of znodes with hostvars for a given string: <groupname>.
 
-    Return a string (DELETED||EXISTS  ==> group: <groupname>).
+    Return a string (DELETED||ERROR  ==> group: <groupname>).
     '''
 
     zk = KazooClient(hosts=cfg.zkServers)
@@ -182,7 +182,7 @@ def hostVarsShow(znodeString):
     '''
     Show hostvars for a given <groupname:hostname> or <groupname>.
     
-    Return dict.
+    Return dict or string (in case of ERROR).
     '''
 
     zk = KazooClient(hosts=cfg.zkServers)
@@ -195,7 +195,8 @@ def hostVarsShow(znodeString):
        hostPath  = "{0}/{1}".format(groupPath, hostName)
        
        if zk.exists(hostPath) is None:
-          print "ERROR  ==> no such hostname: {0} in group {1} !!!".format(hostName, groupName)
+          zk.stop()
+          return "ERROR  ==> no such hostname: {0} in group {1} !!!".format(hostName, groupName)
 
        else:
           hostVarList = zk.get_children(hostPath)
@@ -209,7 +210,8 @@ def hostVarsShow(znodeString):
        groupPath = "{0}/groups/{1}".format(cfg.aPath, groupName)
 
        if zk.exists(groupPath) is None:
-          print "ERROR  ==> no such groupname: {0} !!!".format(groupName)
+          zk.stop()    
+          return "ERROR  ==> no such groupname: {0} !!!".format(groupName)
 
        else:
           hostList = zk.get_children(groupPath)
