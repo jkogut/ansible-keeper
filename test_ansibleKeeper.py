@@ -29,8 +29,8 @@ tst = TestVars()
 tst.testDict  = {"testgroupname1":
                  {
                   "testhostname1":{"var1":"val1", "var2":"val2", "var3":"val3"},
-                  "testhostname2":{"var1":"val1", "var2":"val2", "var3":"val3"},
-                  "testhostname3":{"var1":"val1", "var2":"val2", "var3":"val3"}
+                  "testhostname2":{"var1":"val11", "var2":"val22", "var3":"val33"},
+                  "testhostname3":{"var1":"val111", "var2":"val222", "var3":"val333"}
                  }
 }
 
@@ -167,7 +167,7 @@ def test_hostVarsShowOneHost():
     Test hostVarsShow() function for group with one host.
     '''
 
-    ## 1. run addZnode(var) function to create given Znode with vars provided in tst.testDict 
+    ## 1. run addZnode(var) function to create given Znode with vars provided in tst.oneDict 
     ## 2. test hostVarsShow() against vars and values provided in tst.testDict 
     ## 3. run deleteGroupZnode(var) function to delete given Znode provided in tst.delString 
 
@@ -177,6 +177,32 @@ def test_hostVarsShowOneHost():
     zk.start()
 
     testList = [(tst.delString, tst.varDict),(tst.groupName, tst.oneDict[tst.groupName])]
+    
+    for val in testList:
+        assert hostVarsShow(val[0]) == val[1]
+    
+    zk.stop()
+    
+    deleteGroupZnode(tst.groupName)
+
+
+def test_hostVarsShowMultipleHosts():
+    '''
+    Test hostVarsShow() function for group with multiple hosts.
+    '''
+
+    ## 1. run addZnode(var) function to create given Znode with vars provided in tst.testDict 
+    ## 2. test hostVarsShow() against vars and values provided in tst.testDict 
+    ## 3. run deleteGroupZnode(var) function to delete given Znode provided in tst.delString 
+
+    for key in tst.testDict[tst.groupName].keys():
+        tmpDict = {tst.groupName : { key : tst.testDict[tst.groupName][key] }}
+        addZnode(tmpDict)
+
+    zk = KazooClient(hosts=cfg.zkServers)
+    zk.start()
+
+    testList = [(tst.delString, tst.varDict),(tst.groupName, tst.testDict[tst.groupName])]
     
     for val in testList:
         assert hostVarsShow(val[0]) == val[1]
