@@ -107,7 +107,8 @@ def addZnode(znodeDict):
     #     print "{0}/{1}".format(hostPath, key)
 
     if zk.exists(hostPath):
-       print "ERROR  ==> host: {0} in group {1} exist !!!".format(hostName, groupName)
+       zk.stop()    
+       return "ERROR  ==> host: {0} in group {1} exist !!!".format(hostName, groupName)
     
     if zk.exists(groupPath):
        zk.create(hostPath)
