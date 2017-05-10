@@ -34,7 +34,7 @@ def oParser():
     '''
     Commandline options parsing function.
 
-    Returns dict (parsed options).
+    Return dict (parsed options).
     '''
 
     parser = OptionParser(usage="usage: %prog [opts] <args>",
@@ -239,7 +239,7 @@ def inventoryDump():
     '''
     Inventory dump for a given list of zookeeper servers and ansible-keeper path.
     
-    Returns dict.
+    Return dict.
     '''
 
     zk = KazooClient(hosts=cfg.zkServers, read_only = True)
@@ -261,7 +261,7 @@ def ansibleInventoryDump():
     '''
     Ansible compliant inventory dump for a given list of zookeeper servers and ansible-keeper path.
     
-    Returns dict.
+    Return dict.
     '''
 
     zk = KazooClient(hosts=cfg.zkServers, read_only = True)
