@@ -102,10 +102,6 @@ def addZnode(znodeDict):
     groupPath = "{0}/groups/{1}".format(cfg.aPath, groupName)
     hostPath  = "{0}/{1}".format(groupPath, hostName)
 
-    # print groupName, hostName, groupPath, hostPath
-    # for key in znodeDict[groupName][hostName]:
-    #     print "{0}/{1}".format(hostPath, key)
-
     if zk.exists(hostPath):
        zk.stop()    
        return "ERROR  ==> host: {0} in group {1} exist !!!".format(hostName, groupName)
@@ -138,10 +134,6 @@ def deleteZnode(znodeString):
     hostName  = znodeString.split(':')[1]
     groupPath = "{0}/groups/{1}".format(cfg.aPath, groupName)
     hostPath  = "{0}/{1}".format(groupPath, hostName)
-
-    # print groupName, hostName, groupPath, hostPath
-    # for key in znodeDict[groupName][hostName]:
-    #     print "{0}/{1}".format(hostPath, key)
 
     if zk.exists(hostPath) is None:
        zk.stop()   
@@ -188,8 +180,6 @@ def hostVarsShow(znodeString):
 
     zk = KazooClient(hosts=cfg.zkServers)
     zk.start()
-
-
 
     if ':' in znodeString:
        groupName = znodeString.split(':')[0]
