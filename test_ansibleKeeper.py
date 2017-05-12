@@ -82,11 +82,11 @@ def test_zookeeperServerConnection():
         
 def test_addZnode():
     '''
-    Test if znode added with addZnode() exists.
+    Test if znode added with addZnode(var) exists.
     '''
 
     ## 1. check if Znode provided with tst.groupPath exists
-    ## 2. run addZnode() function
+    ## 2. run addZnode(var) function
     ## 3. check hostname vars values against testes values (from tst.testDict)
     
     zk = KazooClient(hosts=cfg.zkServers)
@@ -109,21 +109,21 @@ def test_addZnode():
     zk.stop()
 
 
-def test_deleteZnode():
+def test_deleteZnodeRecur():
     '''
-    Test that znode deleted with deleteZnode() does not exist.
+    Test that znode deleted with deleteZnodeRecur(var) does not exist.
     '''
 
-    ## 1. run deleteZnode(var) function to delete given Znode provided in tst.delString 
+    ## 1. run deleteZnodeRecur(var) function to delete given Znode provided in tst.delString 
     ## 2. check Znode path against that string 
     
-    deleteZnode(tst.delString)
+    deleteZnodeRecur(tst.delString)
 
     zk = KazooClient(hosts=cfg.zkServers)
     zk.start()
-    
+
     assert zk.exists(tst.hostPath) == None
-     
+
     zk.stop()
 
 
@@ -137,22 +137,22 @@ def test_deleteZnodeExistance():
 
     errString = 'ERROR  ==> could not delete host: {} that does not exist !!!'.format(tst.hostName)
     
-    assert deleteZnode(tst.delString) == errString
+    assert deleteZnodeRecur(tst.delString) == errString
      
     zk.stop()
     
     
-def test_deleteGroupZnode():
+def test_deleteZnodeRecurGroup():
     '''
-    Test that znode deleted with deleteGroupZnode() does not exist.
+    Test that znode deleted with deleteZnodeRecur(var) for groupname does not exist.
     '''
 
     ## 1. run addZnode(var) function to create given Znode provided in tst.testDict 
-    ## 2. run deleteGroupZnode(var) function to delete given Znode provided in tst.delString 
+    ## 2. run deleteZnodeRecur(var) function to delete given Znode provided in tst.delString 
     ## 3. check Znode path against that string 
 
     addZnode(tst.testDict)
-    deleteGroupZnode(tst.groupName)
+    deleteZnodeRecur(tst.groupName)
 
     zk = KazooClient(hosts=cfg.zkServers)
     zk.start()
@@ -169,7 +169,7 @@ def test_hostVarsShowOneHost():
 
     ## 1. run addZnode(var) function to create given Znode with vars provided in tst.oneDict 
     ## 2. test hostVarsShow() against vars and values provided in tst.testDict 
-    ## 3. run deleteGroupZnode(var) function to delete given Znode provided in tst.delString 
+    ## 3. run deleteZnodeRecur(var) function to delete given Znode provided in tst.delString 
 
     addZnode(tst.oneDict)
 
@@ -183,7 +183,7 @@ def test_hostVarsShowOneHost():
     
     zk.stop()
     
-    deleteGroupZnode(tst.groupName)
+    deleteZnodeRecur(tst.groupName)
 
 
 def test_hostVarsShowMultipleHosts():
@@ -209,7 +209,7 @@ def test_hostVarsShowMultipleHosts():
     
     zk.stop()
     
-    deleteGroupZnode(tst.groupName)
+    deleteZnodeRecur(tst.groupName)
 
     
 def test_splitZnodeString():
