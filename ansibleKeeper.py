@@ -184,7 +184,7 @@ def deleteZnodeRecur(znodeString):
     return "DELETED ==> group: {0}".format(znodeString)
 
 
-def hostVarsShow(znodeString):
+def hostVarsShow(znodeStringSplited):
     '''
     Show hostvars for a given <groupname:hostname> or <groupname>.
     
@@ -194,11 +194,12 @@ def hostVarsShow(znodeString):
     zk = KazooClient(hosts=cfg.zkServers)
     zk.start()
 
-    if ':' in znodeString:
-       groupName = znodeString.split(':')[0]
-       hostName  = znodeString.split(':')[1]
-       groupPath = "{0}/groups/{1}".format(cfg.aPath, groupName)
-       hostPath  = "{0}/{1}".format(groupPath, hostName)
+    if type(znodeStringSplited) == list:
+
+       groupName = znodeStringSplited[0][0]
+       groupPath = znodeStringSplited[0][1]
+       hostName  = znodeStringSplited[1][0]
+       hostPath  = znodeStringSplited[1][1]
        
        if zk.exists(hostPath) is None:
           zk.stop()
@@ -211,9 +212,9 @@ def hostVarsShow(znodeString):
           for var in hostVarList:
              valDict[var] = zk.get('{0}/{1}'.format(hostPath, var))[0]
        
-    else:
-       groupName = znodeString
-       groupPath = "{0}/groups/{1}".format(cfg.aPath, groupName)
+    elif type(znodeStringSplited) == tuple:
+       groupName = znodeStringSplited[0]
+       groupPath = znodeStringSplited[1]
 
        if zk.exists(groupPath) is None:
           zk.stop()    
@@ -233,7 +234,9 @@ def hostVarsShow(znodeString):
                 tmpHostPath    = '{0}/{1}'.format(groupPath, host)
                 varDict[var] = zk.get('{0}/{1}'.format(tmpHostPath, var))[0]
                 valDict[host] = varDict
-              
+    else:
+       return "ERROR with processing znodeStrings !!!"
+                    
     zk.stop()
     return valDict
 
@@ -304,7 +307,8 @@ def main():
        print deleteZnodeRecur(oParser()['deleteMode'])
 
     if oParser()['showMode'] is not None:
-       print json.dumps(hostVarsShow(oParser()['showMode']))
+       znodeStringSplited = splitZnodeString((oParser()['showMode']))
+       print json.dumps(hostVarsShow(znodeStringSplited))
                                   
         
 if __name__ == "__main__":
