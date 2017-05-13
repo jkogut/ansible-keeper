@@ -210,11 +210,11 @@ def test_hostVarsShowMultipleHosts():
     zk.stop()
     
     deleteZnodeRecur(tst.groupName)
+         
 
-    
-def test_splitZnodeString():
+def test_splitZnodeVarString():
     '''
-    Test for splitZnodeString() parser.
+    Test for splitZnodeVarString() parser.
     '''
 
     testTup = ({"string":"groupname1:hostname1,var1:val1,var2:val2,var3:val3",
@@ -226,5 +226,5 @@ def test_splitZnodeString():
     )
 
     for varDict in testTup:
-        assert splitZnodeString(varDict['string']) == varDict['output']
+        assert splitZnodeVarString(varDict['string']) == varDict['output']
         
