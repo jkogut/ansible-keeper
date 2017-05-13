@@ -142,7 +142,7 @@ def addZnode(znodeDict):
     return "ADDED   ==> host: {0} to group: {1}".format(hostName, groupName)
 
 
-def deleteZnodeRecur(znodeString):
+def deleteZnodeRecur(znodeStringSplited):
     '''
     Delete znode with hostvars for a given tuple of <groupname:hostname>.
 
@@ -152,11 +152,12 @@ def deleteZnodeRecur(znodeString):
     zk = KazooClient(hosts=cfg.zkServers)
     zk.start()
 
-    if ':' in znodeString:
-       groupName = znodeString.split(':')[0]
-       hostName  = znodeString.split(':')[1]
-       groupPath = "{0}/groups/{1}".format(cfg.aPath, groupName)
-       hostPath  = "{0}/{1}".format(groupPath, hostName)
+    if type(znodeStringSplited) == list:
+
+       groupName = znodeStringSplited[0][0]
+       groupPath = znodeStringSplited[0][1]
+       hostName  = znodeStringSplited[1][0]
+       hostPath  = znodeStringSplited[1][1]
 
        if zk.exists(hostPath) is None:
           zk.stop()   
@@ -170,18 +171,22 @@ def deleteZnodeRecur(znodeString):
        zk.stop()
        return "DELETED ==> host: {0} in group: {1}".format(hostName, groupName)
 
-    else:
-       groupPath = "{0}/groups/{1}".format(cfg.aPath, znodeString)
+    elif type(znodeStringSplited) == tuple:
 
+       groupName = znodeStringSplited[0]
+       groupPath = znodeStringSplited[1]
+       
        if zk.exists(groupPath) is None:
           zk.stop()
-          return "ERROR  ==> could not delete group: {0} that does not exist !!!".format(znodeString)
+          return "ERROR  ==> could not delete group: {0} that does not exist !!!".format(groupName)
 
        else:
           zk.delete(groupPath, recursive=True)
-
+    else:
+       return "ERROR with processing znodeStrings !!!"           
+          
     zk.stop()
-    return "DELETED ==> group: {0}".format(znodeString)
+    return "DELETED ==> group: {0}".format(groupName)
 
 
 def hostVarsShow(znodeStringSplited):
@@ -207,7 +212,7 @@ def hostVarsShow(znodeStringSplited):
 
        else:
           hostVarList = zk.get_children(hostPath)
-          valDict = {}
+          valDict     = {}
 
           for var in hostVarList:
              valDict[var] = zk.get('{0}/{1}'.format(hostPath, var))[0]
@@ -222,17 +227,17 @@ def hostVarsShow(znodeStringSplited):
 
        else:
           hostList = zk.get_children(groupPath)
-          valDict = {}
+          valDict  = {}
           
           for host in hostList:
              tmpHostPath    = '{0}/{1}'.format(groupPath, host)
-             valDict[host] = zk.get_children('{0}'.format(tmpHostPath))
+             valDict[host]  = zk.get_children('{0}'.format(tmpHostPath))
 
           for host in valDict.keys():
              varDict = {}
              for var in valDict[host]:
-                tmpHostPath    = '{0}/{1}'.format(groupPath, host)
-                varDict[var] = zk.get('{0}/{1}'.format(tmpHostPath, var))[0]
+                tmpHostPath   = '{0}/{1}'.format(groupPath, host)
+                varDict[var]  = zk.get('{0}/{1}'.format(tmpHostPath, var))[0]
                 valDict[host] = varDict
     else:
        return "ERROR with processing znodeStrings !!!"
@@ -304,7 +309,8 @@ def main():
        print addZnode(znodeDict)
 
     if oParser()['deleteMode'] is not None:
-       print deleteZnodeRecur(oParser()['deleteMode'])
+       znodeStringSplited = splitZnodeString((oParser()['deleteMode']))
+       print deleteZnodeRecur(znodeStringSplited)
 
     if oParser()['showMode'] is not None:
        znodeStringSplited = splitZnodeString((oParser()['showMode']))
