@@ -63,7 +63,7 @@ def oParser():
             'showMode':opts.S, 'inventoryMode':opts.I}
 
 
-def splitZnodeString(znodeString):
+def splitZnodeVarString(znodeVarString):
     '''
     Parse string for commandline opts: <-A|-U>.
 
@@ -74,7 +74,7 @@ def splitZnodeString(znodeString):
     ## example string: groupname:hostname1,var1:val1,var2:val2,var3:val3
     ## desired dict  : {"groupname":{"hostname1":{"var1":"val1", "var2":"val2", "var3":"val3"}}}
 
-    varList = znodeString.split(',')
+    varList = znodeVarString.split(',')
     varDict = {}
 
     for var in varList[1:]:
