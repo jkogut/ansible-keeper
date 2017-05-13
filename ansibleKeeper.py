@@ -85,6 +85,30 @@ def splitZnodeVarString(znodeVarString):
     return { groupName : { hostName : varDict }}
 
 
+def splitZnodeString(znodeString):
+    '''
+    Splits znodeString into groupName, hostName, groupPath, hostPath.
+
+    Return list of tuples or tuple.
+    '''
+
+    ## spliting example string into list of tuples or tuple :
+    ## example string: groupname:hostname1
+    ## example output: [("groupname","/ansible_zk/groups/groupname"),("hostname1","/ansible_zk/groups/groupname")]
+
+    if ':' in znodeString:
+       groupName = znodeString.split(':')[0]
+       hostName  = znodeString.split(':')[1]
+       groupPath = "{0}/groups/{1}".format(cfg.aPath, groupName)
+       hostPath  = "{0}/{1}".format(groupPath, hostName)
+       return [(groupName, groupPath),(hostName, hostPath)]
+
+    else:
+       groupName = znodeString
+       groupPath = "{0}/groups/{1}".format(cfg.aPath, groupName)
+       return (groupName, groupPath)
+
+
 def addZnode(znodeDict):
     '''
     Add new znode with hostvars.
