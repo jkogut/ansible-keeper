@@ -117,7 +117,7 @@ def test_deleteZnodeRecur():
     ## 1. run deleteZnodeRecur(var) function to delete given Znode provided in tst.delString 
     ## 2. check Znode path against that string 
     
-    deleteZnodeRecur(tst.delString)
+    deleteZnodeRecur(splitZnodeString(tst.delString))
 
     zk = KazooClient(hosts=cfg.zkServers)
     zk.start()
@@ -137,7 +137,7 @@ def test_deleteZnodeExistance():
 
     errString = 'ERROR  ==> could not delete host: {} that does not exist !!!'.format(tst.hostName)
     
-    assert deleteZnodeRecur(tst.delString) == errString
+    assert deleteZnodeRecur(splitZnodeString(tst.delString)) == errString
      
     zk.stop()
     
@@ -152,7 +152,7 @@ def test_deleteZnodeRecurGroup():
     ## 3. check Znode path against that string 
 
     addZnode(tst.testDict)
-    deleteZnodeRecur(tst.groupName)
+    deleteZnodeRecur(splitZnodeString(tst.groupName))
 
     zk = KazooClient(hosts=cfg.zkServers)
     zk.start()
@@ -179,11 +179,11 @@ def test_hostVarsShowOneHost():
     testList = [(tst.delString, tst.varDict),(tst.groupName, tst.oneDict[tst.groupName])]
     
     for val in testList:
-        assert hostVarsShow(val[0]) == val[1]
+        assert hostVarsShow(splitZnodeString(val[0])) == val[1]
     
     zk.stop()
     
-    deleteZnodeRecur(tst.groupName)
+    deleteZnodeRecur(splitZnodeString(tst.groupName))
 
 
 def test_hostVarsShowMultipleHosts():
@@ -205,11 +205,11 @@ def test_hostVarsShowMultipleHosts():
     testList = [(tst.delString, tst.varDict),(tst.groupName, tst.testDict[tst.groupName])]
     
     for val in testList:
-        assert hostVarsShow(val[0]) == val[1]
+        assert hostVarsShow(splitZnodeString(val[0])) == val[1]
     
     zk.stop()
     
-    deleteZnodeRecur(tst.groupName)
+    deleteZnodeRecur(splitZnodeString(tst.groupName))
 
 
 def test_splitZnodeString():
