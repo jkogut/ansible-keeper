@@ -162,6 +162,32 @@ def test_deleteZnodeRecurGroup():
     zk.stop()
 
 
+def test_updateZnode():
+    '''
+    Test updated Znode with updateZnode(var).
+    '''
+
+    ## 1. run addZnode(var) function to create given Znode provided in tst.testDict
+    ## 2. run updateZnode(var) function to update given Znode provided in tst.updateDict
+    ## 3. check upated results against tst.updateDict
+    ## 4. run deleteZnodeRecur(var) function to delete given Znode provided in tst.delString
+    
+    addZnode(tst.testDict)
+    updateZnode(tst.updateDict)
+
+    zk = KazooClient(hosts=cfg.zkServers)
+    zk.start()
+
+    for key in tst.updateDict[tst.groupName][tst.hostName].keys():
+        zkGet     = zk.get('{0}/{1}'.format(tst.hostPath, key))[0]
+        updateValue = tst.updateDict[tst.groupName][tst.hostName][key]
+        assert zkGet == testValue
+
+    zk.stop()
+    
+    deleteZnodeRecur(splitZnodeString(tst.groupName))
+    
+
 def test_hostVarsShowOneHost():
     '''
     Test hostVarsShow() function for group with one host.
