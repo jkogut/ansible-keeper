@@ -18,8 +18,9 @@ from kazoo.client import KazooClient
 ##################################################
 
 class OurConfig(object):
-       """ Our config section """
-       pass
+    ''' Our config section '''
+
+    pass
 
 cfg = OurConfig()
 
@@ -56,8 +57,8 @@ def oParser():
     
     if (opts.A or opts.D or opts.U or opts.I or opts.S) == None:
 
-       parser.print_help()
-       exit(-1)
+        parser.print_help()
+        exit(-1)
         
     return {'addMode':opts.A, 'deleteMode':opts.D, 'updateMode':opts.U,
             'showMode':opts.S, 'inventoryMode':opts.I}
@@ -78,7 +79,7 @@ def splitZnodeVarString(znodeVarString):
     varDict = {}
 
     for var in varList[1:]:
-       varDict[var.split(':')[0]] = var.split(':')[1]
+        varDict[var.split(':')[0]] = var.split(':')[1]
        
     groupName, hostName = varList[0].split(':')[0], varList[0].split(':')[1]
 
@@ -125,18 +126,18 @@ def addZnode(znodeDict):
     hostPath  = "{0}/{1}".format(groupPath, hostName)
 
     if zk.exists(hostPath):
-       zk.stop()    
-       return "ERROR  ==> host: {0} in group {1} exist !!!".format(hostName, groupName)
+        zk.stop()    
+        return "ERROR  ==> host: {0} in group {1} exist !!!".format(hostName, groupName)
     
     if zk.exists(groupPath):
-       zk.create(hostPath)
+        zk.create(hostPath)
     else:
-       zk.ensure_path(hostPath)
+        zk.ensure_path(hostPath)
 
     for key in znodeDict[groupName][hostName]:
-       varPath = "{0}/{1}".format(hostPath, key)
-       varVal  = znodeDict[groupName][hostName][key]
-       zk.create(varPath, varVal)
+        varPath = "{0}/{1}".format(hostPath, key)
+        varVal  = znodeDict[groupName][hostName][key]
+        zk.create(varPath, varVal)
 
     zk.stop()
     return "ADDED   ==> host: {0} to group: {1}".format(hostName, groupName)
@@ -154,36 +155,35 @@ def deleteZnodeRecur(znodeStringSplited):
 
     if len(znodeStringSplited) > 1:
 
-       groupName = znodeStringSplited[0][0]
-       groupPath = znodeStringSplited[0][1]
-       hostName  = znodeStringSplited[1][0]
-       hostPath  = znodeStringSplited[1][1]
+        groupName = znodeStringSplited[0][0]
+        groupPath = znodeStringSplited[0][1]
+        hostName  = znodeStringSplited[1][0]
+        hostPath  = znodeStringSplited[1][1]
 
-       if zk.exists(hostPath) is None:
-          zk.stop()   
-          return "ERROR  ==> could not delete host: {0} that does not exist !!!".format(hostName)
+        if zk.exists(hostPath) is None:
+            zk.stop()   
+            return "ERROR  ==> could not delete host: {0} that does not exist !!!".format(hostName)
 
-       if len(zk.get_children(groupPath)) == 1:
-          zk.delete(groupPath, recursive=True)
-       else:
-          zk.delete(hostPath, recursive=True)
-
-       zk.stop()
-       return "DELETED ==> host: {0} in group: {1}".format(hostName, groupName)
+        if len(zk.get_children(groupPath)) == 1:
+            zk.delete(groupPath, recursive=True)
+        else:
+            zk.delete(hostPath, recursive=True)
+            zk.stop()
+            return "DELETED ==> host: {0} in group: {1}".format(hostName, groupName)
 
     elif len(znodeStringSplited) == 1:
 
-       groupName = znodeStringSplited[0][0]
-       groupPath = znodeStringSplited[0][1]
+        groupName = znodeStringSplited[0][0]
+        groupPath = znodeStringSplited[0][1]
        
-       if zk.exists(groupPath) is None:
-          zk.stop()
-          return "ERROR  ==> could not delete group: {0} that does not exist !!!".format(groupName)
+        if zk.exists(groupPath) is None:
+            zk.stop()
+            return "ERROR  ==> could not delete group: {0} that does not exist !!!".format(groupName)
 
-       else:
-          zk.delete(groupPath, recursive=True)
+        else:
+            zk.delete(groupPath, recursive=True)
     else:
-       return "ERROR with processing znodeStrings !!!"           
+        return "ERROR with processing znodeStrings !!!"           
           
     zk.stop()
     return "DELETED ==> group: {0}".format(groupName)
@@ -201,46 +201,46 @@ def hostVarsShow(znodeStringSplited):
 
     if len(znodeStringSplited) > 1:
 
-       groupName = znodeStringSplited[0][0]
-       groupPath = znodeStringSplited[0][1]
-       hostName  = znodeStringSplited[1][0]
-       hostPath  = znodeStringSplited[1][1]
+        groupName = znodeStringSplited[0][0]
+        groupPath = znodeStringSplited[0][1]
+        hostName  = znodeStringSplited[1][0]
+        hostPath  = znodeStringSplited[1][1]
        
-       if zk.exists(hostPath) is None:
-          zk.stop()
-          return "ERROR  ==> no such hostname: {0} in group {1} !!!".format(hostName, groupName)
+        if zk.exists(hostPath) is None:
+            zk.stop()
+            return "ERROR  ==> no such hostname: {0} in group {1} !!!".format(hostName, groupName)
 
-       else:
-          hostVarList = zk.get_children(hostPath)
-          valDict     = {}
+        else:
+            hostVarList = zk.get_children(hostPath)
+            valDict     = {}
 
-          for var in hostVarList:
-             valDict[var] = zk.get('{0}/{1}'.format(hostPath, var))[0]
+            for var in hostVarList:
+                valDict[var] = zk.get('{0}/{1}'.format(hostPath, var))[0]
        
     elif len(znodeStringSplited) == 1:
-       groupName = znodeStringSplited[0][0]
-       groupPath = znodeStringSplited[0][1]
+        groupName = znodeStringSplited[0][0]
+        groupPath = znodeStringSplited[0][1]
 
-       if zk.exists(groupPath) is None:
-          zk.stop()    
-          return "ERROR  ==> no such groupname: {0} !!!".format(groupName)
+        if zk.exists(groupPath) is None:
+            zk.stop()    
+            return "ERROR  ==> no such groupname: {0} !!!".format(groupName)
 
-       else:
-          hostList = zk.get_children(groupPath)
-          valDict  = {}
+        else:
+            hostList = zk.get_children(groupPath)
+            valDict  = {}
           
-          for host in hostList:
-             tmpHostPath    = '{0}/{1}'.format(groupPath, host)
-             valDict[host]  = zk.get_children('{0}'.format(tmpHostPath))
+            for host in hostList:
+                tmpHostPath    = '{0}/{1}'.format(groupPath, host)
+                valDict[host]  = zk.get_children('{0}'.format(tmpHostPath))
 
-          for host in valDict.keys():
-             varDict = {}
-             for var in valDict[host]:
-                tmpHostPath   = '{0}/{1}'.format(groupPath, host)
-                varDict[var]  = zk.get('{0}/{1}'.format(tmpHostPath, var))[0]
-                valDict[host] = varDict
+            for host in valDict.keys():
+                varDict = {}
+                for var in valDict[host]:
+                    tmpHostPath   = '{0}/{1}'.format(groupPath, host)
+                    varDict[var]  = zk.get('{0}/{1}'.format(tmpHostPath, var))[0]
+                    valDict[host] = varDict
     else:
-       return "ERROR with processing znodeStrings !!!"
+        return "ERROR with processing znodeStrings !!!"
                     
     zk.stop()
     return valDict
@@ -260,9 +260,9 @@ def inventoryDump():
     groupDict = {}
     
     for group in groupList:
-       path     = "{0}/groups/{1}".format(cfg.aPath, group)
-       children = zk.get_children(path)
-       groupDict[group] = children
+        path     = "{0}/groups/{1}".format(cfg.aPath, group)
+        children = zk.get_children(path)
+        groupDict[group] = children
     
     zk.stop()
     return groupDict
@@ -282,12 +282,12 @@ def ansibleInventoryDump():
     groupDict = {}
     
     for group in groupList:
-       path     = "{0}/groups/{1}".format(cfg.aPath, group)
-       children = zk.get_children(path)
-       tmpDict  = {}
-       tmpDict['hosts'] = children
-       tmpDict['vars']  = {"a":"b"}
-       groupDict[group] = tmpDict
+        path     = "{0}/groups/{1}".format(cfg.aPath, group)
+        children = zk.get_children(path)
+        tmpDict  = {}
+        tmpDict['hosts'] = children
+        tmpDict['vars']  = {"a":"b"}
+        groupDict[group] = tmpDict
     
     zk.stop()
     return groupDict
@@ -299,23 +299,23 @@ def main():
     '''
     
     if oParser()['inventoryMode'] == 'true':
-       print json.dumps(inventoryDump())
+        print json.dumps(inventoryDump())
        
     if oParser()['inventoryMode'] == 'ansible':
-       print json.dumps(ansibleInventoryDump())
+        print json.dumps(ansibleInventoryDump())
 
     if oParser()['addMode'] is not None:
-       znodeDict = splitZnodeString(oParser()['addMode'])
-       print addZnode(znodeDict)
+        znodeDict = splitZnodeString(oParser()['addMode'])
+        print addZnode(znodeDict)
 
     if oParser()['deleteMode'] is not None:
-       znodeStringSplited = splitZnodeString((oParser()['deleteMode']))
-       print deleteZnodeRecur(znodeStringSplited)
+        znodeStringSplited = splitZnodeString((oParser()['deleteMode']))
+        print deleteZnodeRecur(znodeStringSplited)
 
     if oParser()['showMode'] is not None:
-       znodeStringSplited = splitZnodeString((oParser()['showMode']))
-       print json.dumps(hostVarsShow(znodeStringSplited))
+        znodeStringSplited = splitZnodeString((oParser()['showMode']))
+        print json.dumps(hostVarsShow(znodeStringSplited))
                                   
         
 if __name__ == "__main__":
-   main()
+    main()
