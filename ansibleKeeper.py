@@ -89,7 +89,7 @@ def splitZnodeString(znodeString):
     '''
     Splits znodeString into groupName, hostName, groupPath, hostPath.
 
-    Return list of tuples or tuple.
+    Return list of tuples.
     '''
 
     ## spliting example string into list of tuples or tuple :
@@ -106,7 +106,7 @@ def splitZnodeString(znodeString):
     else:
        groupName = znodeString
        groupPath = "{0}/groups/{1}".format(cfg.aPath, groupName)
-       return (groupName, groupPath)
+       return [(groupName, groupPath)]
 
 
 def addZnode(znodeDict):
@@ -144,7 +144,7 @@ def addZnode(znodeDict):
 
 def deleteZnodeRecur(znodeStringSplited):
     '''
-    Delete znode with hostvars for a given tuple of <groupname:hostname>.
+    Delete znode with hostvars for a given list of tuple <groupname:hostname>.
 
     Return a string (DELETED||ERROR  ==> host: <hostname> in group: <groupname>||group: <groupname>).
     '''
@@ -152,7 +152,7 @@ def deleteZnodeRecur(znodeStringSplited):
     zk = KazooClient(hosts=cfg.zkServers)
     zk.start()
 
-    if type(znodeStringSplited) == list:
+    if len(znodeStringSplited) > 1:
 
        groupName = znodeStringSplited[0][0]
        groupPath = znodeStringSplited[0][1]
@@ -171,10 +171,10 @@ def deleteZnodeRecur(znodeStringSplited):
        zk.stop()
        return "DELETED ==> host: {0} in group: {1}".format(hostName, groupName)
 
-    elif type(znodeStringSplited) == tuple:
+    elif len(znodeStringSplited) == 1:
 
-       groupName = znodeStringSplited[0]
-       groupPath = znodeStringSplited[1]
+       groupName = znodeStringSplited[0][0]
+       groupPath = znodeStringSplited[0][1]
        
        if zk.exists(groupPath) is None:
           zk.stop()
@@ -199,7 +199,7 @@ def hostVarsShow(znodeStringSplited):
     zk = KazooClient(hosts=cfg.zkServers)
     zk.start()
 
-    if type(znodeStringSplited) == list:
+    if len(znodeStringSplited) > 1:
 
        groupName = znodeStringSplited[0][0]
        groupPath = znodeStringSplited[0][1]
@@ -217,9 +217,9 @@ def hostVarsShow(znodeStringSplited):
           for var in hostVarList:
              valDict[var] = zk.get('{0}/{1}'.format(hostPath, var))[0]
        
-    elif type(znodeStringSplited) == tuple:
-       groupName = znodeStringSplited[0]
-       groupPath = znodeStringSplited[1]
+    elif len(znodeStringSplited) == 1:
+       groupName = znodeStringSplited[0][0]
+       groupPath = znodeStringSplited[0][1]
 
        if zk.exists(groupPath) is None:
           zk.stop()    
