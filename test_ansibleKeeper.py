@@ -246,7 +246,7 @@ def test_splitZnodeString():
     testTup = ({"string": "{0}:{1}".format(tst.groupName, tst.hostName),
                 "output": [(tst.groupName, tst.groupPath), (tst.hostName, tst.hostPath)]},
                {"string": tst.groupName,
-                "output": (tst.groupName, tst.groupPath)}
+                "output": [(tst.groupName, tst.groupPath)]}
     )
 
     for znodeStrgingDict in testTup:
