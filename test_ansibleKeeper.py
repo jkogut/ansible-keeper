@@ -122,7 +122,7 @@ def test_deleteZnodeRecur():
     zk = KazooClient(hosts=cfg.zkServers)
     zk.start()
 
-    assert zk.exists(tst.hostPath) == None
+    assert zk.exists(tst.hostPath) is None
 
     zk.stop()
 
@@ -157,7 +157,7 @@ def test_deleteZnodeRecurGroup():
     zk = KazooClient(hosts=cfg.zkServers)
     zk.start()
 
-    assert zk.exists(tst.groupPath) == None
+    assert zk.exists(tst.groupPath) is None
     
     zk.stop()
 
