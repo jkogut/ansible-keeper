@@ -46,30 +46,35 @@ tst.oneDict   = {tst.groupName:{tst.hostName:tst.varDict}}
 ## END of TestVars: global vars for tests 
 
 
-@pytest.fixture(scope="module")
-def ro_zk():
+class TestReadOnly(object):
     '''
-    Fixture for zookeeper client connection in read-only mode. 
+    Suite of tests where read-only zookeeper client connection is enough.
     '''
 
-    ## example server list string 'zoo1.dmz:2181,zoo2.dmz:2181,zoo3.dmz:2181'    
-    zk = KazooClient(hosts=cfg.zkServers, read_only = True)
+    @pytest.fixture(scope="module")
+    def ro_zk(self):
+        '''
+        Fixture for zookeeper client connection in read-only mode. 
+        '''
 
-    zk.start()
+        ## example server list string 'zoo1.dmz:2181,zoo2.dmz:2181,zoo3.dmz:2181'    
+        zk = KazooClient(hosts=cfg.zkServers, read_only = True)
 
-    return zk
+        zk.start()
+        
+        return zk
 
        
-def test_zookeeperClusterConnection(ro_zk):
-    '''
-    Test if we can connect to zookeeper cluster servers.
-    '''
+    def test_zookeeperClusterConnection(self, ro_zk):
+        '''
+        Test if we can connect to zookeeper cluster servers.
+        '''
 
-    try:
-        assert type(ro_zk).__name__ == 'KazooClient'
+        try:
+            assert type(ro_zk).__name__ == 'KazooClient'
 
-    finally:
-        ro_zk.stop()
+        finally:
+            ro_zk.stop()
 
     
 def test_zookeeperServerConnection():
@@ -84,11 +89,11 @@ def test_zookeeperServerConnection():
         try:
             zk = KazooClient(hosts=srv, read_only = True)
             zk.start()
-        
+            
             assert type(zk).__name__ == 'KazooClient'
         except KazooTimeoutError as error:
             print("{0} check your connection with zookeeper server: {1} ").format(error, srv)
-
+            
         zk.stop()
 
         
