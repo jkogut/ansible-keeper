@@ -77,24 +77,23 @@ class TestReadOnly(object):
             ro_zk.stop()
 
     
-def test_zookeeperServerConnection():
-    '''
-    Test if we can connect to each zookeeper server.
-    '''
+    def test_zookeeperServerConnection(self, ro_zk):
+        '''
+        Test if we can connect to each zookeeper server.
+        '''
 
-    ## example server list string 'zoo1.dmz:2181,zoo2.dmz:2181,zoo3.dmz:2181'
-    zkSrvList = cfg.zkServers.split(',')
+        ## example server list string 'zoo1.dmz:2181,zoo2.dmz:2181,zoo3.dmz:2181'
+        zkSrvList = cfg.zkServers.split(',')
     
-    for srv in zkSrvList:
-        try:
-            zk = KazooClient(hosts=srv, read_only = True)
-            zk.start()
-            
-            assert type(zk).__name__ == 'KazooClient'
-        except KazooTimeoutError as error:
-            print("{0} check your connection with zookeeper server: {1} ").format(error, srv)
-            
-        zk.stop()
+        for srv in zkSrvList:
+            try:
+                assert type(ro_zk).__name__ == 'KazooClient'
+
+            except KazooTimeoutError as error:
+                print("{0} check your connection with zookeeper server: {1} ").format(error, srv)
+
+            finally:
+                ro_zk.stop()
 
         
 def test_addZnode():
