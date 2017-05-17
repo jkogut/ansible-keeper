@@ -21,7 +21,7 @@ from kazoo.exceptions import *
 ##################################################
 
 class TestVars(object):
-    """ Test vars section """
+    ''' Test vars section '''
     pass
             
 tst = TestVars()
@@ -46,20 +46,32 @@ tst.oneDict   = {tst.groupName:{tst.hostName:tst.varDict}}
 ## END of TestVars: global vars for tests 
 
 
-def test_zookeeperClusterConnection():
+@pytest.fixture(scope="module")
+def ro_zk():
+    '''
+    Fixture for zookeeper client connection in read-only mode. 
+    '''
+
+    ## example server list string 'zoo1.dmz:2181,zoo2.dmz:2181,zoo3.dmz:2181'    
+    zk = KazooClient(hosts=cfg.zkServers, read_only = True)
+
+    zk.start()
+
+    return zk
+
+       
+def test_zookeeperClusterConnection(ro_zk):
     '''
     Test if we can connect to zookeeper cluster servers.
     '''
 
-    ## example server list string 'zoo1.dmz:2181,zoo2.dmz:2181,zoo3.dmz:2181'
-    zk = KazooClient(hosts=cfg.zkServers, read_only = True)
-    zk.start()
-        
-    assert type(zk).__name__ == 'KazooClient'
+    try:
+        assert type(ro_zk).__name__ == 'KazooClient'
 
-    zk.stop()
+    finally:
+        ro_zk.stop()
 
-
+    
 def test_zookeeperServerConnection():
     '''
     Test if we can connect to each zookeeper server.
