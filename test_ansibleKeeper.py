@@ -116,33 +116,28 @@ class TestReadWrite(object):
         return zk
 
                 
-    # def test_addZnode(self, rw_zk):
-    #     '''
-    #     Test if znode added with addZnode(var) exists.
-    #     '''
+    def test_addZnode(self, rw_zk):
+        '''
+        Test if hostname-znode added with addZnode(var) exists.
+        '''
 
-    #     ## 1. check if Znode provided with tst.groupPath exists
-    #     ## 2. run addZnode(var) function
-    #     ## 3. check hostname vars values against testes values (from tst.testDict)
+        ## 1. check if Znode provided with tst.groupPath exists
+        ## 2. run addZnode(var) function
+        ## 3. check hostname value against testes values (from tst.testDict)
     
-    #     if rw_zk.exists(tst.groupPath) is not None:
-    #         rw_zk.delete(tst.groupPath, recursive=True)
-    #         rw_zk.stop()
+        if rw_zk.exists(tst.groupPath) is not None:
+            rw_zk.delete(tst.groupPath, recursive=True)
+            rw_zk.stop()
 
-    #     addZnode(tst.testDict)
+        addZnode(tst.testDict)
 
-    #     for key in tst.testDict[tst.groupName][tst.hostName].keys():
-    #         rw_zk2       = rw_zk
-    #         rw_zkGet     = rw_zk2.get('{0}/{1}'.format(tst.hostPath, key))[0]
-    #         testValue    = tst.testDict[tst.groupName][tst.hostName][key]
+        try:
+            assert rw_zk.exists(tst.hostPath) is not None
 
-    #         try:
-    #             assert rw_zkGet == testValue
+        finally:
+            rw_zk.stop()
 
-    #         finally:
-    #             rw_zk.stop()
-
-
+             
     def test_deleteZnodeRecur(self, rw_zk):
         '''
         Test that znode deleted with deleteZnodeRecur(var) does not exist.
