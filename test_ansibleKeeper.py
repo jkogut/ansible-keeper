@@ -54,8 +54,19 @@ class TestConfig(object):
 
     def test_zkClusterUp(self):
         '''
-        Test if zookeeper cluster is up
+        Test if the zookeeper cluster is UP.
+        We expect all servers are UP and port for zookeeper: 2181 is open. 
         '''
+
+        zkSrvList = cfg.zkServers.replace(':2181','').split(',')
+
+        for srv in zkSrvList:
+            try:
+                sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+                assert sock.connect_ex((srv,2181)) == 0
+
+            finally:
+                sock.close()
     
     
     @pytest.fixture
@@ -69,23 +80,6 @@ class TestConfig(object):
         zk.start()
         
         return zk
-
-
-    def test_zkClusterUp(self):
-        '''
-        Test if we the zookeeper cluster is UP.
-        We expect all servers are UP and port for zookeeper: 2181 is open. 
-        '''
-
-        zkSrvList = cfg.zkServers.replace(':2181','').split(',')
-
-        for srv in zkSrvList:
-            try:
-                sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-                assert sock.connect_ex((srv,2181)) == 0
-
-            finally:
-                sock.close()
 
                
     def test_configZkClusterConnection(self, ro_zk):
@@ -126,14 +120,13 @@ class TestConfig(object):
         Test if base prefix znode from config exists.
         '''
 
-
         try:
             assert ro_zk.exists(cfg.aPath) is not None
 
         finally:
             ro_zk.stop()
 
-
+            
             
 class TestReadWrite(object):
     '''
@@ -158,9 +151,10 @@ class TestReadWrite(object):
         Test if hostname-znode added with addZnode(var) exists.
         '''
 
-        ## 1. check if Znode provided with tst.groupPath exists
+        ## 1. check if Znode provided with test config exists
         ## 2. run addZnode(var) function
         ## 3. check hostname value against testes values (from tst.testDict)
+        ## 4. run deleteZnodeRecur(var) 
     
         if rw_zk.exists(tst.groupPath) is not None:
             rw_zk.delete(tst.groupPath, recursive=True)
@@ -173,16 +167,20 @@ class TestReadWrite(object):
 
         finally:
             rw_zk.stop()
-
             
+        deleteZnodeRecur(splitZnodeString(tst.delString))
+
+    
     def test_deleteZnodeRecur(self, rw_zk):
         '''
         Test that znode deleted with deleteZnodeRecur(var) does not exist.
         '''
 
-        ## 1. run deleteZnodeRecur(var) function to delete given Znode provided in tst.delString 
-        ## 2. check Znode path against that string 
-    
+        ## 1. run addZnode(var) function to add example Znode provided in test config
+        ## 2. run deleteZnodeRecur(var) function to delete given Znode provided in test config
+        ## 3. check Znode path against that string 
+
+        addZnode(tst.testDict)
         deleteZnodeRecur(splitZnodeString(tst.delString))
 
         try:
