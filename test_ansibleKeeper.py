@@ -65,7 +65,7 @@ class TestReadOnly(object):
         return zk
 
        
-    def test_zookeeperClusterConnection(self, ro_zk):
+    def test_configZkClusterConnection(self, ro_zk):
         '''
         Test if we can connect to zookeeper cluster servers.
         '''
@@ -77,7 +77,7 @@ class TestReadOnly(object):
             ro_zk.stop()
 
     
-    def test_zookeeperServerConnection(self, ro_zk):
+    def test_configZkServerConnection(self, ro_zk):
         '''
         Test if we can connect to each zookeeper server.
         '''
@@ -95,8 +95,21 @@ class TestReadOnly(object):
             finally:
                 ro_zk.stop()
 
-
                 
+    def test_configBasePrefixZnode(self, ro_zk):
+        '''
+        Test if base prefix znode from config exists.
+        '''
+
+
+        try:
+            assert ro_zk.exists(cfg.aPath) is not None
+
+        finally:
+            ro_zk.stop()
+
+
+            
 class TestReadWrite(object):
     '''
     Suite of tests where read-write zookeeper client connection is required.
@@ -114,19 +127,6 @@ class TestReadWrite(object):
         zk.start()
         
         return zk
-
-
-    def test_basePrefixZnode(self, rw_zk):
-        '''
-        Test if base prefix znode from config exists.
-        '''
-
-
-        try:
-            assert rw_zk.exists(cfg.aPath) is not None
-
-        finally:
-            rw_zk.stop()
 
                 
     def test_addZnode(self, rw_zk):
@@ -149,8 +149,8 @@ class TestReadWrite(object):
 
         finally:
             rw_zk.stop()
-         
-  
+          
+        
     def test_deleteZnodeRecur(self, rw_zk):
         '''
         Test that znode deleted with deleteZnodeRecur(var) does not exist.
