@@ -11,6 +11,7 @@ __status__ = "Beta"
 
 
 import pytest
+import socket
 from ansibleKeeper import *
 from kazoo.client import KazooClient
 from kazoo.handlers.threading import *
@@ -46,11 +47,17 @@ tst.oneDict   = {tst.groupName:{tst.hostName:tst.varDict}}
 ## END of TestVars: global vars for tests 
 
 
-class TestReadOnly(object):
+class TestConfig(object):
     '''
-    Suite of tests where read-only zookeeper client connection is enough.
+    Suite of config tests with read-only zookeeper client connection.
     '''
 
+    def test_zkClusterUp(self):
+        '''
+        Test if zookeeper cluster is up
+        '''
+    
+    
     @pytest.fixture
     def ro_zk(self):
         '''
@@ -59,15 +66,32 @@ class TestReadOnly(object):
 
         ## example server list string 'zoo1.dmz:2181,zoo2.dmz:2181,zoo3.dmz:2181'    
         zk = KazooClient(hosts=cfg.zkServers, read_only = True)
-
         zk.start()
         
         return zk
 
-       
+
+    def test_zkClusterUp(self):
+        '''
+        Test if we the zookeeper cluster is UP.
+        We expect all servers are UP and port for zookeeper: 2181 is open. 
+        '''
+
+        zkSrvList = cfg.zkServers.replace(':2181','').split(',')
+
+        for srv in zkSrvList:
+            try:
+                sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+                assert sock.connect_ex((srv,2181)) == 0
+
+            finally:
+                sock.close()
+
+               
     def test_configZkClusterConnection(self, ro_zk):
         '''
-        Test if we can connect to zookeeper cluster servers.
+        Test if we can establish zookeeper client connection to zookeeper cluster servers.
+        We expect at least one server runnig zookeeper.
         '''
 
         try:
@@ -79,7 +103,8 @@ class TestReadOnly(object):
     
     def test_configZkServerConnection(self, ro_zk):
         '''
-        Test if we can connect to each zookeeper server.
+        Test if we can establish zookeeper client connection to each zookeeper server.
+        We expect all of the servers are running zookeeper. 
         '''
 
         ## example server list string 'zoo1.dmz:2181,zoo2.dmz:2181,zoo3.dmz:2181'
@@ -123,7 +148,6 @@ class TestReadWrite(object):
 
         ## example server list string 'zoo1.dmz:2181,zoo2.dmz:2181,zoo3.dmz:2181'    
         zk = KazooClient(hosts=cfg.zkServers)
-
         zk.start()
         
         return zk
@@ -149,8 +173,8 @@ class TestReadWrite(object):
 
         finally:
             rw_zk.stop()
-          
-        
+
+            
     def test_deleteZnodeRecur(self, rw_zk):
         '''
         Test that znode deleted with deleteZnodeRecur(var) does not exist.
