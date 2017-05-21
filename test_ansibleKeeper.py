@@ -115,6 +115,19 @@ class TestReadWrite(object):
         
         return zk
 
+
+    def test_basePrefixZnode(self, rw_zk):
+        '''
+        Test if base prefix znode from config exists.
+        '''
+
+
+        try:
+            assert rw_zk.exists(cfg.aPath) is not None
+
+        finally:
+            rw_zk.stop()
+
                 
     def test_addZnode(self, rw_zk):
         '''
@@ -136,8 +149,8 @@ class TestReadWrite(object):
 
         finally:
             rw_zk.stop()
-
-             
+         
+  
     def test_deleteZnodeRecur(self, rw_zk):
         '''
         Test that znode deleted with deleteZnodeRecur(var) does not exist.
