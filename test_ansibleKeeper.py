@@ -2,12 +2,12 @@
 Tests for ansibleKeeper
 '''
 
-__author__ = "Jan Kogut"
-__copyright__ = "Jan Kogut"
-__license__ = "MIT"
-__version__ = "0.0.1"
+__author__     = "Jan Kogut"
+__copyright__  = "Jan Kogut"
+__license__    = "MIT"
+__version__    = "0.0.1"
 __maintainer__ = "Jan Kogut"
-__status__ = "Beta"
+__status__     = "Beta"
 
 
 import pytest
@@ -43,6 +43,7 @@ tst.groupPath = "{0}/groups/{1}".format(cfg.aPath, tst.groupName)
 tst.delString = "{0}:{1}".format(tst.groupName, tst.hostName)
 
 tst.oneDict   = {tst.groupName:{tst.hostName:tst.varDict}}
+
 #################################################
 ## END of TestVars: global vars for tests 
 
@@ -170,6 +171,32 @@ class TestReadWrite(object):
             
         deleteZnodeRecur(splitZnodeString(tst.delString))
 
+        
+    # def test_addZnodeVar(self, rw_zk):
+    #     '''
+    #     Test if var-znode added with addZnode(var) exists.
+    #     '''
+
+    #     ## 1. check if Znode provided with tst.groupPath exists
+    #     ## 2. run addZnode(var) function
+    #     ## 3. check hostname vars values against testes values (from tst.testDict)
+    
+    #     if rw_zk.exists(tst.groupPath) is not None:
+    #         rw_zk.delete(tst.groupPath, recursive=True)
+    #         rw_zk.stop()
+
+    #     addZnode(tst.testDict)
+
+    #     for key in tst.testDict[tst.groupName][tst.hostName].keys():
+    #         rw_zkGet     = rw_zk.get('{0}/{1}'.format(tst.hostPath, key))[0]
+    #         testValue    = tst.testDict[tst.groupName][tst.hostName][key]
+
+    #         try:
+    #             assert rw_zkGet == testValue
+
+    #         finally:
+    #             rw_zk.stop()
+        
     
     def test_deleteZnodeRecur(self, rw_zk):
         '''
