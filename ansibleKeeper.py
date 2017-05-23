@@ -189,6 +189,35 @@ def deleteZnodeRecur(znodeStringSplited):
     return "DELETED ==> group: {0}".format(groupName)
 
 
+def updateZnode(znodeDict):
+    '''
+    Update znode with hostvars.
+
+    Return a string (UPDATED   ==> host: <hostname> to group: <groupname>).
+    '''
+
+    zk = KazooClient(hosts=cfg.zkServers)
+    zk.start()
+
+    groupName = znodeDict.keys()[0]
+    hostName  = znodeDict[groupName].keys()[0]
+    groupPath = "{0}/groups/{1}".format(cfg.aPath, groupName)
+    hostPath  = "{0}/{1}".format(groupPath, hostName)
+
+    if zk.exists(hostPath) is None:
+        zk.stop()    
+        return "ERROR  ==> host: {0} in group {1} does not exist !!!".format(hostName, groupName)
+    
+    else:
+        for key in znodeDict[groupName][hostName]:
+            varPath = "{0}/{1}".format(hostPath, key)
+            varVal  = znodeDict[groupName][hostName][key]
+            zk.create(varPath, varVal)
+
+            zk.stop()
+            return "ADDED   ==> host: {0} to group: {1}".format(hostName, groupName)
+
+
 def hostVarsShow(znodeStringSplited):
     '''
     Show hostvars for a given <groupname:hostname> or <groupname>.
