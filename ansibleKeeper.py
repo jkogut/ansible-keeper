@@ -41,13 +41,13 @@ def oParser():
     parser = OptionParser(usage="usage: %prog [opts] <args>",
                           version="%prog 0.0.1")
     parser.add_option("-A", nargs = 1,
-                      help="add host: <groupname:newhost1,var1:value1,var2:value2,var3:value3>")
+                      help="add hostname: <groupname1:newhostname1,var1:value1,var2:value2,var3:value3>")
     parser.add_option("-D", nargs = 1,
-                      help="delete hostname or groupname recursively: <groupname:newhost1> or <groupname>")
+                      help="delete hostname or groupname recursively: <groupname1:newhostname1> or <groupname1>")
     parser.add_option("-U", nargs = 1,
-                      help="update host with comma separated hostvars")
+                      help="update hostname with comma separated hostvars: <groupname1:newhostname1,var1:newvalue1,var2:newvalue2>")
     parser.add_option("-S", nargs = 1,
-                      help="show hostvars for a given hostname or groupname: <groupname:newhost1> or <groupname>")
+                      help="show hostvars for a given hostname or groupname: <groupname1:newhostname1> or <groupname1>")
     parser.add_option("-I", nargs = 1,
                       help="inventory mode: dumps inventory in json format from zookeeper")
 
@@ -128,11 +128,13 @@ def splitZnodeString(znodeString):
        hostName  = znodeString.split(':')[1]
        groupPath = "{0}/groups/{1}".format(cfg.aPath, groupName)
        hostPath  = "{0}/{1}".format(groupPath, hostName)
+
        return [(groupName, groupPath),(hostName, hostPath)]
 
     else:
        groupName = znodeString
        groupPath = "{0}/groups/{1}".format(cfg.aPath, groupName)
+
        return [(groupName, groupPath)]
 
 
@@ -152,6 +154,7 @@ def addZnode(znodeDict):
 
     if zk.exists(hostPath):
         zk.stop()    
+
         return "ERROR  ==> host: {0} in group {1} exist !!!".format(hostName, groupName)
     
     if zk.exists(groupPath):
@@ -165,6 +168,7 @@ def addZnode(znodeDict):
         zk.create(varPath, varVal)
 
     zk.stop()
+
     return "ADDED   ==> host: {0} to group: {1}".format(hostName, groupName)
 
 
@@ -222,23 +226,29 @@ def updateZnode(znodeDict):
     
     zk = zkStartRw()
     
-    groupName = znodeDict.keys()[0]
-    hostName  = znodeDict[groupName].keys()[0]
-    groupPath = "{0}/groups/{1}".format(cfg.aPath, groupName)
-    hostPath  = "{0}/{1}".format(groupPath, hostName)
-
+    groupName   = znodeDict.keys()[0]
+    hostName    = znodeDict[groupName].keys()[0]
+    groupPath   = "{0}/groups/{1}".format(cfg.aPath, groupName)
+    hostPath    = "{0}/{1}".format(groupPath, hostName)
+    hostVarList = zk.get_children(hostPath)
+    
     if zk.exists(hostPath) is None:
         zk.stop()    
         return "ERROR  ==> host: {0} in group {1} does not exist !!!".format(hostName, groupName)
-    
-    else:
-        for key in znodeDict[groupName][hostName]:
-            varPath = "{0}/{1}".format(hostPath, key)
-            varVal  = znodeDict[groupName][hostName][key]
-            zk.create(varPath, varVal)
 
-            zk.stop()
-            return "ADDED   ==> host: {0} to group: {1}".format(hostName, groupName)
+    for hostVar in hostVarList:
+        if zk.exists("{0}/{1}".format(hostPath, hostVar)) is None: 
+            zk.stop()            
+            return "ERROR  ==> hostvar: {0} for host {1} in group {2} does not exist !!!".format(hostVar, hostName, groupName)
+    
+    for key in znodeDict[groupName][hostName]:
+        varPath = "{0}/{1}".format(hostPath, key)
+        varVal  = znodeDict[groupName][hostName][key]
+        if 
+        zk.create(varPath, varVal)
+
+    zk.stop()
+    return "ADDED   ==> host: {0} to group: {1}".format(hostName, groupName)
 
 
 def hostVarsShow(znodeStringSplited):
@@ -286,6 +296,7 @@ def hostVarsShow(znodeStringSplited):
 
             for host in valDict.keys():
                 varDict = {}
+
                 for var in valDict[host]:
                     tmpHostPath   = '{0}/{1}'.format(groupPath, host)
                     varDict[var]  = zk.get('{0}/{1}'.format(tmpHostPath, var))[0]
