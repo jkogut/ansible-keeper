@@ -64,6 +64,19 @@ def oParser():
             'showMode':opts.S, 'inventoryMode':opts.I}
 
 
+def zkStartRw():
+    '''
+    Start a zookeeper client connection in read-write mode.
+
+    Return zookeeper read-write connection object.
+    '''
+
+    zk = KazooClient(hosts=cfg.zkServers)
+    zk.start()
+    
+    return zk
+    
+
 def splitZnodeVarString(znodeVarString):
     '''
     Parse string for commandline opts: <-A|-U>.
@@ -117,9 +130,8 @@ def addZnode(znodeDict):
     Return a string (ADDED    ==> host: <hostname> to group: <groupname>).
     '''
 
-    zk = KazooClient(hosts=cfg.zkServers)
-    zk.start()
-
+    zk = zkStartRw()
+    
     groupName = znodeDict.keys()[0]
     hostName  = znodeDict[groupName].keys()[0]
     groupPath = "{0}/groups/{1}".format(cfg.aPath, groupName)
@@ -150,8 +162,7 @@ def deleteZnodeRecur(znodeStringSplited):
     Return a string (DELETED||ERROR  ==> host: <hostname> in group: <groupname>||group: <groupname>).
     '''
 
-    zk = KazooClient(hosts=cfg.zkServers)
-    zk.start()
+    zk = zkStartRw()
 
     if len(znodeStringSplited) > 1:
 
@@ -195,10 +206,9 @@ def updateZnode(znodeDict):
 
     Return a string (UPDATED   ==> host: <hostname> to group: <groupname>).
     '''
-
-    zk = KazooClient(hosts=cfg.zkServers)
-    zk.start()
-
+    
+    zk = zkStartRw()
+    
     groupName = znodeDict.keys()[0]
     hostName  = znodeDict[groupName].keys()[0]
     groupPath = "{0}/groups/{1}".format(cfg.aPath, groupName)
@@ -225,9 +235,8 @@ def hostVarsShow(znodeStringSplited):
     Return dict or string (in case of ERROR).
     '''
 
-    zk = KazooClient(hosts=cfg.zkServers)
-    zk.start()
-
+    zk = zkStartRw()
+    
     if len(znodeStringSplited) > 1:
 
         groupName = znodeStringSplited[0][0]
@@ -282,9 +291,8 @@ def inventoryDump():
     Return dict.
     '''
 
-    zk = KazooClient(hosts=cfg.zkServers, read_only = True)
-    zk.start()
-
+    zk = zkStartRw()
+    
     groupList = zk.get_children("{}/groups".format(cfg.aPath))
     groupDict = {}
     
@@ -303,9 +311,8 @@ def ansibleInventoryDump():
     
     Return dict.
     '''
-
-    zk = KazooClient(hosts=cfg.zkServers, read_only = True)
-    zk.start()
+    
+    zk = zkStartRw()
 
     groupList = zk.get_children("{}/groups".format(cfg.aPath))
     groupDict = {}
