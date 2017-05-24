@@ -1,11 +1,11 @@
 #!/usr/bin/env python
 
-__author__ = "Jan Kogut"
-__copyright__ = "Jan Kogut"
-__license__ = "MIT"
-__version__ = "0.0.1"
+__author__     = "Jan Kogut"
+__copyright__  = "Jan Kogut"
+__license__    = "MIT"
+__version__    = "0.0.1"
 __maintainer__ = "Jan Kogut"
-__status__ = "Beta"
+__status__     = "Beta"
 
 
 import json
