@@ -64,6 +64,19 @@ def oParser():
             'showMode':opts.S, 'inventoryMode':opts.I}
 
 
+def zkStartRo():
+    '''
+    Start a zookeeper client connection in read-only mode.
+
+    Return zookeeper read-only connection object.
+    '''
+
+    zk = KazooClient(hosts=cfg.zkServers, read_only = True)
+    zk.start()
+    
+    return zk
+
+
 def zkStartRw():
     '''
     Start a zookeeper client connection in read-write mode.
@@ -235,7 +248,7 @@ def hostVarsShow(znodeStringSplited):
     Return dict or string (in case of ERROR).
     '''
 
-    zk = zkStartRw()
+    zk = zkStartRo()
     
     if len(znodeStringSplited) > 1:
 
@@ -291,7 +304,7 @@ def inventoryDump():
     Return dict.
     '''
 
-    zk = zkStartRw()
+    zk = zkStartRo()
     
     groupList = zk.get_children("{}/groups".format(cfg.aPath))
     groupDict = {}
@@ -312,7 +325,7 @@ def ansibleInventoryDump():
     Return dict.
     '''
     
-    zk = zkStartRw()
+    zk = zkStartRo()
 
     groupList = zk.get_children("{}/groups".format(cfg.aPath))
     groupDict = {}
