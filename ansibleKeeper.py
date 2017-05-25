@@ -365,15 +365,15 @@ def main():
         print json.dumps(ansibleInventoryDump())
 
     if oParser()['addMode'] is not None:
-        znodeDict = splitZnodeString(oParser()['addMode'])
+        znodeDict = splitZnodeVarString(oParser()['addMode'])
         print addZnode(znodeDict)
 
     if oParser()['deleteMode'] is not None:
-        znodeStringSplited = splitZnodeString((oParser()['deleteMode']))
+        znodeStringSplited = splitZnodeString(oParser()['deleteMode'])
         print deleteZnodeRecur(znodeStringSplited)
 
     if oParser()['showMode'] is not None:
-        znodeStringSplited = splitZnodeString((oParser()['showMode']))
+        znodeStringSplited = splitZnodeString(oParser()['showMode'])
         print json.dumps(hostVarsShow(znodeStringSplited))
                                   
         
