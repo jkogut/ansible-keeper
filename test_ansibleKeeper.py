@@ -35,6 +35,15 @@ tst.testDict  = {"testgroupname1":
                  }
 }
 
+
+tst.updateDict  = {"testgroupname1":
+                 {
+                  "testhostname1":{"var1":"valUpdated1", "var2":"valUpdated2", "var3":"valUpdated3"},
+                  "testhostname2":{"var1":"valUpdated11", "var2":"valUpdated22", "var3":"valUpdated33"},
+                  "testhostname3":{"var1":"valUpdated111", "var2":"valUpdated222", "var3":"valUpdated333"}
+                 }
+}
+
 tst.groupName = tst.testDict.keys()[0]
 tst.hostName  = tst.testDict[tst.groupName].keys()[0]
 tst.varDict   = tst.testDict[tst.groupName][tst.hostName]
