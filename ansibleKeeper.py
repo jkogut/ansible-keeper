@@ -217,38 +217,38 @@ def deleteZnodeRecur(znodeStringSplited):
     return "DELETED ==> group: {0}".format(groupName)
 
 
-def updateZnode(znodeDict):
-    '''
-    Update znode with hostvars.
+# def updateZnode(znodeDict):
+#     '''
+#     Update znode with hostvars.
 
-    Return a string (UPDATED   ==> host: <hostname> to group: <groupname>).
-    '''
+#     Return a string (UPDATED   ==> host: <hostname> to group: <groupname>).
+#     '''
     
-    zk = zkStartRw()
+#     zk = zkStartRw()
     
-    groupName   = znodeDict.keys()[0]
-    hostName    = znodeDict[groupName].keys()[0]
-    groupPath   = "{0}/groups/{1}".format(cfg.aPath, groupName)
-    hostPath    = "{0}/{1}".format(groupPath, hostName)
-    hostVarList = zk.get_children(hostPath)
+#     groupName   = znodeDict.keys()[0]
+#     hostName    = znodeDict[groupName].keys()[0]
+#     groupPath   = "{0}/groups/{1}".format(cfg.aPath, groupName)
+#     hostPath    = "{0}/{1}".format(groupPath, hostName)
+#     hostVarList = zk.get_children(hostPath)
     
-    if zk.exists(hostPath) is None:
-        zk.stop()    
-        return "ERROR  ==> host: {0} in group {1} does not exist !!!".format(hostName, groupName)
+#     if zk.exists(hostPath) is None:
+#         zk.stop()    
+#         return "ERROR  ==> host: {0} in group {1} does not exist !!!".format(hostName, groupName)
 
-    for hostVar in hostVarList:
-        if zk.exists("{0}/{1}".format(hostPath, hostVar)) is None: 
-            zk.stop()            
-            return "ERROR  ==> hostvar: {0} for host {1} in group {2} does not exist !!!".format(hostVar, hostName, groupName)
+#     for hostVar in hostVarList:
+#         if zk.exists("{0}/{1}".format(hostPath, hostVar)) is None: 
+#             zk.stop()            
+#             return "ERROR  ==> hostvar: {0} for host {1} in group {2} does not exist !!!".format(hostVar, hostName, groupName)
     
-    for key in znodeDict[groupName][hostName]:
-        varPath = "{0}/{1}".format(hostPath, key)
-        varVal  = znodeDict[groupName][hostName][key]
-        if 
-        zk.create(varPath, varVal)
+#     for key in znodeDict[groupName][hostName]:
+#         varPath = "{0}/{1}".format(hostPath, key)
+#         varVal  = znodeDict[groupName][hostName][key]
+#         if CONDITION: #FIXME!!!
+#            zk.create(varPath, varVal)
 
-    zk.stop()
-    return "ADDED   ==> host: {0} to group: {1}".format(hostName, groupName)
+#     zk.stop()
+#     return "ADDED   ==> host: {0} to group: {1}".format(hostName, groupName)
 
 
 def hostVarsShow(znodeStringSplited):
