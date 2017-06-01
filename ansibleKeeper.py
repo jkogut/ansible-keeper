@@ -124,18 +124,18 @@ def splitZnodeString(znodeString):
     ## example output: [("groupname","/ansible_zk/groups/groupname"),("hostname1","/ansible_zk/groups/groupname")]
 
     if ':' in znodeString:
-       groupName = znodeString.split(':')[0]
-       hostName  = znodeString.split(':')[1]
-       groupPath = "{0}/groups/{1}".format(cfg.aPath, groupName)
-       hostPath  = "{0}/{1}".format(groupPath, hostName)
+        groupName = znodeString.split(':')[0]
+        hostName  = znodeString.split(':')[1]
+        groupPath = "{0}/groups/{1}".format(cfg.aPath, groupName)
+        hostPath  = "{0}/{1}".format(groupPath, hostName)
 
-       return [(groupName, groupPath),(hostName, hostPath)]
+        return [(groupName, groupPath),(hostName, hostPath)]
 
     else:
-       groupName = znodeString
-       groupPath = "{0}/groups/{1}".format(cfg.aPath, groupName)
+        groupName = znodeString
+        groupPath = "{0}/groups/{1}".format(cfg.aPath, groupName)
 
-       return [(groupName, groupPath)]
+        return [(groupName, groupPath)]
 
 
 def addZnode(znodeDict):
@@ -301,6 +301,9 @@ def hostVarsShow(znodeStringSplited):
                     tmpHostPath   = '{0}/{1}'.format(groupPath, host)
                     varDict[var]  = zk.get('{0}/{1}'.format(tmpHostPath, var))[0]
                     valDict[host] = varDict
+
+            return valDict
+
     else:
         return "ERROR with processing znodeStrings !!!"
                     
