@@ -183,6 +183,31 @@ class TestReadWrite(object):
         deleteZnodeRecur(splitZnodeString(tst.groupHostStr))
 
         
+    def test_addHostToGroup(self, rw_zk):
+        '''
+        Test if hostname-znode added with addHostToGroup(var) exists.
+        '''
+
+        ## 1. check if Znode provided with test config exists
+        ## 2. run addHostToGroup(var) function
+        ## 3. check if hostname added with addHostToGroup exists
+        ## 4. run deleteZnodeRecur(var) 
+    
+        if rw_zk.exists(tst.groupPath) is not None:
+            rw_zk.delete(tst.groupPath, recursive=True)
+            rw_zk.stop()
+
+        addHostToGroup(splitZnodeString(tst.groupHostStr))
+
+        try:
+            assert rw_zk.exists(tst.hostPath) is not None
+
+        finally:
+            rw_zk.stop()
+            
+        deleteZnodeRecur(splitZnodeString(tst.groupHostStr))
+
+        
     def test_deleteZnodeRecur(self, rw_zk):
         '''
         Test that znode deleted with deleteZnodeRecur(var) does not exist.
