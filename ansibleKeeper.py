@@ -45,7 +45,7 @@ def oParser():
     parser.add_option("-G", nargs = 1,
                       help="add hostname to hostgroup: <groupname:hostname>")
     parser.add_option("-D", nargs = 1,
-                      help="delete hostname or groupname recursively: <groupname1:newhostname1> or <groupname1>")
+                      help="delete hostname or groupname recursively: <groupname1:hostname1> or <groupname1> or <hosts:hostname1>")
     parser.add_option("-U", nargs = 1,
                       help="update hostname with comma separated hostvars: <groupname1:newhostname1,var1:newvalue1,var2:newvalue2>")
     parser.add_option("-S", nargs = 1,
@@ -118,20 +118,22 @@ def splitZnodeString(znodeString):
     '''
     Splits znodeString into groupName, hostName, groupPath, hostPath.
 
-    Return list of tuples.
+    Return list of tuples or list of tuple.
     '''
 
-    ## spliting example string into list of tuples or tuple :
+    ## spliting example string into list of tuples or list of tuple :
     ## example string: groupname:hostname1
-    ## example output: [("groupname","/ansible_zk/groups/groupname"),("hostname1","/ansible_zk/groups/groupname/hostname1")]
+    ## example output: [("groupname","/ansible_zk/groups/groupname"),
+    ##                  ("hostname1","/ansible_zk/hosts/hostname1","/ansible_zk/groups/groupname/hostname1")]
 
     if ':' in znodeString:
-        groupName = znodeString.split(':')[0]
-        hostName  = znodeString.split(':')[1]
-        groupPath = "{0}/groups/{1}".format(cfg.aPath, groupName)
-        hostPath  = "{0}/{1}".format(groupPath, hostName)
+        groupName      = znodeString.split(':')[0]
+        hostName       = znodeString.split(':')[1]
+        groupPath      = "{0}/groups/{1}".format(cfg.aPath, groupName)
+        hostPath       = "{0}/hosts/{1}".format(cfg.aPath, hostName)
+        hostGroupPath  = "{0}/{1}".format(groupPath, hostName)
 
-        return [(groupName, groupPath),(hostName, hostPath)]
+        return [(groupName, groupPath),(hostName, hostPath, hostGroupPath)]
 
     else:
         groupName = znodeString
@@ -205,11 +207,11 @@ def addHostToGroup(znodeStringSplited):
     return "ADDED   ==> host: {0} to group: {1}".format(hostName, groupName)
 
 
-def deleteZnodeRecur(znodeStringSplited):
+def deleteZnodeRecur(znodeString):
     '''
-    Delete znode with hostvars for a given list of tuple <groupname:hostname>.
+    Delete znode recursivelly for a given string <groupname> or <hostname>.
 
-    Return a string (DELETED||ERROR  ==> host: <hostname> in group: <groupname>||group: <groupname>).
+    Return a string (DELETED||ERROR  ==> [host: <hostname> || group: <groupname>]).
     '''
 
     zk = zkStartRw()
