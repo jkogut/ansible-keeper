@@ -41,7 +41,9 @@ def oParser():
     parser = OptionParser(usage="usage: %prog [opts] <args>",
                           version="%prog 0.0.1")
     parser.add_option("-A", nargs = 1,
-                      help="add hostname: <groupname1:newhostname1,var1:value1,var2:value2,var3:value3>")
+                      help="add hostname with hostvars: <groupname1:newhostname1,var1:value1,var2:value2,var3:value3>")
+    parser.add_option("-G", nargs = 1,
+                      help="add hostname to hostgroup: <groupname:hostname>")
     parser.add_option("-D", nargs = 1,
                       help="delete hostname or groupname recursively: <groupname1:newhostname1> or <groupname1>")
     parser.add_option("-U", nargs = 1,
@@ -49,18 +51,18 @@ def oParser():
     parser.add_option("-S", nargs = 1,
                       help="show hostvars for a given hostname or groupname: <groupname1:newhostname1> or <groupname1>")
     parser.add_option("-I", nargs = 1,
-                      help="inventory mode: dumps inventory in json format from zookeeper")
+                      help="inventory mode: true|ansible dumps inventory in json format from zookeeper")
 
     
     (opts, args) = parser.parse_args()
     
     
-    if (opts.A or opts.D or opts.U or opts.I or opts.S) == None:
+    if (opts.A or opts.G or opts.D or opts.U or opts.I or opts.S) == None:
 
         parser.print_help()
         exit(-1)
         
-    return {'addMode':opts.A, 'deleteMode':opts.D, 'updateMode':opts.U,
+    return {'addMode':opts.A, 'groupMode':opts.G, 'deleteMode':opts.D, 'updateMode':opts.U,
             'showMode':opts.S, 'inventoryMode':opts.I}
 
 
@@ -138,7 +140,41 @@ def splitZnodeString(znodeString):
         return [(groupName, groupPath)]
 
 
-def addZnode(znodeDict):
+def addHostWithHostvars(znodeDict):
+    '''
+    Add existing znode to new group.
+
+    Return a string (ADDED    ==> host: <hostname> to group: <groupname>).
+    '''
+
+    zk = zkStartRw()
+    
+    groupName = znodeDict.keys()[0]
+    hostName  = znodeDict[groupName].keys()[0]
+    groupPath = "{0}/groups/{1}".format(cfg.aPath, groupName)
+    hostPath  = "{0}/{1}".format(groupPath, hostName)
+
+    if zk.exists(hostPath):
+        zk.stop()    
+
+        return "ERROR  ==> host: {0} in group {1} exist !!!".format(hostName, groupName)
+    
+    if zk.exists(groupPath):
+        zk.create(hostPath)
+    else:
+        zk.ensure_path(hostPath)
+
+    for key in znodeDict[groupName][hostName]:
+        varPath = "{0}/{1}".format(hostPath, key)
+        varVal  = znodeDict[groupName][hostName][key]
+        zk.create(varPath, varVal)
+
+    zk.stop()
+
+    return "ADDED   ==> host: {0} to group: {1}".format(hostName, groupName)
+
+
+def addHostToGroup(znodeDict):
     '''
     Add new znode with hostvars.
 
@@ -170,6 +206,7 @@ def addZnode(znodeDict):
     zk.stop()
 
     return "ADDED   ==> host: {0} to group: {1}".format(hostName, groupName)
+
 
 
 def deleteZnodeRecur(znodeStringSplited):
@@ -369,7 +406,11 @@ def main():
 
     if oParser()['addMode'] is not None:
         znodeDict = splitZnodeVarString(oParser()['addMode'])
-        print addZnode(znodeDict)
+        print addHostWithHostvars(znodeDict)
+
+    if oParser()['groupMode'] is not None:
+        znodeStringSplited = splitZnodeString(oParser()['groupMode'])
+        print addHostToGroup(znodeStringSplited)
 
     if oParser()['deleteMode'] is not None:
         znodeStringSplited = splitZnodeString(oParser()['deleteMode'])
