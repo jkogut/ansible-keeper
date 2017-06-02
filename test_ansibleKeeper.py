@@ -44,14 +44,16 @@ tst.updateDict  = {"testgroupname1":
                  }
 }
 
-tst.groupName = tst.testDict.keys()[0]
-tst.hostName  = tst.testDict[tst.groupName].keys()[0]
-tst.varDict   = tst.testDict[tst.groupName][tst.hostName]
-tst.hostPath  = "{0}/groups/{1}/{2}".format(cfg.aPath, tst.groupName, tst.hostName)
-tst.groupPath = "{0}/groups/{1}".format(cfg.aPath, tst.groupName)
-tst.delString = "{0}:{1}".format(tst.groupName, tst.hostName)
+tst.groupName    = tst.testDict.keys()[0]
+tst.hostName     = tst.testDict[tst.groupName].keys()[0]
 
-tst.oneDict   = {tst.groupName:{tst.hostName:tst.varDict}}
+tst.varDict      = tst.testDict[tst.groupName][tst.hostName]
+tst.oneDict      = {tst.groupName:{tst.hostName:tst.varDict}}
+
+tst.hostPath     = "{0}/groups/{1}/{2}".format(cfg.aPath, tst.groupName, tst.hostName)
+tst.groupPath    = "{0}/groups/{1}".format(cfg.aPath, tst.groupName)
+tst.groupHostStr = "{0}:{1}".format(tst.groupName, tst.hostName)
+
 
 #################################################
 ## END of TestVars: global vars for tests 
@@ -163,7 +165,7 @@ class TestReadWrite(object):
 
         ## 1. check if Znode provided with test config exists
         ## 2. run addHostWithHostvars(var) function
-        ## 3. check hostname value against testes values (from tst.testDict)
+        ## 3. check hostname value against tested values (from tst.testDict)
         ## 4. run deleteZnodeRecur(var) 
     
         if rw_zk.exists(tst.groupPath) is not None:
@@ -178,35 +180,9 @@ class TestReadWrite(object):
         finally:
             rw_zk.stop()
             
-        deleteZnodeRecur(splitZnodeString(tst.delString))
+        deleteZnodeRecur(splitZnodeString(tst.groupHostStr))
 
         
-    # def test_addHostWithHostvarsVar(self, rw_zk):
-    #     '''
-    #     Test if var-znode added with addHostWithHostvars(var) exists.
-    #     '''
-
-    #     ## 1. check if Znode provided with tst.groupPath exists
-    #     ## 2. run addHostWithHostvars(var) function
-    #     ## 3. check hostname vars values against testes values (from tst.testDict)
-    
-    #     if rw_zk.exists(tst.groupPath) is not None:
-    #         rw_zk.delete(tst.groupPath, recursive=True)
-    #         rw_zk.stop()
-
-    #     addHostWithHostvars(tst.testDict)
-
-    #     for key in tst.testDict[tst.groupName][tst.hostName].keys():
-    #         rw_zkGet     = rw_zk.get('{0}/{1}'.format(tst.hostPath, key))[0]
-    #         testValue    = tst.testDict[tst.groupName][tst.hostName][key]
-
-    #         try:
-    #             assert rw_zkGet == testValue
-
-    #         finally:
-    #             rw_zk.stop()
-        
-    
     def test_deleteZnodeRecur(self, rw_zk):
         '''
         Test that znode deleted with deleteZnodeRecur(var) does not exist.
@@ -217,7 +193,7 @@ class TestReadWrite(object):
         ## 3. check Znode path against that string 
 
         addHostWithHostvars(tst.testDict)
-        deleteZnodeRecur(splitZnodeString(tst.delString))
+        deleteZnodeRecur(splitZnodeString(tst.groupHostStr))
 
         try:
             assert rw_zk.exists(tst.hostPath) is None
@@ -233,7 +209,7 @@ class TestReadWrite(object):
 
         errString = 'ERROR  ==> could not delete host: {} that does not exist !!!'.format(tst.hostName)
 
-        assert deleteZnodeRecur(splitZnodeString(tst.delString)) == errString
+        assert deleteZnodeRecur(splitZnodeString(tst.groupHostStr)) == errString
     
     
     def test_deleteZnodeRecurGroup(self, rw_zk):
@@ -242,7 +218,7 @@ class TestReadWrite(object):
         '''
 
         ## 1. run addHostWithHostvars(var) function to create given Znode provided in tst.testDict 
-        ## 2. run deleteZnodeRecur(var) function to delete given Znode provided in tst.delString 
+        ## 2. run deleteZnodeRecur(var) function to delete given Znode provided in tst.groupHostStr 
         ## 3. check Znode path against that string 
 
         addHostWithHostvars(tst.testDict)
@@ -262,11 +238,11 @@ class TestReadWrite(object):
 
         ## 1. run addHostWithHostvars(var) function to create given Znode with vars provided in tst.oneDict 
         ## 2. test hostVarsShow() against vars and values provided in tst.testDict 
-        ## 3. run deleteZnodeRecur(var) function to delete given Znode provided in tst.delString 
+        ## 3. run deleteZnodeRecur(var) function to delete given Znode provided in tst.groupHostStr 
 
         addHostWithHostvars(tst.oneDict)
 
-        testList = [(tst.delString, tst.varDict),(tst.groupName, tst.oneDict[tst.groupName])]
+        testList = [(tst.groupHostStr, tst.varDict),(tst.groupName, tst.oneDict[tst.groupName])]
     
         for val in testList:
             assert hostVarsShow(splitZnodeString(val[0])) == val[1]
@@ -281,13 +257,13 @@ class TestReadWrite(object):
 
         ## 1. run addHostWithHostvars(var) function to create given Znode with vars provided in tst.testDict 
         ## 2. test hostVarsShow() against vars and values provided in tst.testDict 
-        ## 3. run deleteGroupZnode(var) function to delete given Znode provided in tst.delString 
+        ## 3. run deleteGroupZnode(var) function to delete given Znode provided in tst.groupHostStr 
 
         for key in tst.testDict[tst.groupName].keys():
             tmpDict = {tst.groupName : { key : tst.testDict[tst.groupName][key] }}
             addHostWithHostvars(tmpDict)
 
-        testList = [(tst.delString, tst.varDict),(tst.groupName, tst.testDict[tst.groupName])]
+        testList = [(tst.groupHostStr, tst.varDict),(tst.groupName, tst.testDict[tst.groupName])]
     
         for val in testList:
             assert hostVarsShow(splitZnodeString(val[0])) == val[1]
@@ -303,7 +279,7 @@ class TestReadWrite(object):
     #     ## 1. run addHostWithHostvars(var) function to create given Znode provided in tst.testDict
     #     ## 2. run updateZnode(var) function to update given Znode provided in tst.updateDict
     #     ## 3. check upated results against tst.updateDict
-    #     ## 4. run deleteZnodeRecur(var) function to delete given Znode provided in tst.delString
+    #     ## 4. run deleteZnodeRecur(var) function to delete given Znode provided in tst.groupHostStr
     
     #     addHostWithHostvars(tst.testDict)
     #     updateZnode(tst.updateDict)
