@@ -149,33 +149,37 @@ def addHostWithHostvars(znodeDict):
 
     zk = zkStartRw()
     
-    groupName = znodeDict.keys()[0]
-    hostName  = znodeDict[groupName].keys()[0]
-    groupPath = "{0}/groups/{1}".format(cfg.aPath, groupName)
-    hostPath  = "{0}/{1}".format(groupPath, hostName)
+    groupName      = znodeDict.keys()[0]
+    hostName       = znodeDict[groupName].keys()[0]
+    groupPath      = "{0}/groups/{1}".format(cfg.aPath, groupName)
+    hostPath       = "{0}/hosts/{1}".format(cfg.aPath, hostName)
+    hostGroupPath  = "{0}/{1}".format(groupPath, hostName)
 
     if zk.exists(hostPath):
         zk.stop()    
-        return "ERROR  ==> host: {0} in group {1} exist !!!".format(hostName, groupName)
-    
-    if zk.exists(groupPath):
-        zk.create(hostPath)
+        return "ERROR  ==> host: {0} exists !!!".format(hostName, groupName)
+
+    elif zk.exists(hostGroupPath):
+        zk.stop()    
+        return "ERROR  ==> host: {0} in group {1} exists !!!".format(hostName, groupName)
+
     else:
         zk.ensure_path(hostPath)
+        zk.ensure_path(hostGroupPath)
 
-    for key in znodeDict[groupName][hostName]:
-        varPath = "{0}/{1}".format(hostPath, key)
-        varVal  = znodeDict[groupName][hostName][key]
-        zk.create(varPath, varVal)
+        for key in znodeDict[groupName][hostName]:
+            varPath = "{0}/{1}".format(hostPath, key)
+            varVal  = znodeDict[groupName][hostName][key]
+            zk.create(varPath, varVal)
 
-    zk.stop()
+        zk.stop()
 
-    return "ADDED   ==> host: {0} to group: {1}".format(hostName, groupName)
+        return "ADDED   ==> host: {0} to group: {1}".format(hostName, groupName)
 
 
 def addHostToGroup(znodeStringSplited):
     '''
-    Add new znode with hostvars.
+    Add host to group.
 
     Return a string (ADDED    ==> host: <hostname> to group: <groupname>).
     '''
