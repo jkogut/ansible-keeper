@@ -123,7 +123,7 @@ def splitZnodeString(znodeString):
 
     ## spliting example string into list of tuples or tuple :
     ## example string: groupname:hostname1
-    ## example output: [("groupname","/ansible_zk/groups/groupname"),("hostname1","/ansible_zk/groups/groupname")]
+    ## example output: [("groupname","/ansible_zk/groups/groupname"),("hostname1","/ansible_zk/groups/groupname/hostname1")]
 
     if ':' in znodeString:
         groupName = znodeString.split(':')[0]
@@ -156,7 +156,6 @@ def addHostWithHostvars(znodeDict):
 
     if zk.exists(hostPath):
         zk.stop()    
-
         return "ERROR  ==> host: {0} in group {1} exist !!!".format(hostName, groupName)
     
     if zk.exists(groupPath):
@@ -174,7 +173,7 @@ def addHostWithHostvars(znodeDict):
     return "ADDED   ==> host: {0} to group: {1}".format(hostName, groupName)
 
 
-def addHostToGroup(znodeDict):
+def addHostToGroup(znodeStringSplited):
     '''
     Add new znode with hostvars.
 
@@ -182,15 +181,14 @@ def addHostToGroup(znodeDict):
     '''
 
     zk = zkStartRw()
-    
-    groupName = znodeDict.keys()[0]
-    hostName  = znodeDict[groupName].keys()[0]
-    groupPath = "{0}/groups/{1}".format(cfg.aPath, groupName)
-    hostPath  = "{0}/{1}".format(groupPath, hostName)
+
+    groupName = znodeStringSplited[0][0]
+    groupPath = znodeStringSplited[0][1]
+    hostName  = znodeStringSplited[1][0]
+    hostPath  = znodeStringSplited[1][1]
 
     if zk.exists(hostPath):
         zk.stop()    
-
         return "ERROR  ==> host: {0} in group {1} exist !!!".format(hostName, groupName)
     
     if zk.exists(groupPath):
@@ -198,15 +196,9 @@ def addHostToGroup(znodeDict):
     else:
         zk.ensure_path(hostPath)
 
-    for key in znodeDict[groupName][hostName]:
-        varPath = "{0}/{1}".format(hostPath, key)
-        varVal  = znodeDict[groupName][hostName][key]
-        zk.create(varPath, varVal)
-
     zk.stop()
 
     return "ADDED   ==> host: {0} to group: {1}".format(hostName, groupName)
-
 
 
 def deleteZnodeRecur(znodeStringSplited):
