@@ -354,17 +354,18 @@ def inventoryDump():
     '''
 
     zk = zkStartRo()
+
+    hostsList  = zk.get_children("{}/hosts".format(cfg.aPath))
+    groupsList = zk.get_children("{}/groups".format(cfg.aPath))
+    dumpDict   = {"hosts": hostsList}
     
-    groupList = zk.get_children("{}/groups".format(cfg.aPath))
-    groupDict = {}
-    
-    for group in groupList:
+    for group in groupsList:
         path     = "{0}/groups/{1}".format(cfg.aPath, group)
         children = zk.get_children(path)
-        groupDict[group] = children
+        dumpDict[group] = children
     
     zk.stop()
-    return groupDict
+    return dumpDict
 
 
 def ansibleInventoryDump():
