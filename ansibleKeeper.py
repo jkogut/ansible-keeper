@@ -126,7 +126,14 @@ def splitZnodeString(znodeString):
     ## example output: [("groupname","/ansible_zk/groups/groupname"),
     ##                  ("hostname1","/ansible_zk/hosts/hostname1","/ansible_zk/groups/groupname/hostname1")]
 
-    if ':' in znodeString:
+
+    if 'hosts:' in znodeString:
+        hostName       = znodeString.split(':')[1]
+        hostPath       = "{0}/hosts/{1}".format(cfg.aPath, hostName)
+
+        return [(hostName, hostPath, None)]
+
+    elif ':' in znodeString:
         groupName      = znodeString.split(':')[0]
         hostName       = znodeString.split(':')[1]
         groupPath      = "{0}/groups/{1}".format(cfg.aPath, groupName)
