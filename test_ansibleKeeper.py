@@ -170,14 +170,14 @@ class TestReadWrite(object):
         ## 3. check hostname value against tested values (from tst.testDict)
         ## 4. run deleteZnodeRecur(var) 
     
-        if rw_zk.exists(tst.groupPath) is not None:
-            rw_zk.delete(tst.groupPath, recursive=True)
+        if rw_zk.exists(tst.hostPath) is not None:
+            rw_zk.delete(tst.hostPath, recursive=True)
             rw_zk.stop()
 
         addHostWithHostvars(tst.testDict)
 
         try:
-            assert rw_zk.exists(tst.hostGroupPath) is not None
+            assert rw_zk.exists(tst.hostPath) is not None
 
         finally:
             rw_zk.stop()
