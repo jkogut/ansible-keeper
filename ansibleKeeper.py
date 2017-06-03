@@ -116,7 +116,7 @@ def splitZnodeVarString(znodeVarString):
 
 def splitZnodeString(znodeString):
     '''
-    Splits znodeString into groupName, hostName, groupPath, hostPath.
+    Splits znodeString into groupName, hostName, groupPath, hostPath, hostGroupPath.
 
     Return list of tuples or list of tuple.
     '''
@@ -188,26 +188,22 @@ def addHostToGroup(znodeStringSplited):
 
     zk = zkStartRw()
 
-    groupName = znodeStringSplited[0][0]
-    groupPath = znodeStringSplited[0][1]
-    hostName  = znodeStringSplited[1][0]
-    hostPath  = znodeStringSplited[1][1]
+    groupName      = znodeStringSplited[0][0]
+    groupPath      = znodeStringSplited[0][1]
+    hostName       = znodeStringSplited[1][0]
+    hostGroupPath  = znodeStringSplited[1][2]
 
-    if zk.exists(hostPath):
+    if zk.exists(hostGroupPath):
         zk.stop()    
         return "ERROR  ==> host: {0} in group {1} exist !!!".format(hostName, groupName)
     
-    if zk.exists(groupPath):
-        zk.create(hostPath)
-    else:
-        zk.ensure_path(hostPath)
-
+    zk.ensure_path(hostGroupPath)
     zk.stop()
 
     return "ADDED   ==> host: {0} to group: {1}".format(hostName, groupName)
 
 
-def deleteZnodeRecur(znodeString):
+def deleteZnodeRecur(znodeStringSplited):
     '''
     Delete znode recursivelly for a given string <groupname> or <hostname>.
 
