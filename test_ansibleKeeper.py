@@ -229,10 +229,10 @@ class TestReadWrite(object):
 
     def test_deleteZnodeExistance(self):
         '''
-        Test that deleteZnode() will inform us that we want to delete nonexistent Znode.
+        Test that deleteZnodeRecur() will inform us that we want to delete nonexistent Znode.
         '''
 
-        errString = 'ERROR  ==> could not delete host: {} that does not exist !!!'.format(tst.hostName)
+        errString = 'ERROR  ==> could not delete host: {0} that does not exist in group: {1} !!!'.format(tst.hostName, tst.groupName)
 
         assert deleteZnodeRecur(splitZnodeString(tst.groupHostStr)) == errString
     
