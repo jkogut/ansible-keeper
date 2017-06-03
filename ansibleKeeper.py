@@ -224,6 +224,7 @@ def deleteZnodeRecur(znodeStringSplited):
 
     zk = zkStartRw()
 
+    ## check if it is <groupname:hostname> case
     if len(znodeStringSplited) > 1:
 
         groupName      = znodeStringSplited[0][0]
@@ -248,23 +249,43 @@ def deleteZnodeRecur(znodeStringSplited):
             zk.delete(hostGroupPath, recursive=True)
             zk.stop()
             return "DELETED ==> host: {0} in group: {1}".format(hostName, groupName)
-
+    
+    ## check if it is <groupname> or <hosts:hostname> case    
     elif len(znodeStringSplited) == 1:
-
-        groupName = znodeStringSplited[0][0]
-        groupPath = znodeStringSplited[0][1]
+        ## first check for group only
+        if len(znodeStringSplited[0]) == 2:
+        
+            groupName = znodeStringSplited[0][0]
+            groupPath = znodeStringSplited[0][1]
        
-        if zk.exists(groupPath) is None:
-            zk.stop()
-            return "ERROR  ==> could not delete group: {0} that does not exist !!!".format(groupName)
+            if zk.exists(groupPath) is None:
+                zk.stop()
+                return "ERROR  ==> could not delete group: {0} that does not exist !!!".format(groupName)
 
+            else:
+                zk.delete(groupPath, recursive=True)
+                zk.stop()
+                return "DELETED ==> group: {0}".format(groupName)
+            
+        ## then assume check for hosts only 
         else:
-            zk.delete(groupPath, recursive=True)
+            hostName       = znodeStringSplited[0][0]
+            hostPath       = znodeStringSplited[0][1]
+
+            if zk.exists(hostPath) is None:
+                zk.stop()
+                return "ERROR  ==> could not delete host: {0} that does not exist !!!".format(hostName)
+
+            else:
+                zk.delete(hostPath, recursive=True)
+                zk.stop()
+                return "DELETED ==> host: {0}".format(hostName)
+            
+    ## Unknown cases        
     else:
         return "ERROR with processing znodeStrings !!!"           
-          
+
     zk.stop()
-    return "DELETED ==> group: {0}".format(groupName)
 
 
 # def updateZnode(znodeDict):
