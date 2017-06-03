@@ -44,18 +44,18 @@ tst.updateDict  = {"testgroupname1":
                  }
 }
 
-tst.groupName     = tst.testDict.keys()[0]
-tst.hostName      = tst.testDict[tst.groupName].keys()[0]
+tst.groupName     = tst.testDict.keys()[0]                     ## ==> 'testgroupname1'
+tst.hostName      = tst.testDict[tst.groupName].keys()[0]      ## ==> 'testhostname1' 
 
-tst.varDict       = tst.testDict[tst.groupName][tst.hostName]
-tst.oneDict       = {tst.groupName:{tst.hostName:tst.varDict}}
+tst.varDict       = tst.testDict[tst.groupName][tst.hostName]  ## ==> {'var1': 'val1', 'var3': 'val3', 'var2': 'val2'}
+tst.oneDict       = {tst.groupName:{tst.hostName:tst.varDict}} ## ==> {'testgroupname1': {'testhostname1': {'var1': 'val1', 'var3': 'val3', 'var2': 'val2'}}}
 
 tst.hostPath      = "{0}/hosts/{1}".format(cfg.aPath, tst.hostName)
 tst.groupPath     = "{0}/groups/{1}".format(cfg.aPath, tst.groupName)
 tst.hostGroupPath = "{0}/groups/{1}/{2}".format(cfg.aPath, tst.groupName, tst.hostName)
 
-tst.groupHostStr  = "{0}:{1}".format(tst.groupName, tst.hostName)
-
+tst.groupHostStr  = "{0}:{1}".format(tst.groupName, tst.hostName) ## ==> 'testgroupname1:testhostname1'
+tst.hostHostStr   = "hosts:{0}".format(tst.hostName)              ## ==> 'hosts:testhostname1'
 
 #################################################
 ## END of TestVars: global vars for tests 
@@ -182,7 +182,7 @@ class TestReadWrite(object):
         finally:
             rw_zk.stop()
             
-        deleteZnodeRecur(splitZnodeString(tst.groupHostStr))
+        deleteZnodeRecur(splitZnodeString(tst.hostHostStr))
 
         
     def test_addHostToGroup(self, rw_zk):
@@ -199,7 +199,7 @@ class TestReadWrite(object):
             rw_zk.delete(tst.groupPath, recursive=True)
             rw_zk.stop()
 
-        addHostToGroup(splitZnodeString(tst.groupHostStr))
+        addHostToGroup(splitZnodeString(tst.hostHostStr))
 
         try:
             assert rw_zk.exists(tst.hostGroupPath) is not None
@@ -207,7 +207,7 @@ class TestReadWrite(object):
         finally:
             rw_zk.stop()
             
-        deleteZnodeRecur(splitZnodeString(tst.groupHostStr))
+        deleteZnodeRecur(splitZnodeString(tst.hostHostStr))
 
         
     def test_deleteZnodeRecur(self, rw_zk):
@@ -220,7 +220,7 @@ class TestReadWrite(object):
         ## 3. check Znode path against that string 
 
         addHostWithHostvars(tst.testDict)
-        deleteZnodeRecur(splitZnodeString(tst.groupHostStr))
+        deleteZnodeRecur(splitZnodeString(tst.hostHostStr))
 
         try:
             assert rw_zk.exists(tst.hostGroupPath) is None
@@ -236,7 +236,7 @@ class TestReadWrite(object):
 
         errString = 'ERROR  ==> could not delete host: {0} that does not exist in group: {1} !!!'.format(tst.hostName, tst.groupName)
 
-        assert deleteZnodeRecur(splitZnodeString(tst.groupHostStr)) == errString
+        assert deleteZnodeRecur(splitZnodeString(tst.hostHostStr)) == errString
     
     
     def test_deleteZnodeRecurGroup(self, rw_zk):
@@ -245,7 +245,7 @@ class TestReadWrite(object):
         '''
 
         ## 1. run addHostWithHostvars(var) function to create given Znode provided in tst.testDict 
-        ## 2. run deleteZnodeRecur(var) function to delete given Znode provided in tst.groupHostStr 
+        ## 2. run deleteZnodeRecur(var) function to delete given Znode provided in tst.hostHostStr 
         ## 3. check Znode path against that string 
 
         addHostWithHostvars(tst.testDict)
@@ -265,16 +265,16 @@ class TestReadWrite(object):
 
         ## 1. run addHostWithHostvars(var) function to create given Znode with vars provided in tst.oneDict 
         ## 2. test hostVarsShow() against vars and values provided in tst.testDict 
-        ## 3. run deleteZnodeRecur(var) function to delete given Znode provided in tst.groupHostStr 
+        ## 3. run deleteZnodeRecur(var) function to delete given Znode provided in tst.hostHostStr 
 
         addHostWithHostvars(tst.oneDict)
 
-        testList = [(tst.groupHostStr, tst.varDict),(tst.groupName, tst.oneDict[tst.groupName])]
+        testList = [(tst.hostHostStr, tst.varDict),(tst.groupName, tst.oneDict[tst.groupName])]
     
         for val in testList:
             assert hostVarsShow(splitZnodeString(val[0])) == val[1]
     
-        deleteZnodeRecur(splitZnodeString(tst.groupName))
+        deleteZnodeRecur(splitZnodeString(tst.hostName))
 
 
     def test_hostVarsShowMultipleHosts(self):
@@ -284,13 +284,13 @@ class TestReadWrite(object):
 
         ## 1. run addHostWithHostvars(var) function to create given Znode with vars provided in tst.testDict 
         ## 2. test hostVarsShow() against vars and values provided in tst.testDict 
-        ## 3. run deleteGroupZnode(var) function to delete given Znode provided in tst.groupHostStr 
+        ## 3. run deleteGroupZnode(var) function to delete given Znode provided in tst.hostHostStr 
 
         for key in tst.testDict[tst.groupName].keys():
             tmpDict = {tst.groupName : { key : tst.testDict[tst.groupName][key] }}
             addHostWithHostvars(tmpDict)
 
-        testList = [(tst.groupHostStr, tst.varDict),(tst.groupName, tst.testDict[tst.groupName])]
+        testList = [(tst.hostHostStr, tst.varDict),(tst.groupName, tst.testDict[tst.groupName])]
     
         for val in testList:
             assert hostVarsShow(splitZnodeString(val[0])) == val[1]
@@ -306,7 +306,7 @@ class TestReadWrite(object):
     #     ## 1. run addHostWithHostvars(var) function to create given Znode provided in tst.testDict
     #     ## 2. run updateZnode(var) function to update given Znode provided in tst.updateDict
     #     ## 3. check upated results against tst.updateDict
-    #     ## 4. run deleteZnodeRecur(var) function to delete given Znode provided in tst.groupHostStr
+    #     ## 4. run deleteZnodeRecur(var) function to delete given Znode provided in tst.hostHostStr
     
     #     addHostWithHostvars(tst.testDict)
     #     updateZnode(tst.updateDict)
@@ -330,9 +330,9 @@ def test_splitZnodeString():
     Test for splitZnodeString() parser.
     '''
 
-    testTup = ({"string": "{0}:{1}".format(tst.groupName, tst.hostName),
+    testTup = ({"string": tst.groupHostStr,
                 "output": [(tst.groupName, tst.groupPath), (tst.hostName, tst.hostPath, tst.hostGroupPath)]},
-               {"string": "hosts:{0}".format(tst.hostName),
+               {"string": tst.hostHostStr,
                 "output": [(tst.hostName, tst.hostPath, None)]},
                {"string": tst.groupName,
                 "output": [(tst.groupName, tst.groupPath)]}
