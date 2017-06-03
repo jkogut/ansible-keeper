@@ -210,7 +210,7 @@ def addHostToGroup(znodeStringSplited):
 
 def deleteZnodeRecur(znodeStringSplited):
     '''
-    Delete znode recursivelly for a given string <groupname> or <hostname>.
+    Delete znode recursivelly for a given string <groupname> or <hosts:hostname> or <groupname:hostname>.
 
     Return a string (DELETED||ERROR  ==> [host: <hostname> || group: <groupname>]).
     '''
@@ -219,19 +219,26 @@ def deleteZnodeRecur(znodeStringSplited):
 
     if len(znodeStringSplited) > 1:
 
-        groupName = znodeStringSplited[0][0]
-        groupPath = znodeStringSplited[0][1]
-        hostName  = znodeStringSplited[1][0]
-        hostPath  = znodeStringSplited[1][1]
+        groupName      = znodeStringSplited[0][0]
+        groupPath      = znodeStringSplited[0][1]
+        hostName       = znodeStringSplited[1][0]
+        hostPath       = znodeStringSplited[1][1]
+        hostGroupPath  = znodeStringSplited[1][2]
 
         if zk.exists(hostPath) is None:
             zk.stop()   
             return "ERROR  ==> could not delete host: {0} that does not exist !!!".format(hostName)
 
+        if zk.exists(hostGroupPath) is None:
+            zk.stop()   
+            return "ERROR  ==> could not delete host: {0} that does not exist in group: {1} !!!".format(hostName, groupName)
+
+        ## delete group if there is only one host in it
         if len(zk.get_children(groupPath)) == 1:
             zk.delete(groupPath, recursive=True)
+
         else:
-            zk.delete(hostPath, recursive=True)
+            zk.delete(hostGroupPath, recursive=True)
             zk.stop()
             return "DELETED ==> host: {0} in group: {1}".format(hostName, groupName)
 
