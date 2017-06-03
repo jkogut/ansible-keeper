@@ -44,15 +44,17 @@ tst.updateDict  = {"testgroupname1":
                  }
 }
 
-tst.groupName    = tst.testDict.keys()[0]
-tst.hostName     = tst.testDict[tst.groupName].keys()[0]
+tst.groupName     = tst.testDict.keys()[0]
+tst.hostName      = tst.testDict[tst.groupName].keys()[0]
 
-tst.varDict      = tst.testDict[tst.groupName][tst.hostName]
-tst.oneDict      = {tst.groupName:{tst.hostName:tst.varDict}}
+tst.varDict       = tst.testDict[tst.groupName][tst.hostName]
+tst.oneDict       = {tst.groupName:{tst.hostName:tst.varDict}}
 
-tst.hostPath     = "{0}/groups/{1}/{2}".format(cfg.aPath, tst.groupName, tst.hostName)
-tst.groupPath    = "{0}/groups/{1}".format(cfg.aPath, tst.groupName)
-tst.groupHostStr = "{0}:{1}".format(tst.groupName, tst.hostName)
+tst.hostPath      = "{0}/hosts/{1}".format(cfg.aPath, tst.hostName)
+tst.groupPath     = "{0}/groups/{1}".format(cfg.aPath, tst.groupName)
+tst.hostGroupPath = "{0}/groups/{1}/{2}".format(cfg.aPath, tst.groupName, tst.hostName)
+
+tst.groupHostStr  = "{0}:{1}".format(tst.groupName, tst.hostName)
 
 
 #################################################
@@ -175,7 +177,7 @@ class TestReadWrite(object):
         addHostWithHostvars(tst.testDict)
 
         try:
-            assert rw_zk.exists(tst.hostPath) is not None
+            assert rw_zk.exists(tst.hostGroupPath) is not None
 
         finally:
             rw_zk.stop()
@@ -200,7 +202,7 @@ class TestReadWrite(object):
         addHostToGroup(splitZnodeString(tst.groupHostStr))
 
         try:
-            assert rw_zk.exists(tst.hostPath) is not None
+            assert rw_zk.exists(tst.hostGroupPath) is not None
 
         finally:
             rw_zk.stop()
@@ -221,7 +223,7 @@ class TestReadWrite(object):
         deleteZnodeRecur(splitZnodeString(tst.groupHostStr))
 
         try:
-            assert rw_zk.exists(tst.hostPath) is None
+            assert rw_zk.exists(tst.hostGroupPath) is None
 
         finally:
             rw_zk.stop()
@@ -313,7 +315,7 @@ class TestReadWrite(object):
     #     zk.start()
 
     #     for key in tst.updateDict[tst.groupName][tst.hostName].keys():
-    #         zkGet     = zk.get('{0}/{1}'.format(tst.hostPath, key))[0]
+    #         zkGet     = zk.get('{0}/{1}'.format(tst.hostGroupPath, key))[0]
     #         updateValue = tst.updateDict[tst.groupName][tst.hostName][key]
     #         assert zkGet == testValue
 
@@ -329,13 +331,15 @@ def test_splitZnodeString():
     '''
 
     testTup = ({"string": "{0}:{1}".format(tst.groupName, tst.hostName),
-                "output": [(tst.groupName, tst.groupPath), (tst.hostName, tst.hostPath)]},
+                "output": [(tst.groupName, tst.groupPath), (tst.hostName, tst.hostPath, tst.hostGroupPath)]},
+               {"string": "hosts:{0}".format(tst.hostName),
+                "output": [(tst.hostName, tst.hostPath, None)]},
                {"string": tst.groupName,
                 "output": [(tst.groupName, tst.groupPath)]}
     )
 
-    for znodeStrgingDict in testTup:
-        assert splitZnodeString(znodeStrgingDict['string']) == znodeStrgingDict['output']
+    for znodeStringDict in testTup:
+        assert splitZnodeString(znodeStringDict['string']) == znodeStringDict['output']
 
 
 def test_splitZnodeVarString():
