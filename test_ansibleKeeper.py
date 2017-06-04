@@ -352,37 +352,40 @@ class TestReadWrite(object):
     # #     deleteZnodeRecur(splitZnodeString(tst.groupName))
 
 
-
-
-def test_splitZnodeString():
+class TestSplitters(object):
     '''
-    Test for splitZnodeString() parser.
+    Suite of tests splitter functions 
     '''
-
-    testTup = ({"string": tst.groupHostStr,
-                "output": [(tst.groupName, tst.groupPath), (tst.hostName, tst.hostPath, tst.hostGroupPath)]},
-               {"string": tst.hostHostStr,
-                "output": [(tst.hostName, tst.hostPath, None)]},
-               {"string": tst.groupName,
-                "output": [(tst.groupName, tst.groupPath)]}
-    )
     
-    for znodeStringDict in testTup:
-        assert splitZnodeString(znodeStringDict['string']) == znodeStringDict['output']
+    def test_splitZnodeString(self):
+        '''
+        Test for splitZnodeString() parser.
+        '''
+
+        testTup = ({"string": tst.groupHostStr,
+                    "output": [(tst.groupName, tst.groupPath), (tst.hostName, tst.hostPath, tst.hostGroupPath)]},
+                   {"string": tst.hostHostStr,
+                    "output": [(tst.hostName, tst.hostPath, None)]},
+                   {"string": tst.groupName,
+                    "output": [(tst.groupName, tst.groupPath)]}
+        )
+        
+        for znodeStringDict in testTup:
+            assert splitZnodeString(znodeStringDict['string']) == znodeStringDict['output']
 
 
-def test_splitZnodeVarString():
-    '''
-    Test for splitZnodeVarString() parser.
-    '''
+    def test_splitZnodeVarString(self):
+        '''
+        Test for splitZnodeVarString() parser.
+        '''
 
-    testTup = ({"string":"groupname1:hostname1,var1:val1,var2:val2,var3:val3",
-                "output":{"groupname1":{"hostname1":{"var1":"val1", "var2":"val2", "var3":"val3"}}}},
-               {"string":"kafka:kafka01,fqdn:kafka01.fqdn.com,ipv4:1.2.3.4,kafka-id:1",
-                "output":{"kafka":{"kafka01":{"fqdn":"kafka01.fqdn.com","ipv4":"1.2.3.4","kafka-id":"1"}}}},
-               {"string":"zoo:zoo-srv01,fqdn:zoo-srv01.fqdn.com,ipv4:2.3.4.5,zoo-id:1",
-                "output":{"zoo":{"zoo-srv01":{"fqdn":"zoo-srv01.fqdn.com","ipv4":"2.3.4.5","zoo-id":"1"}}}}
-    )
+        testTup = ({"string":"groupname1:hostname1,var1:val1,var2:val2,var3:val3",
+                    "output":{"groupname1":{"hostname1":{"var1":"val1", "var2":"val2", "var3":"val3"}}}},
+                   {"string":"kafka:kafka01,fqdn:kafka01.fqdn.com,ipv4:1.2.3.4,kafka-id:1",
+                    "output":{"kafka":{"kafka01":{"fqdn":"kafka01.fqdn.com","ipv4":"1.2.3.4","kafka-id":"1"}}}},
+                   {"string":"zoo:zoo-srv01,fqdn:zoo-srv01.fqdn.com,ipv4:2.3.4.5,zoo-id:1",
+                    "output":{"zoo":{"zoo-srv01":{"fqdn":"zoo-srv01.fqdn.com","ipv4":"2.3.4.5","zoo-id":"1"}}}}
+        )
 
-    for varDict in testTup:
-        assert splitZnodeVarString(varDict['string']) == varDict['output']
+        for varDict in testTup:
+            assert splitZnodeVarString(varDict['string']) == varDict['output']
