@@ -287,7 +287,7 @@ class TestReadWrite(object):
         '''
 
         ## 1. run addHostWithHostvars(var) function to create given Znode with vars provided in tst.oneDict 
-        ## 2. test showHostVars(var) against vars and values provided in tst.testDict 
+        ## 2. test showHostVars(var) against vars and values provided in tst.oneDict 
         ## 3. run deleteZnodeRecur(var) function to delete given Znode provided in tst.hostHostStr 
 
         addHostWithHostvars(tst.oneDict)
@@ -306,21 +306,25 @@ class TestReadWrite(object):
     #     Test hostVarsShow() function for group with multiple hosts.
     #     '''
 
-    #     ## 1. run addHostWithHostvars(var) function to create given Znode with vars provided in tst.testDict 
-    #     ## 2. test hostVarsShow() against vars and values provided in tst.testDict 
+    #     ## 1. run addHostWithHostvars(var) function to create given Znode with vars provided in tst.oneDict 
+    #     ## 2. test showHostVars(var) against vars and values provided in tst.testDict 
     #     ## 3. run deleteGroupZnode(var) function to delete given Znode provided in tst.hostHostStr 
 
-    #     for key in tst.testDict[tst.groupName].keys():
-    #         tmpDict = {tst.groupName : { key : tst.testDict[tst.groupName][key] }}
+    #     for hostname in tst.testDict[tst.groupName].keys():
+    #         tmpDict = {tst.groupName : { hostname : tst.testDict[tst.groupName][hostname] }}
     #         addHostWithHostvars(tmpDict)
 
-    #     testList = [(tst.hostHostStr, tst.varDict),(tst.groupName, tst.testDict[tst.groupName])]
+    #     testList = [(tst.hostHostStr, {tst.hostName:tst.varDict}),(tst.groupName, tst.testDict[tst.groupName])]
     
     #     for val in testList:
-    #         assert hostVarsShow(splitZnodeString(val[0])) == val[1]
-    
-    #     deleteZnodeRecur(splitZnodeString(tst.groupName))
+    #         assert showHostVars(splitZnodeString(val[0])) == val[1]
 
+    #     delete all hosts in group created with addHostWithHostvars(var)    
+    #     deleteZnodeRecur(splitZnodeString(tst.groupName))
+    #     for hostname in  tst.testDict[tst.groupName].keys():
+    #         tmpHostStr = "hosts:{}".format(hostname)
+    #         deleteZnodeRecur(splitZnodeString(tmpHostStr))
+            
         
     # # def test_updateZnode():
     # #     '''
@@ -347,7 +351,8 @@ class TestReadWrite(object):
             
     # #     deleteZnodeRecur(splitZnodeString(tst.groupName))
 
-        
+
+
 
 def test_splitZnodeString():
     '''
@@ -361,7 +366,7 @@ def test_splitZnodeString():
                {"string": tst.groupName,
                 "output": [(tst.groupName, tst.groupPath)]}
     )
-
+    
     for znodeStringDict in testTup:
         assert splitZnodeString(znodeStringDict['string']) == znodeStringDict['output']
 
