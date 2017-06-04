@@ -337,10 +337,6 @@ def hostVarsShow(znodeStringSplited):
         groupName     = znodeStringSplited[0][0]
         groupPath     = znodeStringSplited[0][1]
 
-        # hostName      = znodeStringSplited[1][0]
-        # hostPath      = znodeStringSplited[1][1]
-        # hostGroupPath = znodeStringSplited[1][2]
-
         if zk.exists(groupPath) is None:
             zk.stop()
             return "ERROR  ==> no such groupname: {0} !!!".format(groupName)
@@ -359,39 +355,33 @@ def hostVarsShow(znodeStringSplited):
                     valDict[var] = zk.get('{0}/{1}'.format(tmpHostPath, var))[0]
 
                 varDict[host] = valDict
+            return varDict
                     
-       
-    elif len(znodeStringSplited) == 1:
-        groupName = znodeStringSplited[0][0]
-        groupPath = znodeStringSplited[0][1]
+    ## check for hostname only   
+    elif len(znodeStringSplited[0]) == 3:
 
-        if zk.exists(groupPath) is None:
+        hostName      = znodeStringSplited[0][0]
+        hostPath      = znodeStringSplited[0][1]
+
+        if zk.exists(hostPath) is None:
             zk.stop()    
-            return "ERROR  ==> no such groupname: {0} !!!".format(groupName)
+            return "ERROR  ==> no such host: {0} !!!".format(hostName)
 
         else:
-            hostList = zk.get_children(groupPath)
-            valDict  = {}
-          
-            for host in hostList:
-                tmpHostPath    = '{0}/{1}'.format(groupPath, host)
-                valDict[host]  = zk.get_children('{0}'.format(tmpHostPath))
+            varDict  = {}
+            varDict[hostName]  = zk.get_children('{0}'.format(hostPath))
 
-            for host in valDict.keys():
-                varDict = {}
+            valDict = {}
+            for var in varDict[hostName]:
+                valDict[var]  = zk.get('{0}/{1}'.format(hostPath, var))[0]
 
-                for var in valDict[host]:
-                    tmpHostPath   = '{0}/{1}'.format(groupPath, host)
-                    varDict[var]  = zk.get('{0}/{1}'.format(tmpHostPath, var))[0]
-                    valDict[host] = varDict
-
-            return valDict
+            varDict[hostName] = valDict
+            return varDict
 
     else:
         return "ERROR with processing znodeStrings !!!"
                     
     zk.stop()
-    return valDict
 
 
 def inventoryDump():
