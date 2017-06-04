@@ -219,7 +219,7 @@ class TestReadWrite(object):
         '''
 
         ## 1. run addHostWithHostvars(var) function to add example Znode provided in test config
-        ## 2. run deleteZnodeRecur(var) function to delete given Znode provided in test config
+        ## 2. run twice deleteZnodeRecur(var) function to delete given Znode provided in test config
         ## 3. check Znode path against that string 
 
         addHostWithHostvars(tst.oneDict)
@@ -234,14 +234,13 @@ class TestReadWrite(object):
             rw_zk.stop()
 
 
-    # def test_deleteZnodeExistance(self):
-    #     '''
-    #     Test that deleteZnodeRecur() will inform us that we want to delete nonexistent Znode.
-    #     '''
+    def test_deleteZnodeExistance(self):
+        '''
+        Test that deleteZnodeRecur() will inform us that we want to delete nonexistent Znode.
+        '''
+        errStringHost  = 'ERROR  ==> could not delete host: {0} that does not exist !!!'.format(tst.hostName)
 
-    #     errString = 'ERROR  ==> could not delete host: {0} that does not exist in group: {1} !!!'.format(tst.hostName, tst.groupName)
-
-    #     assert deleteZnodeRecur(splitZnodeString(tst.hostHostStr)) == errString
+        assert deleteZnodeRecur(splitZnodeString(tst.hostHostStr)) == errStringHost
     
     
     # def test_deleteZnodeRecurGroup(self, rw_zk):
