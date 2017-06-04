@@ -259,25 +259,28 @@ class TestReadWrite(object):
         deleteZnodeRecur(splitZnodeString(tst.hostHostStr))
 
         
-    # def test_deleteZnodeRecurGroup(self, rw_zk):
-    #     '''
-    #     Test that znode deleted with deleteZnodeRecur(var) for groupname does not exist.
-    #     '''
+    def test_deleteZnodeRecurGroup(self, rw_zk):
+        '''
+        Test that znode deleted with deleteZnodeRecur(var) for groupname does not exist.
+        '''
 
-    #     ## 1. run addHostWithHostvars(var) function to create given Znode provided in tst.testDict 
-    #     ## 2. run deleteZnodeRecur(var) function to delete given Znode provided in tst.hostHostStr 
-    #     ## 3. check Znode path against that string 
+        ## 1. run addHostWithHostvars(var) function to create given Znode provided in tst.oneDict 
+        ## 2. run deleteZnodeRecur(var) function to delete given Znode provided in tst.groupName
+        ## 3. check Znode path against that string
+        ## 4. delete hostname Znode in hosts group with deleteZnodeRecur(var)
 
-    #     addHostWithHostvars(tst.testDict)
-    #     deleteZnodeRecur(splitZnodeString(tst.groupName))
+        addHostWithHostvars(tst.oneDict)
+        deleteZnodeRecur(splitZnodeString(tst.groupName))
 
-    #     try:
-    #         assert rw_zk.exists(tst.groupPath) is None
+        try:
+            assert rw_zk.exists(tst.groupPath) is None
 
-    #     finally:
-    #         rw_zk.stop()
+        finally:
+            rw_zk.stop()
+            
+        deleteZnodeRecur(splitZnodeString(tst.hostHostStr))
 
-
+        
     # def test_hostVarsShowOneHost(self):
     #     '''
     #     Test hostVarsShow() function for group with one host.
