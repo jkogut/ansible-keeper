@@ -322,7 +322,7 @@ def deleteZnodeRecur(znodeStringSplited):
 #     return "ADDED   ==> host: {0} to group: {1}".format(hostName, groupName)
 
 
-def hostVarsShow(znodeStringSplited):
+def showHostVars(znodeStringSplited):
     '''
     Show hostvars for a given <hosts:hostname> or <groupname>.
     
@@ -460,7 +460,7 @@ def main():
 
     if oParser()['showMode'] is not None:
         znodeStringSplited = splitZnodeString(oParser()['showMode'])
-        print json.dumps(hostVarsShow(znodeStringSplited))
+        print json.dumps(showHostVars(znodeStringSplited))
                                   
         
 if __name__ == "__main__":
