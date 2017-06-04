@@ -194,7 +194,7 @@ class TestReadWrite(object):
         ## 1. check if Znode provided with test config exists
         ## 2. run addHostWithHostvars(var) and addHostToGroup(var) functions
         ## 3. check if hostname added with addHostToGroup exists
-        ## 4. run twice deleteZnodeRecur(var) to remove hostname from groupname and hosts group 
+        ## 4. run twice deleteZnodeRecur(var) to remove hostname from groupname and hosts group
     
         if rw_zk.exists(tst.groupPath) is not None:
             rw_zk.delete(tst.groupPath, recursive=True)
@@ -213,23 +213,25 @@ class TestReadWrite(object):
         deleteZnodeRecur(splitZnodeString(tst.hostHostStr))
 
                 
-    # def test_deleteZnodeRecur(self, rw_zk):
-    #     '''
-    #     Test that znode deleted with deleteZnodeRecur(var) does not exist.
-    #     '''
+    def test_deleteZnodeRecur(self, rw_zk):
+        '''
+        Test that znode deleted with deleteZnodeRecur(var) does not exist.
+        '''
 
-    #     ## 1. run addHostWithHostvars(var) function to add example Znode provided in test config
-    #     ## 2. run deleteZnodeRecur(var) function to delete given Znode provided in test config
-    #     ## 3. check Znode path against that string 
+        ## 1. run addHostWithHostvars(var) function to add example Znode provided in test config
+        ## 2. run deleteZnodeRecur(var) function to delete given Znode provided in test config
+        ## 3. check Znode path against that string 
 
-    #     addHostWithHostvars(tst.testDict)
-    #     deleteZnodeRecur(splitZnodeString(tst.hostHostStr))
+        addHostWithHostvars(tst.oneDict)
+        deleteZnodeRecur(splitZnodeString(tst.groupHostStr))
+        deleteZnodeRecur(splitZnodeString(tst.hostHostStr))
 
-    #     try:
-    #         assert rw_zk.exists(tst.hostGroupPath) is None
+        try:
+            assert rw_zk.exists(tst.hostPath) is None
+            assert rw_zk.exists(tst.hostGroupPath) is None
 
-    #     finally:
-    #         rw_zk.stop()
+        finally:
+            rw_zk.stop()
 
 
     # def test_deleteZnodeExistance(self):
