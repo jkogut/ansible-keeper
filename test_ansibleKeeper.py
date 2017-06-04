@@ -234,15 +234,31 @@ class TestReadWrite(object):
             rw_zk.stop()
 
 
-    def test_deleteZnodeExistance(self):
+    def test_deleteZnodeHostExistance(self):
         '''
-        Test that deleteZnodeRecur() will inform us that we want to delete nonexistent Znode.
+        Test that deleteZnodeRecur() will inform us that we want to delete nonexistent Znode from hosts group.
         '''
+
         errStringHost  = 'ERROR  ==> could not delete host: {0} that does not exist !!!'.format(tst.hostName)
 
         assert deleteZnodeRecur(splitZnodeString(tst.hostHostStr)) == errStringHost
-    
-    
+
+
+    def test_deleteZnodeHostInGroupExistance(self):
+        '''
+        Test that deleteZnodeRecur() will inform us that we want to delete nonexistent Znode from groups/groupname group.
+        '''
+
+        errStringGroup  = 'ERROR  ==> could not delete host: {0} that does not exist in group: {1} !!!'.format(tst.hostName, tst.groupName)
+
+        addHostWithHostvars(tst.oneDict)
+        deleteZnodeRecur(splitZnodeString(tst.groupHostStr))
+
+        assert deleteZnodeRecur(splitZnodeString(tst.groupHostStr)) == errStringGroup
+
+        deleteZnodeRecur(splitZnodeString(tst.hostHostStr))
+
+        
     # def test_deleteZnodeRecurGroup(self, rw_zk):
     #     '''
     #     Test that znode deleted with deleteZnodeRecur(var) for groupname does not exist.
