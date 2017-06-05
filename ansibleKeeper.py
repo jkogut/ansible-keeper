@@ -327,9 +327,12 @@ def updateZnode(znodeDict):
            
     zk.stop()
 
-    if len(nonExistList) > 0:
-        return "UPDATED  ==> host: {0} with new hostvars {1} ===> NOT UPDATED hostvars {2} which do not exist".format(hostName, updatedDict, nonExistList)
+    if len(nonExistList) > 0 and len(updatedDict) == 0:
+        return "NOT UPDATED  ==> host: {0} with no existing hostvars {1} ===> NOT UPDATED hostvars {2} which do not exist".format(hostName, updatedDict, nonExistList)
 
+    elif len(nonExistList) and len(updatedDict) > 0:
+        return "UPDATED  ==> host: {0} with new hostvars {1} ===> NOT UPDATED hostvars {2} which do not exist".format(hostName, updatedDict, nonExistList)
+    
     else:
         return "UPDATED  ==> host: {0} with new hostvars {1}".format(hostName, updatedDict)
 
