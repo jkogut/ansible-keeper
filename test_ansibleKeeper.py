@@ -49,6 +49,8 @@ tst.hostName      = tst.testDict[tst.groupName].keys()[0]      ## ==> 'testhostn
 
 tst.varDict       = tst.testDict[tst.groupName][tst.hostName]  ## ==> {'var1': 'val1', 'var3': 'val3', 'var2': 'val2'}
 tst.oneDict       = {tst.groupName:{tst.hostName:tst.varDict}} ## ==> {'testgroupname1': {'testhostname1': {'var1': 'val1', 'var3': 'val3', 'var2': 'val2'}}}
+tst.oneUpdateDict = {"testgroupname1": {"testhostname1": {"var1":"valUpdated1", "var2":"valUpdated2", "var3":"valUpdated3"}}}
+
 
 tst.hostPath      = "{0}/hosts/{1}".format(cfg.aPath, tst.hostName)
 tst.groupPath     = "{0}/groups/{1}".format(cfg.aPath, tst.groupName)
@@ -326,30 +328,28 @@ class TestReadWrite(object):
     #         deleteZnodeRecur(splitZnodeString(tmpHostStr))
             
         
-    # # def test_updateZnode():
-    # #     '''
-    # #     Test updated Znode with updateZnode(var).
-    # #     '''
+    # def test_updateZnode(self, rw_zk):
+    #     '''
+    #     Test updated Znode with updateZnode(var).
+    #     '''
 
-    # #     ## 1. run addHostWithHostvars(var) function to create given Znode provided in tst.testDict
-    # #     ## 2. run updateZnode(var) function to update given Znode provided in tst.updateDict
-    # #     ## 3. check upated results against tst.updateDict
-    # #     ## 4. run deleteZnodeRecur(var) function to delete given Znode provided in tst.hostHostStr
+    #     ## 1. run addHostWithHostvars(var) function to create given Znode provided in tst.oneDict
+    #     ## 2. run updateZnode(var) function to update given Znode provided in tst.updateDict
+    #     ## 3. check upated results against tst.updateDict
+    #     ## 4. run deleteZnodeRecur(var) function to delete given Znode provided in tst.hostHostStr
     
-    # #     addHostWithHostvars(tst.testDict)
-    # #     updateZnode(tst.updateDict)
+    #     addHostWithHostvars(tst.oneDict)
+    #     updateZnode(tst.oneUpdateDict)
 
-    # #     zk = KazooClient(hosts=cfg.zkServers)
-    # #     zk.start()
+    #     for key in tst.updateDict[tst.groupName][tst.hostName].keys():
+    #         zkGet       = rw_zk.get('{0}/{1}'.format(tst.hostGroupPath, key))[0]
+    #         updateValue = tst.updateDict[tst.groupName][tst.hostName][key]
 
-    # #     for key in tst.updateDict[tst.groupName][tst.hostName].keys():
-    # #         zkGet     = zk.get('{0}/{1}'.format(tst.hostGroupPath, key))[0]
-    # #         updateValue = tst.updateDict[tst.groupName][tst.hostName][key]
-    # #         assert zkGet == testValue
+    #         assert zkGet == testValue
 
-    # #         zk.stop()
+    #         rw_zk.stop()
             
-    # #     deleteZnodeRecur(splitZnodeString(tst.groupName))
+    #     deleteZnodeRecur(splitZnodeString(tst.groupName))
 
 
 class TestSplitters(object):
