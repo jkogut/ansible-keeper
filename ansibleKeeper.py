@@ -224,8 +224,7 @@ def deleteZnodeRecur(znodeStringSplited):
 
     zk = zkStartRw()
 
-    ## check if it is <groupname:hostname> case
-    if len(znodeStringSplited) > 1:
+    if len(znodeStringSplited) > 1:  ## check if it is <groupname:hostname> case
 
         groupName      = znodeStringSplited[0][0]
         groupPath      = znodeStringSplited[0][1]
@@ -241,8 +240,7 @@ def deleteZnodeRecur(znodeStringSplited):
             zk.stop()   
             return "ERROR  ==> could not delete host: {0} that does not exist in group: {1} !!!".format(hostName, groupName)
 
-        ## delete group if there is only one host in it
-        if len(zk.get_children(groupPath)) == 1:
+        if len(zk.get_children(groupPath)) == 1:  ## delete group if there is only one host in it
             zk.delete(groupPath, recursive=True)
 
         else:
@@ -250,10 +248,9 @@ def deleteZnodeRecur(znodeStringSplited):
             zk.stop()
             return "DELETED ==> host: {0} in group: {1}".format(hostName, groupName)
     
-    ## check if it is <groupname> or <hosts:hostname> case    
-    elif len(znodeStringSplited) == 1:
-        ## first check for group only
-        if len(znodeStringSplited[0]) == 2:
+
+    elif len(znodeStringSplited) == 1:  ## check if it is <groupname> or <hosts:hostname> case    
+        if len(znodeStringSplited[0]) == 2:  ## first check for group only
         
             groupName = znodeStringSplited[0][0]
             groupPath = znodeStringSplited[0][1]
@@ -267,8 +264,7 @@ def deleteZnodeRecur(znodeStringSplited):
                 zk.stop()
                 return "DELETED ==> group: {0}".format(groupName)
             
-        ## then assume check for hosts only 
-        else:
+        else:  ## then assume check for hosts only 
             hostName       = znodeStringSplited[0][0]
             hostPath       = znodeStringSplited[0][1]
 
@@ -281,8 +277,7 @@ def deleteZnodeRecur(znodeStringSplited):
                 zk.stop()
                 return "DELETED ==> host: {0}".format(hostName)
             
-    ## Unknown cases        
-    else:
+    else:  ## Unknown cases        
         return "ERROR with processing znodeStrings !!!"           
 
     zk.stop()
@@ -292,7 +287,7 @@ def updateZnode(znodeDict):
     '''
     Update znode with hostvars.
 
-    Return a string (UPDATED   ==> host: <hostname> to group: <groupname>).
+    Return a string (ERROR ... || UPDATED ... || NOT UPDATED ...).
     '''
     
     zk = zkStartRw()
@@ -346,8 +341,7 @@ def showHostVars(znodeStringSplited):
 
     zk = zkStartRo()
 
-    ## check for groupname only
-    if len(znodeStringSplited[0]) == 2:
+    if len(znodeStringSplited[0]) == 2:    ## check for groupname only
 
         groupName     = znodeStringSplited[0][0]
         groupPath     = znodeStringSplited[0][1]
@@ -360,8 +354,7 @@ def showHostVars(znodeStringSplited):
             hostList    = zk.get_children(groupPath)
             varDict     = {}
 
-            ## build a dict with host variables
-            for host in hostList:
+            for host in hostList:             ## build a dict with host variables
                 tmpHostPath    = "{0}/hosts/{1}".format(cfg.aPath, host)
                 varDict[host]  = zk.get_children('{0}'.format(tmpHostPath))
 
@@ -372,8 +365,7 @@ def showHostVars(znodeStringSplited):
                 varDict[host] = valDict
             return varDict
                     
-    ## check for hostname only   
-    elif len(znodeStringSplited[0]) == 3:
+    elif len(znodeStringSplited[0]) == 3:     ## check for hostname only   
 
         hostName      = znodeStringSplited[0][0]
         hostPath      = znodeStringSplited[0][1]
