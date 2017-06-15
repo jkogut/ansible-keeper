@@ -283,14 +283,14 @@ class TestReadWrite(object):
         deleteZnodeRecur(splitZnodeString(tst.hostHostStr))
 
         
-    def test_hostVarsShowOneHost(self):
+    def test_showHostVarsOneHost(self):
         '''
-        Test hostVarsShow() function for group with one host.
+        Test showHostVars() function for group with one host.
         '''
 
         ## 1. run addHostWithHostvars(var) function to create given Znode with vars provided in tst.oneDict 
         ## 2. test showHostVars(var) against vars and values provided in tst.oneDict 
-        ## 3. run deleteZnodeRecur(var) function to delete given Znode provided in tst.hostHostStr 
+        ## 3. run twice deleteZnodeRecur(var) function to delete given Znodes provided in tst.hostHostStr 
 
         addHostWithHostvars(tst.oneDict)
 
@@ -303,9 +303,9 @@ class TestReadWrite(object):
         deleteZnodeRecur(splitZnodeString(tst.hostHostStr))
 
 
-    # def test_hostVarsShowMultipleHosts(self):
+    # def test_showHostVarsMultipleHosts(self):
     #     '''
-    #     Test hostVarsShow() function for group with multiple hosts.
+    #     Test showHostVars() function for group with multiple hosts.
     #     '''
 
     #     ## 1. run addHostWithHostvars(var) function to create given Znode with vars provided in tst.oneDict 
