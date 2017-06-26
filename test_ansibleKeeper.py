@@ -303,29 +303,29 @@ class TestReadWrite(object):
         deleteZnodeRecur(splitZnodeString(tst.hostHostStr))
 
 
-    # def test_showHostVarsMultipleHosts(self):
-    #     '''
-    #     Test showHostVars() function for group with multiple hosts.
-    #     '''
+    def test_showHostVarsMultipleHosts(self):
+        '''
+        Test showHostVars() function for group with multiple hosts.
+        '''
 
-    #     ## 1. run addHostWithHostvars(var) function to create given Znode with vars provided in tst.oneDict 
-    #     ## 2. test showHostVars(var) against vars and values provided in tst.testDict 
-    #     ## 3. run deleteGroupZnode(var) function to delete given Znode provided in tst.hostHostStr 
+        ## 1. run addHostWithHostvars(var) function to create given Znode with vars provided in tst.oneDict 
+        ## 2. test showHostVars(var) against vars and values provided in tst.testDict 
+        ## 3. run deleteGroupZnode(var) function to delete given Znode provided in tst.hostHostStr 
 
-    #     for hostname in tst.testDict[tst.groupName].keys():
-    #         tmpDict = {tst.groupName : { hostname : tst.testDict[tst.groupName][hostname] }}
-    #         addHostWithHostvars(tmpDict)
+        for hostname in tst.testDict[tst.groupName].keys():
+            tmpDict = {tst.groupName : { hostname : tst.testDict[tst.groupName][hostname] }}
+            addHostWithHostvars(tmpDict)
 
-    #     testList = [(tst.hostHostStr, {tst.hostName:tst.varDict}),(tst.groupName, tst.testDict[tst.groupName])]
+        testList = [(tst.hostHostStr, {tst.hostName:tst.varDict}),(tst.groupName, tst.testDict[tst.groupName])]
     
-    #     for val in testList:
-    #         assert showHostVars(splitZnodeString(val[0])) == val[1]
+        for val in testList:
+            assert showHostVars(splitZnodeString(val[0])) == val[1]
 
-    #     delete all hosts in group created with addHostWithHostvars(var)    
-    #     deleteZnodeRecur(splitZnodeString(tst.groupName))
-    #     for hostname in  tst.testDict[tst.groupName].keys():
-    #         tmpHostStr = "hosts:{}".format(hostname)
-    #         deleteZnodeRecur(splitZnodeString(tmpHostStr))
+        ## delete all hosts in group created with addHostWithHostvars(var)    
+        deleteZnodeRecur(splitZnodeString(tst.groupName))
+        for hostname in  tst.testDict[tst.groupName].keys():
+            tmpHostStr = "hosts:{}".format(hostname)
+            deleteZnodeRecur(splitZnodeString(tmpHostStr))
             
         
     # def test_updateZnode(self, rw_zk):
