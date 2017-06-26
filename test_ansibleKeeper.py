@@ -49,8 +49,7 @@ tst.hostName      = tst.testDict[tst.groupName].keys()[0]      ## ==> 'testhostn
 
 tst.varDict       = tst.testDict[tst.groupName][tst.hostName]  ## ==> {'var1': 'val1', 'var3': 'val3', 'var2': 'val2'}
 tst.oneDict       = {tst.groupName:{tst.hostName:tst.varDict}} ## ==> {'testgroupname1': {'testhostname1': {'var1': 'val1', 'var3': 'val3', 'var2': 'val2'}}}
-tst.oneUpdateDict = {"testgroupname1": {"testhostname1": {"var1":"valUpdated1", "var2":"valUpdated2", "var3":"valUpdated3"}}}
-
+tst.oneUpdateDict = {tst.groupName:{tst.hostName:{"var1":"valUpdated1", "var2":"valUpdated2", "var3":"valUpdated3"}}}
 
 tst.hostPath      = "{0}/hosts/{1}".format(cfg.aPath, tst.hostName)
 tst.groupPath     = "{0}/groups/{1}".format(cfg.aPath, tst.groupName)
