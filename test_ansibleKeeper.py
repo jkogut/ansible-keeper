@@ -329,9 +329,9 @@ class TestReadWrite(object):
             deleteZnodeRecur(splitZnodeString(tmpHostStr))
             
         
-    def test_updateZnode(self, rw_zk):
+    def test_updateSingleZnode(self, rw_zk):
         '''
-        Test updated Znode with updateZnode(var).
+        Test updated Znode with updateZnode(var) for one host.
         '''
 
         ## 1. run addHostWithHostvars(var) function to create given Znode provided in tst.oneDict
@@ -344,12 +344,12 @@ class TestReadWrite(object):
         updateZnode(tst.oneUpdateDict)
 
         for key in tst.updateDict[tst.groupName][tst.hostName].keys():
-            zkGet       = rw_zk.get('{0}/{1}'.format(tst.hostGroupPath, key))[0]
+            zkGet       = rw_zk.get('{0}/{1}'.format(tst.hostPath, key))[0]
             updateValue = tst.updateDict[tst.groupName][tst.hostName][key]
 
-            assert zkGet == testValue
+            assert zkGet == updateValue
 
-            rw_zk.stop()
+        rw_zk.stop()
             
         ## delete all hosts in group created with addHostWithHostvars(var)    
         deleteZnodeRecur(splitZnodeString(tst.groupName))
@@ -357,7 +357,7 @@ class TestReadWrite(object):
             tmpHostStr = "hosts:{}".format(hostname)
             deleteZnodeRecur(splitZnodeString(tmpHostStr))
 
-        
+            
 
 class TestSplitters(object):
     '''
