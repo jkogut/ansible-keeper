@@ -41,15 +41,15 @@ def oParser():
     parser = OptionParser(usage="usage: %prog [opts] <args>",
                           version="%prog 0.0.1")
     parser.add_option("-A", nargs = 1,
-                      help="add hostname with hostvars: <groupname1:newhostname1,var1:value1,var2:value2,var3:value3>")
+                      help="add host with hostvars: <groupname1:newhostname1,var1:value1,var2:value2,var3:value3>")
     parser.add_option("-G", nargs = 1,
-                      help="add hostname to hostgroup: <groupname:hostname>")
+                      help="add host to hostgroup: <groupname:hostname>")
     parser.add_option("-D", nargs = 1,
-                      help="delete hostname or groupname recursively: <groupname1:hostname1> or <groupname1> or <hosts:hostname1>")
+                      help="delete host or group recursively: <groupname1:hostname1> or <groupname1> or <hosts:hostname1>")
     parser.add_option("-U", nargs = 1,
-                      help="update hostname with comma separated hostvars: <groupname1:newhostname1,var1:newvalue1,var2:newvalue2>")
+                      help="update host variables with comma separated hostvars: <groupname1:hostname1,var1:newvalue1,var2:newvalue2>")
     parser.add_option("-S", nargs = 1,
-                      help="show hostvars for a given hostname or groupname: <groupname1:newhostname1> or <groupname1>")
+                      help="show host variables for a given host or group: <groupname1:hostname1> or <groupname1>")
     parser.add_option("-I", nargs = 1,
                       help="inventory mode: true|ansible dumps inventory in json format from zookeeper")
 
