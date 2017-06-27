@@ -61,6 +61,8 @@ tst.hostHostStr   = "hosts:{0}".format(tst.hostName)              ## ==> 'hosts:
 tst.renameDict      = {"newgroupname":"renamedgroup", "newhostname":"renamedhostname"}
 tst.renameHostPath  = "{0}/hosts/{1}".format(cfg.aPath, tst.renameDict['newhostname'])
 tst.renameHostStr   = "hosts:{0}:{1}".format(tst.hostName, tst.renameDict['newhostname'])
+tst.renameGroupPath = "{0}/groups/{1}".format(cfg.aPath, tst.renameDict['newgroupname'])
+tst.renameGroupStr  = "groups:{0}:{1}".format(tst.groupName, tst.renameDict['newgroupname'])
 
 #################################################
 ## END of TestVars: global vars for tests 
@@ -386,6 +388,34 @@ class TestReadWrite(object):
         deleteZnodeRecur(splitZnodeString(tst.groupName))
         hostname = tst.renameDict['newhostname']
         tmpHostStr = "hosts:{}".format(hostname)
+        deleteZnodeRecur(splitZnodeString(tmpHostStr))
+
+
+    def test_renameGroupname(self, rw_zk):
+        '''
+        Test if renameZnode(var) works properly for new groupname.
+        '''
+
+        ## 1. run addHostWithHostvars(var) function to create given Znode provided in tst.oneDict
+        ## 2. run renameZnode(var) function to rename given groupname provided in tst.renameDict
+        ## 3. check updated results against tst.renameDict
+        ## 4. run deleteZnodeRecur(var) function to delete test group provided in tst.hostHostStr 
+        ## 5. run deleteZnodeRecur(var) function to delete all hosts provided in tst.testDict
+    
+        addHostWithHostvars(tst.oneDict)
+        renameZnode(tst.renameGroupStr)
+        
+        try:
+            assert rw_zk.exists('{0}'.format(tst.groupPath)) is None
+            assert rw_zk.exists('{0}'.format(tst.renamedGroupPath)) is not None
+            
+        finally:
+            rw_zk.stop()
+            
+        ## delete all hosts in group created with addHostWithHostvars(var)    
+        deleteZnodeRecur(splitZnodeString(tst.groupName))
+        groupname  = tst.renameDict['newgroupname']
+        tmpGroupStr = "groups:{}".format(groupname)
         deleteZnodeRecur(splitZnodeString(tmpHostStr))
 
         
