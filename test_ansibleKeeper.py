@@ -58,6 +58,10 @@ tst.hostGroupPath = "{0}/groups/{1}/{2}".format(cfg.aPath, tst.groupName, tst.ho
 tst.groupHostStr  = "{0}:{1}".format(tst.groupName, tst.hostName) ## ==> 'testgroupname1:testhostname1'
 tst.hostHostStr   = "hosts:{0}".format(tst.hostName)              ## ==> 'hosts:testhostname1'
 
+tst.renameDict      = {"newgroupname":"renamedgroup", "newhostname":"renamedhostname"}
+tst.renameHostPath  = "{0}/hosts/{1}".format(cfg.aPath, tst.renameDict['newhostname'])
+tst.renameHostStr   = "hosts:{0}:{1}".format(tst.hostName, tst.renameDict['newhostname'])
+
 #################################################
 ## END of TestVars: global vars for tests 
 
@@ -356,8 +360,36 @@ class TestReadWrite(object):
             tmpHostStr = "hosts:{}".format(hostname)
             deleteZnodeRecur(splitZnodeString(tmpHostStr))
 
-            
 
+    def test_renameHostname(self, rw_zk):
+        '''
+        Test if renameZnode(var) works properly for new hostname.
+        '''
+
+        ## 1. run addHostWithHostvars(var) function to create given Znode provided in tst.oneDict
+        ## 2. run renameZnode(var) function to rename given hostname provided in tst.renameDict
+        ## 3. check updated results against tst.renameDict
+        ## 4. run deleteZnodeRecur(var) function to delete test group provided in tst.hostHostStr 
+        ## 5. run deleteZnodeRecur(var) function to delete all hosts provided in tst.testDict
+    
+        addHostWithHostvars(tst.oneDict)
+        renameZnode(tst.renameHostStr)
+        
+        try:
+            assert rw_zk.exists('{0}'.format(tst.hostPath)) is None
+            assert rw_zk.exists('{0}'.format(tst.renamedHostPath)) is not None
+            
+        finally:
+            rw_zk.stop()
+            
+        ## delete all hosts in group created with addHostWithHostvars(var)    
+        deleteZnodeRecur(splitZnodeString(tst.groupName))
+        hostname = tst.renameDict['newhostname']
+        tmpHostStr = "hosts:{}".format(hostname)
+        deleteZnodeRecur(splitZnodeString(tmpHostStr))
+
+        
+            
 class TestSplitters(object):
     '''
     Suite of tests splitter functions 
