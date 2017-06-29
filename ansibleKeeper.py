@@ -558,7 +558,7 @@ def main():
 
     if oParser()['renameMode'] is not None:
         znodeRenameStringSplited = splitRenameZnodeString(oParser()['renameMode'])
-        print renameZnodeString(znodeRenameStringSplited)
+        print renameZnode(znodeRenameStringSplited)
         
     if oParser()['showMode'] is not None:
         znodeStringSplited = splitZnodeString(oParser()['showMode'])
