@@ -164,7 +164,7 @@ def splitRenameZnodeString(renameZnodeString):
 
     ## check if len of splited list is not 3
     if len(renameZnodeString.split(':')) is not 3:
-        return "SYNTAX ERROR in {0} no valid number of keywords [keyword:keyword1:newkeyword1]".format(renameZnodeString)
+        return "SYNTAX ERROR --> {0} <-- no valid number of keywords [keyword:keyword1:newkeyword1]".format(renameZnodeString)
     
     if 'hosts:' in renameZnodeString:
         oldHostName    = renameZnodeString.split(':')[1]
@@ -185,7 +185,7 @@ def splitRenameZnodeString(renameZnodeString):
         return [(oldGroupName, oldGroupPath), (newGroupName, newGroupPath)]
 
     else:
-        return "SYNTAX ERROR in {0} no valid keywords [groups:hosts] found".format(renameZnodeString)
+        return "SYNTAX ERROR --> {0} <-- no valid keywords [groups|hosts] found".format(renameZnodeString)
     
 
 def addHostWithHostvars(znodeDict):
