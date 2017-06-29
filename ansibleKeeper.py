@@ -373,50 +373,47 @@ def updateZnode(znodeDict):
         return "UPDATED  ==> host: {0} with new hostvars {1}".format(hostName, updatedDict)
 
 
-# def renameZnode(znodeDict):
-#     '''
-#     Rename znode.
+def renameZnode(znodeRenameStringSplited):
+    '''
+    Rename znode.
 
-#     Return a string (ERROR ... || RENAMED ... || NOT RENAMED ...).
-#     '''
+    Return a string (ERROR ... || RENAMED ... || NOT RENAMED ...).
+    '''
     
-#     zk = zkStartRw()
+    zk = zkStartRw()
     
-#     groupName   = znodeDict.keys()[0]
-#     hostName    = znodeDict[groupName].keys()[0]
-#     hostPath    = "{0}/hosts/{1}".format(cfg.aPath, hostName)
-#     hostVarList = zk.get_children(hostPath)
+    oldName  = znodeRenameStringSplited[0][0]
+    newName  = znodeRenameStringSplited[1][0]
+    oldPath  = znodeRenameStringSplited[0][1]
+    newPath  = znodeRenameStringSplited[1][1]
     
-#     if zk.exists(hostPath) is None:
-#         zk.stop()    
-#         return "ERROR  ==> host: {0} does not exist !!!".format(hostName)
+    if zk.exists(oldPath) is None:
+        zk.stop()    
+        return "ERROR  ==> could not rename nonexistent path: {0} !!!".format(hostName)
 
-#     for hostVar in hostVarList:
-#         if zk.exists("{0}/{1}".format(hostPath, hostVar)) is None: 
-#             zk.stop()            
-#             return "ERROR  ==> hostvar: {0} for host {1} does not exist !!!".format(hostVar, hostName)
-
-#     nonExistList = []    
-#     updatedDict  = {}
-    
-#     for var in znodeDict[groupName][hostName]:
-#         varPath = "{0}/{1}".format(hostPath, var)
-#         varVal  = znodeDict[groupName][hostName][var]
-        
-#         if var in hostVarList: ## check if given variable exists
-#             zk.set(varPath, varVal)
-#             updatedDict[var] = varVal
+    ## rename only when newPath does not exist
+    if zk.exists(newPath) is None:
+        if 'hosts' in oldPath:
+            ## check for hostvars, if none create newPath and delete oldPath
+            if len(zk.get_children(oldPath)) == 0:
+                zk.ensure_path(newPath)
+                zk.delete(oldPath)
+                zk.stop()
+                return "RENAMED {0} --> {1}".format(oldName, newName)
             
-#         else:
-#             nonExistList.append(var)
-           
-#     zk.stop()
-
-#     if len(nonExistList) > 0 and len(updatedDict) == 0:
-#         return "NOT RENAMED  ==> host: {0}".format(hostName, updatedDict, nonExistList)
-
-#     else:
-#         return "RENAMED  ==> host: {0}".format(hostName, updatedDict)
+            else:
+                ## create newPath, copy hostvars from oldPath and delete oldPath
+                varDict = {}
+                for child in zk.get_children(oldPath):
+                    varDict[child] = zk.get('{0}/{1}'.format(oldPath,child))[0]
+                    
+                zk.ensure_path(newPath)
+                for var in varDict:
+                    zk.create('{0}/{1}'.format(newPath,var),varDict[var])
+                
+                zk.delete(oldPath, recursive=True)
+                zk.stop()
+                return "RENAMED {0} --> {1}".format(oldName, newName)
 
     
 def showHostVars(znodeStringSplited):
