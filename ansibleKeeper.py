@@ -48,6 +48,8 @@ def oParser():
                       help="delete host or group recursively: <groupname1:hostname1> or <groupname1> or <hosts:hostname1>")
     parser.add_option("-U", nargs = 1,
                       help="update host variables with comma separated hostvars: <groupname1:hostname1,var1:newvalue1,var2:newvalue2>")
+    parser.add_option("-R", nargs = 1,
+                      help="rename existing hostname or groupname: <groups:oldgroupname:newgroupname> or <hosts:oldhostname:newhostname>")
     parser.add_option("-S", nargs = 1,
                       help="show host variables for a given host or group: <groupname1:hostname1> or <groupname1>")
     parser.add_option("-I", nargs = 1,
@@ -57,13 +59,13 @@ def oParser():
     (opts, args) = parser.parse_args()
     
     
-    if (opts.A or opts.G or opts.D or opts.U or opts.I or opts.S) == None:
+    if (opts.A or opts.G or opts.D or opts.U or opts.R or opts.S or opts.I) == None:
 
         parser.print_help()
         exit(-1)
         
     return {'addMode':opts.A, 'groupMode':opts.G, 'deleteMode':opts.D, 'updateMode':opts.U,
-            'showMode':opts.S, 'inventoryMode':opts.I}
+            'renameMode':opts.R, 'showMode':opts.S, 'inventoryMode':opts.I}
 
 
 def zkStartRo():
@@ -545,7 +547,7 @@ def main():
     if oParser()['groupMode'] is not None:
         znodeStringSplited = splitZnodeString(oParser()['groupMode'])
         print addHostToGroup(znodeStringSplited)
-
+ 
     if oParser()['updateMode'] is not None:
         znodeDict = splitZnodeVarString(oParser()['updateMode'])
         print updateZnode(znodeDict)
@@ -554,6 +556,10 @@ def main():
         znodeStringSplited = splitZnodeString(oParser()['deleteMode'])
         print deleteZnodeRecur(znodeStringSplited)
 
+    if oParser()['renameMode'] is not None:
+        znodeRenameStringSplited = splitRenameZnodeString(oParser()['renameMode'])
+        print renameZnodeString(znodeRenameStringSplited)
+        
     if oParser()['showMode'] is not None:
         znodeStringSplited = splitZnodeString(oParser()['showMode'])
         print json.dumps(showHostVars(znodeStringSplited))
