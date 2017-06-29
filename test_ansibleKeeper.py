@@ -58,11 +58,14 @@ tst.hostGroupPath = "{0}/groups/{1}/{2}".format(cfg.aPath, tst.groupName, tst.ho
 tst.groupHostStr  = "{0}:{1}".format(tst.groupName, tst.hostName) ## ==> 'testgroupname1:testhostname1'
 tst.hostHostStr   = "hosts:{0}".format(tst.hostName)              ## ==> 'hosts:testhostname1'
 
-tst.renameDict      = {"newgroupname":"renamedgroup", "newhostname":"renamedhostname"}
-tst.renameHostPath  = "{0}/hosts/{1}".format(cfg.aPath, tst.renameDict['newhostname'])
-tst.renameHostStr   = "hosts:{0}:{1}".format(tst.hostName, tst.renameDict['newhostname'])
-tst.renameGroupPath = "{0}/groups/{1}".format(cfg.aPath, tst.renameDict['newgroupname'])
-tst.renameGroupStr  = "groups:{0}:{1}".format(tst.groupName, tst.renameDict['newgroupname'])
+tst.renameDict       = {"newgroupname":"renamedgroup", "newhostname":"renamedhostname"}
+tst.renameHostName   = tst.renameDict['newhostname']
+tst.renameHostPath   = "{0}/hosts/{1}".format(cfg.aPath, tst.renameDict['newhostname'])
+tst.renameHostStr    = "hosts:{0}:{1}".format(tst.hostName, tst.renameDict['newhostname'])
+
+tst.renameGroupName  = tst.renameDict['newgroupname']
+tst.renameGroupPath  = "{0}/groups/{1}".format(cfg.aPath, tst.renameDict['newgroupname'])
+tst.renameGroupStr   = "groups:{0}:{1}".format(tst.groupName, tst.renameDict['newgroupname'])
 
 #################################################
 ## END of TestVars: global vars for tests 
@@ -457,3 +460,22 @@ class TestSplitters(object):
 
         for varDict in testTup:
             assert splitZnodeVarString(varDict['string']) == varDict['output']
+
+            
+    def test_splitRenameZnodeVarString(self):
+        '''
+        Test for splitRenameZnodeVarString() parser.
+        '''
+
+        testTup = ({"string":tst.renameGroupStr,
+                    "output":[(tst.groupName, tst.groupPath),(tst.renameGroupName, tst.renameGroupPath)]},
+                   {"string":tst.renameHostStr,
+                    "output":[(tst.hostName, tst.hostPath),(tst.renameHostName, tst.renameHostPath)]},
+                   {"string":"groups:newgroup",
+                    "output":"SYNTAX ERROR --> groups:newgroup <-- no valid number of keywords [keyword:keyword1:newkeyword1]"},
+                   {"string":"group:oldgroup:newgroup",
+                    "output":"SYNTAX ERROR --> group:oldgroup:newgroup <-- no valid keywords [groups|hosts] found"}
+        )
+
+        for renameDict in testTup:
+            assert splitRenameZnodeString(renameDict['string']) == renameDict['output']
