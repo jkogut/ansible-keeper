@@ -149,6 +149,45 @@ def splitZnodeString(znodeString):
         return [(groupName, groupPath)]
 
 
+def splitRenameZnodeString(renameZnodeString):
+    '''
+    Splits znodeString into [old|new]GroupName, [old|new]HostName, [old|new]GroupPath, [old|new]HostPath.
+
+    Return list of tuples or ERROR string.
+    '''
+
+    ## spliting example string into list of tuples or list of tuple :
+    ## example string for newgroupname :  groups:oldgroupname:newgroupname
+    ## example string for newhostname  :  hosts:oldhostname:newhostname
+    ## example output: [("newgroupname","/ansible_zk/groups/newgroupname"),
+    ##                  ("newhostname","/ansible_zk/hosts/newhostname")]
+
+    ## check if len of splited list is not 3
+    if len(renameZnodeString.split(':')) is not 3:
+        return "SYNTAX ERROR in {0} no valid number of keywords [keyword:keyword1:newkeyword1]".format(renameZnodeString)
+    
+    if 'hosts:' in renameZnodeString:
+        oldHostName    = renameZnodeString.split(':')[1]
+        newHostName    = renameZnodeString.split(':')[2]
+
+        oldHostPath    = "{0}/hosts/{1}".format(cfg.aPath, oldHostName)
+        newHostPath    = "{0}/hosts/{1}".format(cfg.aPath, newHostName)
+        
+        return [(oldHostName, oldHostPath), (newHostName, newHostPath)]
+
+    elif 'groups' in renameZnodeString:
+        oldGroupName    = renameZnodeString.split(':')[1]
+        newGroupName    = renameZnodeString.split(':')[2]
+
+        oldGroupPath    = "{0}/groups/{1}".format(cfg.aPath, oldGroupName)
+        newGroupPath    = "{0}/groups/{1}".format(cfg.aPath, newGroupName)
+        
+        return [(oldGroupName, oldGroupPath), (newGroupName, newGroupPath)]
+
+    else:
+        return "SYNTAX ERROR in {0} no valid keywords [groups:hosts] found".format(renameZnodeString)
+    
+
 def addHostWithHostvars(znodeDict):
     '''
     Add existing znode to new group.
