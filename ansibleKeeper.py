@@ -389,7 +389,8 @@ def renameZnode(znodeRenameStringSplited):
 
     def renameHostInGroup(oldName, newName):
         '''
-        Take odlName, find a corresponding group in groups and rename host with newName.
+        Find a corresponding group in groups for oldName, rename host with newName
+        and delete that host.
 
         Return a string (ERROR ...||RENAMED ...).
         '''
@@ -414,13 +415,18 @@ def renameZnode(znodeRenameStringSplited):
         zk.stop()    
         return "ERROR  ==> could not rename nonexistent path: {0} !!!".format(hostName)
 
+    ## ADD IF_ZNODE_EXISTS check (!!!)
+    
     ## rename only when newPath does not exist
     if zk.exists(newPath) is None:
         if 'hosts' in oldPath:
             ## check for hostvars, if none create newPath and delete oldPath
             if len(zk.get_children(oldPath)) == 0:
                 zk.ensure_path(newPath)
+                
+                ## find, rename and delete host with no hostvars in a corresponding group
                 renameHostInGroup(oldName, newName)
+
                 zk.delete(oldPath)
                 zk.stop()
 
@@ -436,7 +442,7 @@ def renameZnode(znodeRenameStringSplited):
                 for var in varDict:
                     zk.create('{0}/{1}'.format(newPath,var),varDict[var])
 
-                ## rename     
+                ## find, rename and delete host with no hostvars in a corresponding group
                 renameHostInGroup(oldName, newName)
 
                 ## delete oldPath from hosts
@@ -444,6 +450,23 @@ def renameZnode(znodeRenameStringSplited):
                 zk.stop()
 
                 return "RENAMED {0} --> {1}".format(oldName, newName)
+
+        elif 'groups' in oldPath:
+            ## look for hosts in the group, create new group
+            ## delete theirs znode in that group ONLY and create new ones in the group
+
+            oldChildren = zk.get_children(oldPath)
+            zk.ensure_path(newPath)
+
+            for child in oldChildren:
+                zk.ensure_path('{0}/{1}'.format(newPath, child))
+
+            ## delete old group with its members
+            zk.delete(oldPath, recursive=True)
+
+            zk.stop()
+
+            return "RENAMED group {0} --> {1}".format(oldName, newName)
 
             
 def showHostVars(znodeStringSplited):
