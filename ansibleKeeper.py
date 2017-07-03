@@ -413,9 +413,11 @@ def renameZnode(znodeRenameStringSplited):
             
     if zk.exists(oldPath) is None:
         zk.stop()    
-        return "ERROR  ==> could not rename nonexistent path: {0} !!!".format(hostName)
+        return "ERROR  ==> could not rename nonexistent path: {0} !!!".format(oldPath)
 
-    ## ADD IF_ZNODE_EXISTS check (!!!)
+    if zk.exists(newPath) is not None:
+        zk.stop()
+        return "ERROR  ==> new path already exist: {0} !!!".format(newPath)
     
     ## rename only when newPath does not exist
     if zk.exists(newPath) is None:
@@ -426,7 +428,6 @@ def renameZnode(znodeRenameStringSplited):
                 
                 ## find, rename and delete host with no hostvars in a corresponding group
                 renameHostInGroup(oldName, newName)
-
                 zk.delete(oldPath)
                 zk.stop()
 
@@ -463,11 +464,14 @@ def renameZnode(znodeRenameStringSplited):
 
             ## delete old group with its members
             zk.delete(oldPath, recursive=True)
-
             zk.stop()
 
             return "RENAMED group {0} --> {1}".format(oldName, newName)
 
+        else:
+
+            return "ERROR no valid keywords <groups|hosts> found"
+        
             
 def showHostVars(znodeStringSplited):
     '''
