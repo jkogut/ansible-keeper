@@ -118,3 +118,35 @@ Use *-R hosts:oldhostname:newhostname* option to rename fworker1.dmz host:
 ```
 ./ansibleKeeper.py -R hosts:fworker1.dmz:flink-worker1.dmz
 ```
+
+
+### Run ansibleKeeper.py with ansible
+
+List all hosts with ansible
+
+```
+ansible -i fetch-inventory.sh all --list-hosts
+```
+
+
+List all hosts in zookeeper group with ansible
+
+```
+ansible -i fetch-inventory.sh zookeeper --list-hosts
+```
+
+Check `uptime` as a user `root`:
+
+```
+ansible -i fetch-inventory.sh zookeeper -a "uptime" -u root
+
+  zoo3.dmz | SUCCESS | rc=0 >>
+    12:20:29 up 65 days, 16:42,  1 user,  load average: 0.00, 0.01, 0.05
+ 
+  zoo2.dmz | SUCCESS | rc=0 >>
+    12:20:48 up 65 days, 16:42,  1 user,  load average: 0.00, 0.01, 0.05
+  
+  zoo1.dmz | SUCCESS | rc=0 >>
+    12:20:43 up 70 days, 16:51,  1 user,  load average: 0.00, 0.01, 0.05
+   
+```
