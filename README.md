@@ -119,6 +119,15 @@ Use *-R hosts:oldhostname:newhostname* option to rename fworker1.dmz host:
 ./ansibleKeeper.py -R hosts:fworker1.dmz:flink-worker1.dmz
 ```
 
+### Update host variables
+
+Use *-U groupname1:hostname1,var1:newvalue1,var2:newvalue2* option to update host variables:
+
+*[example for host fworker2.dmz: update lan_ip4 variable with new IP 1.1.1.20]*
+
+```
+./ansibleKeeper.py -U groups:flink-workers:fworker2.dmz,lan_ip4:1.1.1.20
+```
 
 ### Run ansibleKeeper.py with ansible
 
