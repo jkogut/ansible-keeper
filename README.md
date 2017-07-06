@@ -44,19 +44,19 @@ Usage
 -----
 
 ### Read the manual
-run ./ansibleKeeper.py and read the help 
+run `./ansibleKeeper.py -h` and read the help 
 
 
 ### Add some hosts
 
-Add new hosts to inventory: *[example with adding zookeeper hosts to zookeepers group]*
+Add new hosts to inventory: *[example with adding zookeeper hosts to zookeeper group]*
 ```
-./ansibleKeeper.py -A zookeepers:zoo1.dmz
-./ansibleKeeper.py -A zookeepers:zoo1.dmz
-./ansibleKeeper.py -A zookeepers:zoo1.dmz
+./ansibleKeeper.py -A zookeeper:zoo1.dmz
+./ansibleKeeper.py -A zookeeper:zoo1.dmz
+./ansibleKeeper.py -A zookeeper:zoo1.dmz
 ```
 
-Add new hosts with host variables: *[example with adding flink worker hosts to flink-worker group]*
+Add new hosts with host variables: *[example with adding flink worker hosts to flink-workers group]*
 ```
 ./ansibleKeeper.py -A flink-workers:fworker1.dmz,lan_ip4:1.1.1.1,id:1
 ./ansibleKeeper.py -A flink-workers:fworker2.dmz,lan_ip4:1.1.1.2,id:2
@@ -64,3 +64,29 @@ Add new hosts with host variables: *[example with adding flink worker hosts to f
 
 ```
 
+### Check newly added groups
+
+Use show option to check what is in zookeepers group:
+
+```
+./ansibleKeeper.py -S zookeeper
+```
+
+You should get JSON output
+
+```
+{"zoo1.dmz": {}, "zoo3.dmz": {}, "zoo2.dmz": {}}
+```
+
+Now use show option to check what is in flink-workers group:
+
+```
+./ansibleKeeper.py -S flink-workers
+```
+
+You should get JSON output
+
+```
+												  
+{"fworker3.dmz": {"id": "3", "lan_ip4": "1.1.1.3"}, "fworker2.dmz": {"id": "2", "lan_ip4": "1.1.1.2"}, "fworker1.dmz": {"id": "1", "lan_ip4": "1.1.1.1"}}
+```
