@@ -541,15 +541,16 @@ def inventoryDump():
 
     zk = zkStartRo()
 
-    hostsList  = zk.get_children("{}/hosts".format(cfg.aPath))
-    groupsList = zk.get_children("{}/groups".format(cfg.aPath))
+#    from ipdb import set_trace; set_trace()
+    hostsList  = sorted(zk.get_children("{}/hosts".format(cfg.aPath)))
+    groupsList = sorted(zk.get_children("{}/groups".format(cfg.aPath)))
     dumpDict   = {"hosts": hostsList}
 
     tmpList = []
     for group in groupsList:
         tmpDict  = {}
         path     = "{0}/groups/{1}".format(cfg.aPath, group)
-        children = zk.get_children(path)
+        children = sorted(zk.get_children(path))
         tmpDict[group] = children
         tmpList.append(tmpDict)
         
