@@ -134,6 +134,15 @@ List all hosts with ansible
 
 ```
 ansible -i fetch-inventory.sh all --list-hosts
+
+  hosts (6):
+	zoo3.dmz
+	zoo1.dmz
+	zoo2.dmz
+	fworker2.dmz
+	fworker3.dmz
+	fworker1.dmz
+
 ```
 
 
@@ -141,6 +150,11 @@ List all hosts in zookeeper group with ansible
 
 ```
 ansible -i fetch-inventory.sh zookeeper --list-hosts
+
+  hosts (3):
+	zoo3.dmz
+	zoo1.dmz
+	zoo2.dmz
 ```
 
 Check `uptime` as a user `root`:
