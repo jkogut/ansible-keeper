@@ -128,6 +128,16 @@ Use *-U groupname1:hostname1,var1:newvalue1,var2:newvalue2* option to update hos
 ./ansibleKeeper.py -U groups:flink-workers:fworker2.dmz,lan_ip4:1.1.1.20
 ```
 
+### Add host to another group
+
+Use *-G newgroupname:hostname* option to add host to another group.
+If group exists it will add the host only otherwise it will create new group.
+
+
+```
+./ansibleKeeper.py -G new-flinkgroup:fworker2.dmz
+```
+
 ### Run ansibleKeeper.py with ansible
 
 List all hosts with ansible
@@ -142,9 +152,7 @@ ansible -i fetch-inventory.sh all --list-hosts
 	fworker2.dmz
 	fworker3.dmz
 	fworker1.dmz
-
 ```
-
 
 List all hosts in zookeeper group with ansible
 
