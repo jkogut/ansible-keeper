@@ -11,7 +11,7 @@ Motivation
 4. JSON format combined with `jq` gives you nice and pretty colorful output 
 5. *Github integration (not yet implemented)* 
 6. *Import/Export of ansible inventory TOML file (not yet implemented)* 
-
+7. *AWS Dynamic inventory integration (not yet implemented)* 
 
 Install
 -------
@@ -140,6 +140,11 @@ If group exists it will add the host only otherwise it will create new group.
 
 ### Run ansibleKeeper.py with ansible
 
+You can run ansibleKeeper.py with ansible in one of two ways:
+
+1. Use `ansible -i` option to point to your zookeeper based inventory:
+
+
 List all hosts with ansible
 
 ```
@@ -165,10 +170,32 @@ ansible -i fetch-inventory.sh zookeeper --list-hosts
 	zoo2.dmz
 ```
 
-Check `uptime` as a user `root`:
+Check `uptime` as a user `root` for group `zookeeper`:
 
 ```
 ansible -i fetch-inventory.sh zookeeper -a "uptime" -u root
+
+  zoo3.dmz | SUCCESS | rc=0 >>
+    12:20:29 up 65 days, 16:42,  1 user,  load average: 0.00, 0.01, 0.05
+ 
+  zoo2.dmz | SUCCESS | rc=0 >>
+    12:20:48 up 65 days, 16:42,  1 user,  load average: 0.00, 0.01, 0.05
+  
+  zoo1.dmz | SUCCESS | rc=0 >>
+    12:20:43 up 70 days, 16:51,  1 user,  load average: 0.00, 0.01, 0.05
+```
+
+2. Use default `/etc/ansible/hosts` inventory file to point to zookeeper based inventory:
+
+Update `fetch-inventory.sh` script with `ansibleKeeper.py` path and copy it to `/etc/ansible/hosts` and `chmod +x` it.
+
+Run it `ansible --list all` as you would normally.
+
+
+Example with check `uptime` as a user `root` for group `zookeeper`:
+
+```
+ansible zookeeper -a "uptime" -u root
 
   zoo3.dmz | SUCCESS | rc=0 >>
     12:20:29 up 65 days, 16:42,  1 user,  load average: 0.00, 0.01, 0.05
