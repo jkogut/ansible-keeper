@@ -54,18 +54,20 @@ def oParser():
                       help="show host variables for a given host or group: <groupname1:hostname1> or <groupname1>")
     parser.add_option("-I", nargs = 1,
                       help="inventory mode: true|ansible dumps inventory in json format from zookeeper")
+    parser.add_option("--host", nargs = 1,
+                      help="ansible compliant option for hostvars access: --host hostname")
 
     
     (opts, args) = parser.parse_args()
     
     
-    if (opts.A or opts.G or opts.D or opts.U or opts.R or opts.S or opts.I) == None:
+    if (opts.A or opts.G or opts.D or opts.U or opts.R or opts.S or opts.I or opts.host) == None:
 
         parser.print_help()
         exit(-1)
         
     return {'addMode':opts.A, 'groupMode':opts.G, 'deleteMode':opts.D, 'updateMode':opts.U,
-            'renameMode':opts.R, 'showMode':opts.S, 'inventoryMode':opts.I}
+            'renameMode':opts.R, 'showMode':opts.S, 'inventoryMode':opts.I, 'ansibleHost':opts.host}
 
 
 def zkStartRo():
@@ -582,19 +584,49 @@ def ansibleInventoryDump():
     
     zk.stop()
     return groupDict
-        
 
+
+def ansibleHostAccess(hostName):
+    '''
+    Ansible pre 1.3 compliant hostvars dump.
+
+    Return dict.
+    '''
+
+    zk = zkStartRo()
+
+    hostPath = "{0}/hosts/{1}".format(cfg.aPath, hostName)
+    
+    if zk.exists(hostPath) is None:
+        zk.stop()    
+        return "ERROR  ==> no such host: {0} !!!".format(hostName)
+
+    else:
+        varList = zk.get_children('{0}'.format(hostPath))
+      
+        varDict = {}
+        for var in varList:
+            varDict[var]  = zk.get('{0}/{1}'.format(hostPath, var))[0]
+
+        return varDict
+ 
+    
 def main():
     '''
     Main logic
     '''
-    
-    if oParser()['inventoryMode'] == 'true':
-        print json.dumps(inventoryDump())
-       
+
+    ## options for ansible only 
+    if oParser()['ansibleHost'] is not None:
+        print json.dumps(ansibleHostAccess(oParser()['ansibleHost']))
+
     if oParser()['inventoryMode'] == 'ansible':
         print json.dumps(ansibleInventoryDump())
 
+    ## options for users
+    if oParser()['inventoryMode'] == 'true':
+        print json.dumps(inventoryDump())
+        
     if oParser()['addMode'] is not None:
         znodeDict = splitZnodeVarString(oParser()['addMode'])
         print addHostWithHostvars(znodeDict)
