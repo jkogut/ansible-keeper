@@ -1,4 +1,5 @@
 #!/usr/bin/env python
+# -*- coding: utf-8 -*-
 
 __author__     = "Jan Kogut"
 __copyright__  = "Jan Kogut"
@@ -593,6 +594,16 @@ def ansibleHostAccess(hostName):
     Return dict.
     '''
 
+    # Before version 1.0, each group could only have a list of hostnames/IP addresses, like the webservers,
+    # marietta, and 5points groups above.
+    #
+    # When called with the arguments --host <hostname> (where <hostname> is a host from above), the script
+    # must print either an empty JSON hash/dictionary, or a hash/dictionary of variables to make available
+    # to templates and playbooks. Printing variables is optional, if the script does not wish to do this,
+    # printing an empty hash/dictionary is the way to go
+    #
+    # Source: http://docs.ansible.com/ansible/dev_guide/developing_inventory.html#script-conventions
+    
     zk = zkStartRo()
 
     hostPath = "{0}/hosts/{1}".format(cfg.aPath, hostName)
