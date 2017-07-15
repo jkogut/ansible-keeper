@@ -54,7 +54,7 @@ def oParser():
     parser.add_option("-S", nargs = 1,
                       help="show host variables for a given host or group: <groupname1:hostname1> or <groupname1>")
     parser.add_option("-I", nargs = 1,
-                      help="inventory mode: true|ansible dumps inventory in json format from zookeeper")
+                      help="inventory mode: groups|all|ansible dumps inventory in json format from zookeeper")
     parser.add_option("--host", nargs = 1,
                       help="ansible compliant option for hostvars access: --host hostname")
 
@@ -535,11 +535,11 @@ def showHostVars(znodeStringSplited):
     zk.stop()
 
 
-def inventoryDump():
+def inventoryDump(dumpMode):
     '''
-    Inventory dump for a given list of zookeeper servers and ansible-keeper path.
+    User friendly inventory dump for all|groups modes.
     
-    Return dict.
+    Return dict or list.
     '''
 
     zk = zkStartRo()
@@ -550,17 +550,23 @@ def inventoryDump():
     dumpDict   = {"hosts": hostsList}
 
     tmpList = []
-    for group in groupsList:
-        tmpDict  = {}
-        path     = "{0}/groups/{1}".format(cfg.aPath, group)
-        children = sorted(zk.get_children(path))
-        tmpDict[group] = children
-        tmpList.append(tmpDict)
+
+    if dumpMode == 'groups':
+        return groupsList
+
+    elif dumpMode == 'all':
+        for group in groupsList:
+            tmpDict  = {}
+            path     = "{0}/groups/{1}".format(cfg.aPath, group)
+            children = sorted(zk.get_children(path))
+            tmpDict[group] = children
+            tmpList.append(tmpDict)
         
-    dumpDict["groups"] = tmpList
-    
+            dumpDict["groups"] = tmpList
+
+        return dumpDict
+            
     zk.stop()
-    return dumpDict
 
 
 def ansibleInventoryDump():
@@ -673,9 +679,12 @@ def main():
         print json.dumps(ansibleInventoryDump())
 
     ## options for users
-    if oParser()['inventoryMode'] == 'true':
-        print json.dumps(inventoryDump())
-        
+    if oParser()['inventoryMode'] == 'all':
+        print json.dumps(inventoryDump('all'))
+
+    if oParser()['inventoryMode'] == 'groups':
+        print json.dumps(inventoryDump('groups'))
+
     if oParser()['addMode'] is not None:
         znodeDict = splitZnodeVarString(oParser()['addMode'])
         print addHostWithHostvars(znodeDict)
