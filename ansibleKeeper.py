@@ -544,7 +544,7 @@ def inventoryDump():
 
     zk = zkStartRo()
 
-#    from ipdb import set_trace; set_trace()
+    # from ipdb import set_trace; set_trace()
     hostsList  = sorted(zk.get_children("{}/hosts".format(cfg.aPath)))
     groupsList = sorted(zk.get_children("{}/groups".format(cfg.aPath)))
     dumpDict   = {"hosts": hostsList}
@@ -569,7 +569,17 @@ def ansibleInventoryDump():
     
     Return dict.
     '''
-    
+
+    ## The stock inventory script system detailed above works for all versions of Ansible, but calling --host for
+    ## every host can be rather expensive, especially if it involves expensive API calls to a remote subsystem.
+    ## In Ansible 1.3 or later, if the inventory script returns a top level element called “_meta”,
+    ## it is possible to return all of the host variables in one inventory script call. When this meta element
+    ## contains a value for “hostvars”, the inventory script will not be invoked with --host for each host.
+    ## This results in a significant performance increase for large numbers of hosts, and also makes client side
+    ## caching easier to implement for the inventory script.
+    ##
+    ## Source: http://docs.ansible.com/ansible/dev_guide/developing_inventory.html#tuning-the-external-inventory-script
+
     zk = zkStartRo()
 
     groupList = zk.get_children("{}/groups".format(cfg.aPath))
@@ -580,10 +590,38 @@ def ansibleInventoryDump():
         children = zk.get_children(path)
         tmpDict  = {}
         tmpDict['hosts'] = children
-        tmpDict['vars']  = {"a":"b"}
+        tmpDict['vars']  = {} ## not yet implemented
         groupDict[group] = tmpDict
+        
+    ## building ansible compliant hostvars dict:
+    ##
+    ## {"_meta": {
+    ##     "hostvars": {
+    ##         "moocow.example.com": {"asdf" : 1234, "var2": 111 },
+    ##         "llama.example.com": {"asdf": 5678, "var2": 222 }
+    ##     }
+    ## }}
+
+    hostList    = zk.get_children("{}/hosts".format(cfg.aPath))
+    hostVarDict = {}
+    varDict     = {}
+
+    for host in hostList:             ## build a dict with host variables
+        tmpHostPath    = "{0}/hosts/{1}".format(cfg.aPath, host)
+        varDict[host]  = zk.get_children('{0}'.format(tmpHostPath))
+
+        valDict = {}
+        for var in varDict[host]:
+            valDict[var] = zk.get('{0}/{1}'.format(tmpHostPath, var))[0]
+
+        varDict[host] = valDict
+
+    ## modify output dict to be compliant with ansible >= 1.3 version
+    hostVarDict['hostvars'] = varDict
+    groupDict['_meta']      = hostVarDict
     
     zk.stop()
+
     return groupDict
 
 
@@ -594,15 +632,15 @@ def ansibleHostAccess(hostName):
     Return dict.
     '''
 
-    # Before version 1.0, each group could only have a list of hostnames/IP addresses, like the webservers,
-    # marietta, and 5points groups above.
-    #
-    # When called with the arguments --host <hostname> (where <hostname> is a host from above), the script
-    # must print either an empty JSON hash/dictionary, or a hash/dictionary of variables to make available
-    # to templates and playbooks. Printing variables is optional, if the script does not wish to do this,
-    # printing an empty hash/dictionary is the way to go
-    #
-    # Source: http://docs.ansible.com/ansible/dev_guide/developing_inventory.html#script-conventions
+    ## Before version 1.0, each group could only have a list of hostnames/IP addresses, like the webservers,
+    ## marietta, and 5points groups above.
+    ##
+    ## When called with the arguments --host <hostname> (where <hostname> is a host from above), the script
+    ## must print either an empty JSON hash/dictionary, or a hash/dictionary of variables to make available
+    ## to templates and playbooks. Printing variables is optional, if the script does not wish to do this,
+    ## printing an empty hash/dictionary is the way to go
+    ##
+    ## Source: http://docs.ansible.com/ansible/dev_guide/developing_inventory.html#script-conventions
     
     zk = zkStartRo()
 
