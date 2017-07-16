@@ -245,18 +245,18 @@ def addHostToGroup(znodeStringSplited):
     hostPath       = znodeStringSplited[1][1]
     hostGroupPath  = znodeStringSplited[1][2]
 
-    if zk.exists(hostGroupPath):
-        zk.stop()    
-        return "ERROR  ==> host: {0} in group {1} exists !!!".format(hostName, groupName)
+    try:
+        if zk.exists(hostGroupPath):
+            return "ERROR  ==> host: {0} in group {1} exists !!!".format(hostName, groupName)
 
-    if zk.exists(hostPath) is None:
-        zk.stop()
-        return "ERROR  ==> host: {0} does not exist !!! Could not add non-existent host: {0} to group: {1}".format(hostName, groupName)
+        if zk.exists(hostPath) is None:
+            return "ERROR  ==> host: {0} does not exist !!! Could not add non-existent host: {0} to group: {1}".format(hostName, groupName)
         
-    zk.ensure_path(hostGroupPath)
-    zk.stop()
+        zk.ensure_path(hostGroupPath)
+        return "ADDED   ==> host: {0} to group: {1}".format(hostName, groupName)
 
-    return "ADDED   ==> host: {0} to group: {1}".format(hostName, groupName)
+    finally:
+        zk.stop()
 
 
 def deleteZnodeRecur(znodeStringSplited):
