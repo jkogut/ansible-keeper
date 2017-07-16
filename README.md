@@ -220,3 +220,64 @@ fworker2.dmz | SUCCESS => {
     "lan_ip4": "1.1.1.2"
 	}
 ```
+
+
+### Inventory dump
+
+You can see at any time structure of your infrastructure like: **list of all hosts, groups and hosts with groups** 
+using inventory dump options.
+
+**Use** `-I hosts` option to obtain sorted list of all hosts in the inventory.
+
+```python
+ansibleKeeper.py -I hosts| jq
+[
+	"fworker1.dmz",
+	"fworker2.dmz",
+	"fworker3.dmz",
+	"zoo1.dmz",
+	"zoo2.dmz",
+	"zoo3.dmz"
+]
+```
+
+**Use** `-I groups` option to obtain sorted list of all groups in the inventory.
+
+```python
+ansibleKeeper.py -I groups| jq
+[
+	"flink-workers",
+	"zookeeper"
+]
+```
+
+**Use** `-I all` option to obtain sorted list of all groups and hosts in the inventory.
+
+```python
+ansibleKeeper.py -I all| jq
+{
+  "hosts": [
+	"fworker1.dmz",
+	"fworker2.dmz",
+	"fworker3.dmz",
+	"zoo1.dmz",
+	"zoo2.dmz",
+	"zoo3.dmz"
+	],
+  "groups": [
+	{
+		"flink-workers": [
+			"fworker1.dmz",
+			"fworker2.dmz",
+			"fworker3.dmz"
+		]
+	},
+		"zookeeper": [
+			"zoo1.dmz",
+			"zoo2.dmz",
+			"zoo3.dmz"
+		]
+	}
+  ]
+}
+```		
