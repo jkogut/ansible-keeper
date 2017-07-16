@@ -268,63 +268,57 @@ def deleteZnodeRecur(znodeStringSplited):
 
     zk = zkStartRw()
 
-    if len(znodeStringSplited) > 1:  ## check if it is <groupname:hostname> case
+    try:
+        if len(znodeStringSplited) > 1:  ## check if it is <groupname:hostname> case
 
-        groupName      = znodeStringSplited[0][0]
-        groupPath      = znodeStringSplited[0][1]
-        hostName       = znodeStringSplited[1][0]
-        hostPath       = znodeStringSplited[1][1]
-        hostGroupPath  = znodeStringSplited[1][2]
-
-        if zk.exists(hostPath) is None:
-            zk.stop()   
-            return "ERROR  ==> could not delete host: {0} that does not exist !!!".format(hostName)
-
-        if zk.exists(hostGroupPath) is None:
-            zk.stop()   
-            return "ERROR  ==> could not delete host: {0} that does not exist in group: {1} !!!".format(hostName, groupName)
-
-        if len(zk.get_children(groupPath)) == 1:  ## delete group if there is only one host in it
-            zk.delete(groupPath, recursive=True)
-
-        else:
-            zk.delete(hostGroupPath, recursive=True)
-            zk.stop()
-            return "DELETED ==> host: {0} in group: {1}".format(hostName, groupName)
-    
-
-    elif len(znodeStringSplited) == 1:  ## check if it is <groupname> or <hosts:hostname> case    
-        if len(znodeStringSplited[0]) == 2:  ## first check for group only
-        
-            groupName = znodeStringSplited[0][0]
-            groupPath = znodeStringSplited[0][1]
-       
-            if zk.exists(groupPath) is None:
-                zk.stop()
-                return "ERROR  ==> could not delete group: {0} that does not exist !!!".format(groupName)
-
-            else:
-                zk.delete(groupPath, recursive=True)
-                zk.stop()
-                return "DELETED ==> group: {0}".format(groupName)
-            
-        else:  ## then assume check for hosts only 
-            hostName       = znodeStringSplited[0][0]
-            hostPath       = znodeStringSplited[0][1]
+            groupName      = znodeStringSplited[0][0]
+            groupPath      = znodeStringSplited[0][1]
+            hostName       = znodeStringSplited[1][0]
+            hostPath       = znodeStringSplited[1][1]
+            hostGroupPath  = znodeStringSplited[1][2]
 
             if zk.exists(hostPath) is None:
-                zk.stop()
                 return "ERROR  ==> could not delete host: {0} that does not exist !!!".format(hostName)
 
-            else:
-                zk.delete(hostPath, recursive=True)
-                zk.stop()
-                return "DELETED ==> host: {0}".format(hostName)
-            
-    else:  ## Unknown cases        
-        return "ERROR with processing znodeStrings !!!"           
+            if zk.exists(hostGroupPath) is None:
+                return "ERROR  ==> could not delete host: {0} that does not exist in group: {1} !!!".format(hostName, groupName)
 
-    zk.stop()
+            if len(zk.get_children(groupPath)) == 1:  ## delete group if there is only one host in it
+                zk.delete(groupPath, recursive=True)
+
+            else:
+                zk.delete(hostGroupPath, recursive=True)
+                return "DELETED ==> host: {0} in group: {1}".format(hostName, groupName)
+    
+        elif len(znodeStringSplited) == 1:  ## check if it is <groupname> or <hosts:hostname> case    
+            if len(znodeStringSplited[0]) == 2:  ## first check for group only
+        
+                groupName = znodeStringSplited[0][0]
+                groupPath = znodeStringSplited[0][1]
+       
+                if zk.exists(groupPath) is None:
+                    return "ERROR  ==> could not delete group: {0} that does not exist !!!".format(groupName)
+
+                else:
+                    zk.delete(groupPath, recursive=True)
+                    return "DELETED ==> group: {0}".format(groupName)
+            
+            else:  ## then assume check for hosts only 
+                hostName       = znodeStringSplited[0][0]
+                hostPath       = znodeStringSplited[0][1]
+
+                if zk.exists(hostPath) is None:
+                    return "ERROR  ==> could not delete host: {0} that does not exist !!!".format(hostName)
+
+                else:
+                    zk.delete(hostPath, recursive=True)
+                    return "DELETED ==> host: {0}".format(hostName)
+            
+        else:  ## Unknown cases        
+            return "ERROR with processing znodeStrings !!!"           
+
+    finally:
+        zk.stop()
 
 
 def updateZnode(znodeDict):
