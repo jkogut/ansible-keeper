@@ -469,54 +469,54 @@ def showHostVars(znodeStringSplited):
 
     zk = zkStartRo()
 
-    if len(znodeStringSplited[0]) == 2:    ## check for groupname only
+    try:
+        if len(znodeStringSplited[0]) == 2:    ## check for groupname only
 
-        groupName     = znodeStringSplited[0][0]
-        groupPath     = znodeStringSplited[0][1]
+            groupName     = znodeStringSplited[0][0]
+            groupPath     = znodeStringSplited[0][1]
 
-        if zk.exists(groupPath) is None:
-            zk.stop()
-            return "ERROR  ==> no such groupname: {0} !!!".format(groupName)
+            if zk.exists(groupPath) is None:
+                return "ERROR  ==> no such groupname: {0} !!!".format(groupName)
 
-        else:
-            hostList    = zk.get_children(groupPath)
-            varDict     = {}
+            else:
+                hostList    = zk.get_children(groupPath)
+                varDict     = {}
 
-            for host in hostList:             ## build a dict with host variables
-                tmpHostPath    = "{0}/hosts/{1}".format(cfg.aPath, host)
-                varDict[host]  = zk.get_children('{0}'.format(tmpHostPath))
+                for host in hostList:             ## build a dict with host variables
+                    tmpHostPath    = "{0}/hosts/{1}".format(cfg.aPath, host)
+                    varDict[host]  = zk.get_children('{0}'.format(tmpHostPath))
+
+                    valDict = {}
+                    for var in varDict[host]:
+                        valDict[var] = zk.get('{0}/{1}'.format(tmpHostPath, var))[0]
+
+                    varDict[host] = valDict
+                return varDict
+                    
+        elif len(znodeStringSplited[0]) == 3:     ## check for hostname only   
+
+            hostName      = znodeStringSplited[0][0]
+            hostPath      = znodeStringSplited[0][1]
+
+            if zk.exists(hostPath) is None:
+                return "ERROR  ==> no such host: {0} !!!".format(hostName)
+
+            else:
+                varDict  = {}
+                varDict[hostName]  = zk.get_children('{0}'.format(hostPath))
 
                 valDict = {}
-                for var in varDict[host]:
-                    valDict[var] = zk.get('{0}/{1}'.format(tmpHostPath, var))[0]
+                for var in varDict[hostName]:
+                    valDict[var]  = zk.get('{0}/{1}'.format(hostPath, var))[0]
 
-                varDict[host] = valDict
-            return varDict
-                    
-    elif len(znodeStringSplited[0]) == 3:     ## check for hostname only   
-
-        hostName      = znodeStringSplited[0][0]
-        hostPath      = znodeStringSplited[0][1]
-
-        if zk.exists(hostPath) is None:
-            zk.stop()    
-            return "ERROR  ==> no such host: {0} !!!".format(hostName)
+                varDict[hostName] = valDict
+                return varDict
 
         else:
-            varDict  = {}
-            varDict[hostName]  = zk.get_children('{0}'.format(hostPath))
+            return "ERROR with processing znodeStrings !!!"
 
-            valDict = {}
-            for var in varDict[hostName]:
-                valDict[var]  = zk.get('{0}/{1}'.format(hostPath, var))[0]
-
-            varDict[hostName] = valDict
-            return varDict
-
-    else:
-        return "ERROR with processing znodeStrings !!!"
-                    
-    zk.stop()
+    finally:
+        zk.stop()
 
 
 def inventoryDump(dumpMode):
