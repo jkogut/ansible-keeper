@@ -2,6 +2,14 @@
 Keep ansible inventory in zookeeper:  http://zookeeper.apache.org/
 
 
+### Table of Contents
+**[Motivation](#motivation)**<br>
+**[Install](#install)**<br>
+**[Config](#config)**<br>
+**[Tests](#tests)**<br>
+**[Usage](#usage)**<br>
+
+
 Motivation
 ----------
 
@@ -49,7 +57,7 @@ Test will check your zookeeper cluster connectivity and `ansibleKeeper.py` code.
 ```python
 py.test -v -l test_ansibleKeeper.py
 
-=============================================== test session starts =================================================
+============================================ test session starts =================================================
 platform linux2 -- Python 2.7.12 -- py-1.4.26 -- pytest-2.6.4 -- /usr/bin/python
 collected 18 items 
 
@@ -72,7 +80,7 @@ test_ansibleKeeper.py::TestSplitters::test_splitZnodeString PASSED
 test_ansibleKeeper.py::TestSplitters::test_splitZnodeVarString PASSED
 test_ansibleKeeper.py::TestSplitters::test_splitRenameZnodeVarString PASSED
 
-=========================================== 18 passed in 1.26 seconds ==============================================
+======================================== 18 passed in 1.26 seconds ==============================================
 ```
 
 
