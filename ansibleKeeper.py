@@ -115,7 +115,6 @@ def splitZnodeVarString(znodeVarString):
         varDict[var.split(':')[0]] = var.split(':')[1]
        
     groupName, hostName = varList[0].split(':')[0], varList[0].split(':')[1]
-
     return { groupName : { hostName : varDict }}
 
 
@@ -135,7 +134,6 @@ def splitZnodeString(znodeString):
     if 'hosts:' in znodeString:
         hostName       = znodeString.split(':')[1]
         hostPath       = "{0}/hosts/{1}".format(cfg.aPath, hostName)
-
         return [(hostName, hostPath, None)]
 
     elif ':' in znodeString:
@@ -144,13 +142,11 @@ def splitZnodeString(znodeString):
         groupPath      = "{0}/groups/{1}".format(cfg.aPath, groupName)
         hostPath       = "{0}/hosts/{1}".format(cfg.aPath, hostName)
         hostGroupPath  = "{0}/{1}".format(groupPath, hostName)
-
         return [(groupName, groupPath),(hostName, hostPath, hostGroupPath)]
 
     else:
         groupName = znodeString
         groupPath = "{0}/groups/{1}".format(cfg.aPath, groupName)
-
         return [(groupName, groupPath)]
 
 
@@ -177,7 +173,6 @@ def splitRenameZnodeString(renameZnodeString):
 
         oldHostPath    = "{0}/hosts/{1}".format(cfg.aPath, oldHostName)
         newHostPath    = "{0}/hosts/{1}".format(cfg.aPath, newHostName)
-        
         return [(oldHostName, oldHostPath), (newHostName, newHostPath)]
 
     elif 'groups' in renameZnodeString:
@@ -186,7 +181,6 @@ def splitRenameZnodeString(renameZnodeString):
 
         oldGroupPath    = "{0}/groups/{1}".format(cfg.aPath, oldGroupName)
         newGroupPath    = "{0}/groups/{1}".format(cfg.aPath, newGroupName)
-        
         return [(oldGroupName, oldGroupPath), (newGroupName, newGroupPath)]
 
     else:
@@ -357,7 +351,6 @@ def updateZnode(znodeDict):
             else:
                 nonExistList.append(var)
            
-
         if len(nonExistList) > 0 and len(updatedDict) == 0:
             return "NOT UPDATED  ==> host: {0} with no existing hostvars {1} ===> NOT UPDATED hostvars {2} which do not exist".format(hostName, updatedDict, nonExistList)
 
@@ -403,8 +396,8 @@ def renameZnode(znodeRenameStringSplited):
                         
                 ## delete oldPath from groups/group_to_find/host     
                 zk.delete(tmpOldHostGroupPath)
-
                 return "RENAMED host {0} in group {1} --> {2}".format(oldName, child, newName)
+
             else:
                 return "ERROR ---> NO GROUP FOUND !!!"
 
@@ -428,7 +421,6 @@ def renameZnode(znodeRenameStringSplited):
                 renameHostInGroup(oldName, newName)
                 zk.delete(oldPath)
                 zk.stop()
-
                 return "RENAMED {0} --> {1}".format(oldName, newName)
 
             else:
@@ -447,7 +439,6 @@ def renameZnode(znodeRenameStringSplited):
                 ## delete oldPath from hosts
                 zk.delete(oldPath, recursive=True)
                 zk.stop()
-
                 return "RENAMED {0} --> {1}".format(oldName, newName)
 
         elif 'groups' in oldPath:
@@ -463,11 +454,9 @@ def renameZnode(znodeRenameStringSplited):
             ## delete old group with its members
             zk.delete(oldPath, recursive=True)
             zk.stop()
-
             return "RENAMED group {0} --> {1}".format(oldName, newName)
 
         else:
-
             return "ERROR no valid keywords <groups|hosts> found"
         
             
@@ -546,25 +535,27 @@ def inventoryDump(dumpMode):
 
     tmpList = []
 
-    if dumpMode == 'hosts':
-        return hostsList
+    try:
+        if dumpMode == 'hosts':
+            return hostsList
 
-    elif dumpMode == 'groups':
-        return groupsList
+        elif dumpMode == 'groups':
+            return groupsList
 
-    elif dumpMode == 'all':
-        for group in groupsList:
-            tmpDict  = {}
-            path     = "{0}/groups/{1}".format(cfg.aPath, group)
-            children = sorted(zk.get_children(path))
-            tmpDict[group] = children
-            tmpList.append(tmpDict)
-        
-            dumpDict["groups"] = tmpList
+        elif dumpMode == 'all':
+            for group in groupsList:
+                tmpDict  = {}
+                path     = "{0}/groups/{1}".format(cfg.aPath, group)
+                children = sorted(zk.get_children(path))
+                tmpDict[group] = children
+                tmpList.append(tmpDict)
+                
+                dumpDict["groups"] = tmpList
 
-        return dumpDict
-            
-    zk.stop()
+            return dumpDict
+
+    finally:
+        zk.stop()
 
 
 def ansibleInventoryDump():
