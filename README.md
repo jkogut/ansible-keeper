@@ -35,7 +35,7 @@ and provide a list of your zookeeper servers with base znode for ansible-keeper.
 
 Defaults:
 
-```
+```python
 cfg.zkServers  = 'zoo1.dmz:2181,zoo2.dmz:2181,zoo3.dmz:2181'
 cfg.aPath      = '/ansible-test'
 ```
@@ -133,7 +133,6 @@ Use **-U groupname1:hostname1,var1:newvalue1,var2:newvalue2** option to update h
 Use **-G newgroupname:hostname** option to add host to another group.
 If group exists it will add the host only otherwise it will create new group.
 
-
 ```
 ./ansibleKeeper.py -G new-flinkgroup:fworker2.dmz
 ```
@@ -143,8 +142,7 @@ If group exists it will add the host only otherwise it will create new group.
 You can run `ansibleKeeper.py` with ansible in one of two ways:
 
 
-1. Use `ansible -i` option to point to your zookeeper based inventory:
-
+1. **Use** `ansible -i` option to point to your zookeeper based inventory:
 
 List all hosts in zookeeper group with ansible pointing inventory with `-i` option:
 
@@ -162,7 +160,6 @@ ansible -i fetch-inventory.sh zookeeper --list-hosts
 Update `fetch-inventory.sh` script with `ansibleKeeper.py` path and copy it to `/etc/ansible/hosts` and `chmod +x` it.
 Run it with `ansible --list all` command as you would normally.
 
-
 List all hosts in zookeeper group with ansible:
 
 ```
@@ -172,4 +169,16 @@ ansible zookeeper --list-hosts
 	zoo3.dmz
 	zoo1.dmz
 	zoo2.dmz
+```
+
+
+### Check inventory hostvars with ansible
+
+Use ansible debug module to check hostvars with ansible:
+
+```python
+ansible fworker2.dmz -m debug -a "var=lan_ip4"
+fworker2.dmz | SUCCESS => {
+    "lan_ip4": "1.1.1.2"
+	}
 ```
