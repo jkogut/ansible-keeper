@@ -63,7 +63,7 @@ Run `./ansibleKeeper.py -h` and read the help.
 Use **-A groupname1:newhostname1** to add new hosts to inventory: 
 
 *[example with adding zookeeper hosts to zookeeper group]*
-```
+```python
 ./ansibleKeeper.py -A zookeeper:zoo1.dmz
 ./ansibleKeeper.py -A zookeeper:zoo1.dmz
 ./ansibleKeeper.py -A zookeeper:zoo1.dmz
@@ -72,7 +72,7 @@ Use **-A groupname1:newhostname1** to add new hosts to inventory:
 Use **-A groupname1:newhostname1,var1:value1,var2:value2,var3:value3** to add new hosts with host variables to inventory: 
 
 *[example with adding flink worker hosts to flink-workers group]*
-```
+```python
 ./ansibleKeeper.py -A flink-workers:fworker1.dmz,lan_ip4:1.1.1.1,id:1
 ./ansibleKeeper.py -A flink-workers:fworker2.dmz,lan_ip4:1.1.1.2,id:2
 ./ansibleKeeper.py -A flink-workers:fworker3.dmz,lan_ip4:1.1.1.3,id:3
@@ -88,33 +88,33 @@ Use **-S zookeeper** option to show what is in zookeeper group:
 
 You should get JSON output:
 
-```
+```python
 {"zoo1.dmz": {}, "zoo3.dmz": {}, "zoo2.dmz": {}}
 ```
 
 Use **-S flink-workers** option to show what is inside flink-workers group:
 
-```
+```python
 ./ansibleKeeper.py -S flink-workers
 ```
 
 You should get JSON output:
 
-```											  
-{"fworker3.dmz": {"id": "3", "lan_ip4": "1.1.1.3"}, "fworker2.dmz": {"id": "2", "lan_ip4": "1.1.1.2"}, "fworker1.dmz": {"id": "1", "lan_ip4": "1.1.1.1"}}
+```python
+{"fworker3.dmz": {"id": "3", "lan_ip4": "1.1.1.3"}, "fworker2.dmz": {"id": "2", "lan_ip4": "1.1.1.2"}, "fworker1.dmz":{"id": "1", "lan_ip4": "1.1.1.1"}}
 ```
 
 ### Rename group and host
 
 Use **-R groups:oldgroupname:newgroupname** option to rename zookeeper group:
 
-```
+```python
 ./ansibleKeeper.py -R groups:zookeeper:zookeepers
 ```
 
 Use **-R hosts:oldhostname:newhostname** option to rename fworker1.dmz host:
 
-```
+```python
 ./ansibleKeeper.py -R hosts:fworker1.dmz:flink-worker1.dmz
 ```
 
@@ -124,7 +124,7 @@ Use **-U groupname1:hostname1,var1:newvalue1,var2:newvalue2** option to update h
 
 *[example for host fworker2.dmz: update lan_ip4 variable with new IP 1.1.1.20]*
 
-```
+```python
 ./ansibleKeeper.py -U groups:flink-workers:fworker2.dmz,lan_ip4:1.1.1.20
 ```
 
@@ -133,7 +133,7 @@ Use **-U groupname1:hostname1,var1:newvalue1,var2:newvalue2** option to update h
 Use **-G newgroupname:hostname** option to add host to another group.
 If group exists it will add the host only otherwise it will create new group.
 
-```
+```python
 ./ansibleKeeper.py -G new-flinkgroup:fworker2.dmz
 ```
 
@@ -146,7 +146,7 @@ You can run `ansibleKeeper.py` with ansible in one of two ways:
 
 List all hosts in zookeeper group with ansible pointing inventory with `-i` option:
 
-```
+```python
 ansible -i fetch-inventory.sh zookeeper --list-hosts
 
   hosts (3):
@@ -162,7 +162,7 @@ Run it with `ansible --list all` command as you would normally.
 
 List all hosts in zookeeper group with ansible:
 
-```
+```python
 ansible zookeeper --list-hosts
 
   hosts (3):
