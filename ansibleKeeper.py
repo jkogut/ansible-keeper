@@ -334,42 +334,43 @@ def updateZnode(znodeDict):
     hostName    = znodeDict[groupName].keys()[0]
     hostPath    = "{0}/hosts/{1}".format(cfg.aPath, hostName)
     hostVarList = zk.get_children(hostPath)
-    
-    if zk.exists(hostPath) is None:
-        zk.stop()    
-        return "ERROR  ==> host: {0} does not exist !!!".format(hostName)
 
-    for hostVar in hostVarList:
-        if zk.exists("{0}/{1}".format(hostPath, hostVar)) is None: 
-            zk.stop()            
-            return "ERROR  ==> hostvar: {0} for host {1} does not exist !!!".format(hostVar, hostName)
+    try:
+        if zk.exists(hostPath) is None:
+            return "ERROR  ==> host: {0} does not exist !!!".format(hostName)
 
-    nonExistList = []    
-    updatedDict  = {}
+        for hostVar in hostVarList:
+            if zk.exists("{0}/{1}".format(hostPath, hostVar)) is None: 
+                return "ERROR  ==> hostvar: {0} for host {1} does not exist !!!".format(hostVar, hostName)
+
+        nonExistList = []    
+        updatedDict  = {}
     
-    for var in znodeDict[groupName][hostName]:
-        varPath = "{0}/{1}".format(hostPath, var)
-        varVal  = znodeDict[groupName][hostName][var]
+        for var in znodeDict[groupName][hostName]:
+            varPath = "{0}/{1}".format(hostPath, var)
+            varVal  = znodeDict[groupName][hostName][var]
         
-        if var in hostVarList: ## check if given variable exists
-            zk.set(varPath, varVal)
-            updatedDict[var] = varVal
+            if var in hostVarList: ## check if given variable exists
+                zk.set(varPath, varVal)
+                updatedDict[var] = varVal
             
-        else:
-            nonExistList.append(var)
+            else:
+                nonExistList.append(var)
            
-    zk.stop()
 
-    if len(nonExistList) > 0 and len(updatedDict) == 0:
-        return "NOT UPDATED  ==> host: {0} with no existing hostvars {1} ===> NOT UPDATED hostvars {2} which do not exist".format(hostName, updatedDict, nonExistList)
+        if len(nonExistList) > 0 and len(updatedDict) == 0:
+            return "NOT UPDATED  ==> host: {0} with no existing hostvars {1} ===> NOT UPDATED hostvars {2} which do not exist".format(hostName, updatedDict, nonExistList)
 
-    elif len(nonExistList) and len(updatedDict) > 0:
-        return "UPDATED  ==> host: {0} with new hostvars {1} ===> NOT UPDATED hostvars {2} which do not exist".format(hostName, updatedDict, nonExistList)
+        elif len(nonExistList) and len(updatedDict) > 0:
+            return "UPDATED  ==> host: {0} with new hostvars {1} ===> NOT UPDATED hostvars {2} which do not exist".format(hostName, updatedDict, nonExistList)
     
-    else:
-        return "UPDATED  ==> host: {0} with new hostvars {1}".format(hostName, updatedDict)
+        else:
+            return "UPDATED  ==> host: {0} with new hostvars {1}".format(hostName, updatedDict)
 
-
+    finally:
+        zk.stop()    
+        
+        
 def renameZnode(znodeRenameStringSplited):
     '''
     Rename znode.
