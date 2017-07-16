@@ -208,27 +208,27 @@ def addHostWithHostvars(znodeDict):
     hostPath       = "{0}/hosts/{1}".format(cfg.aPath, hostName)
     hostGroupPath  = "{0}/{1}".format(groupPath, hostName)
 
-    if zk.exists(hostPath):
+    try:
+        if zk.exists(hostPath):
+            return "ERROR  ==> host: {0} exists !!!".format(hostName, groupName)
+
+        elif zk.exists(hostGroupPath):
+            return "ERROR  ==> host: {0} in group {1} exists !!!".format(hostName, groupName)
+
+        else:
+            zk.ensure_path(hostPath)
+            zk.ensure_path(hostGroupPath)
+
+            for key in znodeDict[groupName][hostName]:
+                varPath = "{0}/{1}".format(hostPath, key)
+                varVal  = znodeDict[groupName][hostName][key]
+                zk.create(varPath, varVal)
+
+            return "ADDED   ==> host: {0} to group: {1}".format(hostName, groupName)
+
+    finally:
         zk.stop()    
-        return "ERROR  ==> host: {0} exists !!!".format(hostName, groupName)
-
-    elif zk.exists(hostGroupPath):
-        zk.stop()    
-        return "ERROR  ==> host: {0} in group {1} exists !!!".format(hostName, groupName)
-
-    else:
-        zk.ensure_path(hostPath)
-        zk.ensure_path(hostGroupPath)
-
-        for key in znodeDict[groupName][hostName]:
-            varPath = "{0}/{1}".format(hostPath, key)
-            varVal  = znodeDict[groupName][hostName][key]
-            zk.create(varPath, varVal)
-
-        zk.stop()
-
-        return "ADDED   ==> host: {0} to group: {1}".format(hostName, groupName)
-
+    
 
 def addHostToGroup(znodeStringSplited):
     '''
@@ -630,7 +630,6 @@ def ansibleInventoryDump():
     groupDict['_meta']      = hostVarDict
     
     zk.stop()
-
     return groupDict
 
 
@@ -666,6 +665,7 @@ def ansibleHostAccess(hostName):
         for var in varList:
             varDict[var]  = zk.get('{0}/{1}'.format(hostPath, var))[0]
 
+        zk.stop()                
         return varDict
  
     
