@@ -43,9 +43,9 @@ cfg.aPath      = '/ansible-test'
 
 Tests
 -----
-Install `py.test` and run test_ansibleKeeper
+Install `py.test` and run test_ansibleKeeper.
 
-It will fail in case of inaccesible zookeeper servers
+It will fail in case of inaccesible zookeeper servers.
 
 ```
 py.test -v -l test_ansibleKeeper.py
@@ -56,11 +56,11 @@ Usage
 -----
 
 ### Read the manual
-run `./ansibleKeeper.py -h` and read the help 
+Run `./ansibleKeeper.py -h` and read the help. 
 
 ### Add some hosts
 
-Use *-A groupname1:newhostname1* to add new hosts to inventory: 
+Use **-A groupname1:newhostname1** to add new hosts to inventory: 
 
 *[example with adding zookeeper hosts to zookeeper group]*
 ```
@@ -69,7 +69,7 @@ Use *-A groupname1:newhostname1* to add new hosts to inventory:
 ./ansibleKeeper.py -A zookeeper:zoo1.dmz
 ```
 
-Use *-A groupname1:newhostname1,var1:value1,var2:value2,var3:value3* to add new hosts with host variables to inventory: 
+Use **-A groupname1:newhostname1,var1:value1,var2:value2,var3:value3** to add new hosts with host variables to inventory: 
 
 *[example with adding flink worker hosts to flink-workers group]*
 ```
@@ -80,25 +80,25 @@ Use *-A groupname1:newhostname1,var1:value1,var2:value2,var3:value3* to add new 
 
 ### Show newly added groups
 
-Use *-S zookeeper* option to show what is in zookeeper group:
+Use **-S zookeeper** option to show what is in zookeeper group:
 
 ```
 ./ansibleKeeper.py -S zookeeper
 ```
 
-You should get JSON output
+You should get JSON output:
 
 ```
 {"zoo1.dmz": {}, "zoo3.dmz": {}, "zoo2.dmz": {}}
 ```
 
-Use *-S flink-workers* option to show what is inside flink-workers group:
+Use **-S flink-workers** option to show what is inside flink-workers group:
 
 ```
 ./ansibleKeeper.py -S flink-workers
 ```
 
-You should get JSON output
+You should get JSON output:
 
 ```											  
 {"fworker3.dmz": {"id": "3", "lan_ip4": "1.1.1.3"}, "fworker2.dmz": {"id": "2", "lan_ip4": "1.1.1.2"}, "fworker1.dmz": {"id": "1", "lan_ip4": "1.1.1.1"}}
@@ -106,13 +106,13 @@ You should get JSON output
 
 ### Rename group and host
 
-Use *-R groups:oldgroupname:newgroupname* option to rename zookeeper group:
+Use **-R groups:oldgroupname:newgroupname** option to rename zookeeper group:
 
 ```
 ./ansibleKeeper.py -R groups:zookeeper:zookeepers
 ```
 
-Use *-R hosts:oldhostname:newhostname* option to rename fworker1.dmz host:
+Use **-R hosts:oldhostname:newhostname** option to rename fworker1.dmz host:
 
 ```
 ./ansibleKeeper.py -R hosts:fworker1.dmz:flink-worker1.dmz
@@ -120,7 +120,7 @@ Use *-R hosts:oldhostname:newhostname* option to rename fworker1.dmz host:
 
 ### Update host variables
 
-Use *-U groupname1:hostname1,var1:newvalue1,var2:newvalue2* option to update host variables:
+Use **-U groupname1:hostname1,var1:newvalue1,var2:newvalue2** option to update host variables:
 
 *[example for host fworker2.dmz: update lan_ip4 variable with new IP 1.1.1.20]*
 
@@ -130,7 +130,7 @@ Use *-U groupname1:hostname1,var1:newvalue1,var2:newvalue2* option to update hos
 
 ### Add host to another group
 
-Use *-G newgroupname:hostname* option to add host to another group.
+Use **-G newgroupname:hostname** option to add host to another group.
 If group exists it will add the host only otherwise it will create new group.
 
 
@@ -140,26 +140,13 @@ If group exists it will add the host only otherwise it will create new group.
 
 ### Run ansibleKeeper.py with ansible
 
-You can run ansibleKeeper.py with ansible in one of two ways:
+You can run `ansibleKeeper.py` with ansible in one of two ways:
+
 
 1. Use `ansible -i` option to point to your zookeeper based inventory:
 
 
-List all hosts with ansible
-
-```
-ansible -i fetch-inventory.sh all --list-hosts
-
-  hosts (6):
-	zoo3.dmz
-	zoo1.dmz
-	zoo2.dmz
-	fworker2.dmz
-	fworker3.dmz
-	fworker1.dmz
-```
-
-List all hosts in zookeeper group with ansible
+List all hosts in zookeeper group with ansible pointing inventory with `-i` option:
 
 ```
 ansible -i fetch-inventory.sh zookeeper --list-hosts
@@ -170,39 +157,19 @@ ansible -i fetch-inventory.sh zookeeper --list-hosts
 	zoo2.dmz
 ```
 
-Check `uptime` as a user `root` for group `zookeeper`:
-
-```
-ansible -i fetch-inventory.sh zookeeper -a "uptime" -u root
-
-  zoo3.dmz | SUCCESS | rc=0 >>
-    12:20:29 up 65 days, 16:42,  1 user,  load average: 0.00, 0.01, 0.05
- 
-  zoo2.dmz | SUCCESS | rc=0 >>
-    12:20:48 up 65 days, 16:42,  1 user,  load average: 0.00, 0.01, 0.05
-  
-  zoo1.dmz | SUCCESS | rc=0 >>
-    12:20:43 up 70 days, 16:51,  1 user,  load average: 0.00, 0.01, 0.05
-```
-
-2. Use default `/etc/ansible/hosts` inventory file to point to zookeeper based inventory:
+2. **Use** default `/etc/ansible/hosts` inventory file to point to zookeeper based inventory:
 
 Update `fetch-inventory.sh` script with `ansibleKeeper.py` path and copy it to `/etc/ansible/hosts` and `chmod +x` it.
+Run it with `ansible --list all` command as you would normally.
 
-Run it `ansible --list all` as you would normally.
 
-
-Example with check `uptime` as a user `root` for group `zookeeper`:
+List all hosts in zookeeper group with ansible:
 
 ```
-ansible zookeeper -a "uptime" -u root
+ansible zookeeper --list-hosts
 
-  zoo3.dmz | SUCCESS | rc=0 >>
-    12:20:29 up 65 days, 16:42,  1 user,  load average: 0.00, 0.01, 0.05
- 
-  zoo2.dmz | SUCCESS | rc=0 >>
-    12:20:48 up 65 days, 16:42,  1 user,  load average: 0.00, 0.01, 0.05
-  
-  zoo1.dmz | SUCCESS | rc=0 >>
-    12:20:43 up 70 days, 16:51,  1 user,  load average: 0.00, 0.01, 0.05
+  hosts (3):
+	zoo3.dmz
+	zoo1.dmz
+	zoo2.dmz
 ```
