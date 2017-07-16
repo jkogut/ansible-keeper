@@ -551,7 +551,10 @@ def inventoryDump(dumpMode):
 
     tmpList = []
 
-    if dumpMode == 'groups':
+    if dumpMode == 'hosts':
+        return hostsList
+
+    elif dumpMode == 'groups':
         return groupsList
 
     elif dumpMode == 'all':
@@ -684,6 +687,9 @@ def main():
 
     if oParser()['inventoryMode'] == 'groups':
         print json.dumps(inventoryDump('groups'))
+
+    if oParser()['inventoryMode'] == 'hosts':
+        print json.dumps(inventoryDump('hosts'))
 
     if oParser()['addMode'] is not None:
         znodeDict = splitZnodeVarString(oParser()['addMode'])
