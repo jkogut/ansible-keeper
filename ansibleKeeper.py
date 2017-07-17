@@ -366,12 +366,10 @@ def renameZnode(znodeRenameStringSplited):
     '''
     
     zk = zkStartRw()
-    
-    oldName  = znodeRenameStringSplited[0][0]
-    newName  = znodeRenameStringSplited[1][0]
-    oldPath  = znodeRenameStringSplited[0][1]
-    newPath  = znodeRenameStringSplited[1][1]
 
+    oldName, oldPath  = znodeRenameStringSplited[0]
+    newName, newPath  = znodeRenameStringSplited[1]
+    
     def renameHostInGroup(oldName, newName):
         '''
         Find a corresponding group in groups for oldName, rename host with newName
