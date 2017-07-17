@@ -298,9 +298,10 @@ def deleteZnodeRecur(znodeStringSplited):
                     return "DELETED ==> group: {0}".format(groupName)
             
             else:  ## then assume check for hosts only 
-                hostName       = znodeStringSplited[0][0]
-                hostPath       = znodeStringSplited[0][1]
 
+                hostName = znodeStringSplited[0][0]
+                hostPath = znodeStringSplited[0][1]
+                
                 if zk.exists(hostPath) is None:
                     return "ERROR  ==> could not delete host: {0} that does not exist !!!".format(hostName)
 
@@ -401,64 +402,62 @@ def renameZnode(znodeRenameStringSplited):
             else:
                 return "ERROR ---> NO GROUP FOUND !!!"
 
-            
-    if zk.exists(oldPath) is None:
-        zk.stop()    
-        return "ERROR  ==> could not rename nonexistent path: {0} !!!".format(oldPath)
+    try:
+        if zk.exists(oldPath) is None:
+            return "ERROR  ==> could not rename nonexistent path: {0} !!!".format(oldPath)
 
-    if zk.exists(newPath) is not None:
-        zk.stop()
-        return "ERROR  ==> new path already exist: {0} !!!".format(newPath)
+        if zk.exists(newPath) is not None:
+            return "ERROR  ==> new path already exist: {0} !!!".format(newPath)
     
-    ## rename only when newPath does not exist
-    if zk.exists(newPath) is None:
-        if 'hosts' in oldPath:
-            ## check for hostvars, if none create newPath and delete oldPath
-            if len(zk.get_children(oldPath)) == 0:
-                zk.ensure_path(newPath)
+        ## rename only when newPath does not exist
+        if zk.exists(newPath) is None:
+            if 'hosts' in oldPath:
+                ## check for hostvars, if none create newPath and delete oldPath
+                if len(zk.get_children(oldPath)) == 0:
+                    zk.ensure_path(newPath)
                 
-                ## find, rename and delete host with no hostvars in a corresponding group
-                renameHostInGroup(oldName, newName)
-                zk.delete(oldPath)
-                zk.stop()
-                return "RENAMED {0} --> {1}".format(oldName, newName)
+                    ## find, rename and delete host with no hostvars in a corresponding group
+                    renameHostInGroup(oldName, newName)
+                    zk.delete(oldPath)
+                    return "RENAMED {0} --> {1}".format(oldName, newName)
 
-            else:
-                ## create newPath in hosts copy hostvars from oldPath 
-                varDict = {}
-                for child in zk.get_children(oldPath):
-                    varDict[child] = zk.get('{0}/{1}'.format(oldPath,child))[0]
+                else:
+                    ## create newPath in hosts copy hostvars from oldPath 
+                    varDict = {}
+                    for child in zk.get_children(oldPath):
+                        varDict[child] = zk.get('{0}/{1}'.format(oldPath,child))[0]
                     
-                zk.ensure_path(newPath)
-                for var in varDict:
-                    zk.create('{0}/{1}'.format(newPath,var),varDict[var])
+                    zk.ensure_path(newPath)
+                    for var in varDict:
+                        zk.create('{0}/{1}'.format(newPath,var),varDict[var])
 
-                ## find, rename and delete host with no hostvars in a corresponding group
-                renameHostInGroup(oldName, newName)
+                    ## find, rename and delete host with no hostvars in a corresponding group
+                    renameHostInGroup(oldName, newName)
 
-                ## delete oldPath from hosts
-                zk.delete(oldPath, recursive=True)
-                zk.stop()
-                return "RENAMED {0} --> {1}".format(oldName, newName)
+                    ## delete oldPath from hosts
+                    zk.delete(oldPath, recursive=True)
+                    return "RENAMED {0} --> {1}".format(oldName, newName)
 
-        elif 'groups' in oldPath:
+            elif 'groups' in oldPath:
             ## look for hosts in the group, create new group
             ## delete theirs znode in that group ONLY and create new ones in the group
 
-            oldChildren = zk.get_children(oldPath)
-            zk.ensure_path(newPath)
+                oldChildren = zk.get_children(oldPath)
+                zk.ensure_path(newPath)
 
-            for child in oldChildren:
-                zk.ensure_path('{0}/{1}'.format(newPath, child))
+                for child in oldChildren:
+                    zk.ensure_path('{0}/{1}'.format(newPath, child))
 
-            ## delete old group with its members
-            zk.delete(oldPath, recursive=True)
-            zk.stop()
-            return "RENAMED group {0} --> {1}".format(oldName, newName)
+                ## delete old group with its members
+                zk.delete(oldPath, recursive=True)
+                return "RENAMED group {0} --> {1}".format(oldName, newName)
 
-        else:
-            return "ERROR no valid keywords <groups|hosts> found"
-        
+            else:
+                return "ERROR no valid keywords <groups|hosts> found"
+
+    finally:
+        zk.stop()
+            
             
 def showHostVars(znodeStringSplited):
     '''
