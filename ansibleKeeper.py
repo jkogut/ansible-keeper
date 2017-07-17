@@ -233,11 +233,8 @@ def addHostToGroup(znodeStringSplited):
 
     zk = zkStartRw()
 
-    groupName      = znodeStringSplited[0][0]
-    groupPath      = znodeStringSplited[0][1]
-    hostName       = znodeStringSplited[1][0]
-    hostPath       = znodeStringSplited[1][1]
-    hostGroupPath  = znodeStringSplited[1][2]
+    groupName, groupPath              = znodeStringSplited[0]
+    hostName, hostPath, hostGroupPath = znodeStringSplited[1]
 
     try:
         if zk.exists(hostGroupPath):
@@ -265,11 +262,8 @@ def deleteZnodeRecur(znodeStringSplited):
     try:
         if len(znodeStringSplited) > 1:  ## check if it is <groupname:hostname> case
 
-            groupName      = znodeStringSplited[0][0]
-            groupPath      = znodeStringSplited[0][1]
-            hostName       = znodeStringSplited[1][0]
-            hostPath       = znodeStringSplited[1][1]
-            hostGroupPath  = znodeStringSplited[1][2]
+            groupName, groupPath              = znodeStringSplited[0]
+            hostName, hostPath, hostGroupPath = znodeStringSplited[1]
 
             if zk.exists(hostPath) is None:
                 return "ERROR  ==> could not delete host: {0} that does not exist !!!".format(hostName)
@@ -287,8 +281,7 @@ def deleteZnodeRecur(znodeStringSplited):
         elif len(znodeStringSplited) == 1:  ## check if it is <groupname> or <hosts:hostname> case    
             if len(znodeStringSplited[0]) == 2:  ## first check for group only
         
-                groupName = znodeStringSplited[0][0]
-                groupPath = znodeStringSplited[0][1]
+                groupName, groupPath = znodeStringSplited[0]
        
                 if zk.exists(groupPath) is None:
                     return "ERROR  ==> could not delete group: {0} that does not exist !!!".format(groupName)
