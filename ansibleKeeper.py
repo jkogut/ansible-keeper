@@ -462,8 +462,7 @@ def showHostVars(znodeStringSplited):
     try:
         if len(znodeStringSplited[0]) == 2:    ## check for groupname only
 
-            groupName     = znodeStringSplited[0][0]
-            groupPath     = znodeStringSplited[0][1]
+            groupName, groupPath = znodeStringSplited[0]
 
             if zk.exists(groupPath) is None:
                 return "ERROR  ==> no such groupname: {0} !!!".format(groupName)
@@ -485,8 +484,7 @@ def showHostVars(znodeStringSplited):
                     
         elif len(znodeStringSplited[0]) == 3:     ## check for hostname only   
 
-            hostName      = znodeStringSplited[0][0]
-            hostPath      = znodeStringSplited[0][1]
+            hostName, hostPath, notUsedValue =  znodeStringSplited[0]
 
             if zk.exists(hostPath) is None:
                 return "ERROR  ==> no such host: {0} !!!".format(hostName)
