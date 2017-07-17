@@ -292,8 +292,7 @@ def deleteZnodeRecur(znodeStringSplited):
             
             else:  ## then assume check for hosts only 
 
-                hostName = znodeStringSplited[0][0]
-                hostPath = znodeStringSplited[0][1]
+                hostName, hostPath, notUsedValue = znodeStringSplited[0]
                 
                 if zk.exists(hostPath) is None:
                     return "ERROR  ==> could not delete host: {0} that does not exist !!!".format(hostName)
