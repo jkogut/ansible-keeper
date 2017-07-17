@@ -191,7 +191,7 @@ def addHostWithHostvars(znodeDict):
     '''
     Add existing znode to new group.
 
-    Return a string (ADDED    ==> host: <hostname> to group: <groupname>).
+    Return string (ADDED    ==> host: <hostname> to group: <groupname>).
     '''
 
     zk = zkStartRw()
@@ -228,7 +228,7 @@ def addHostToGroup(znodeStringSplited):
     '''
     Add host to group.
 
-    Return a string (ADDED    ==> host: <hostname> to group: <groupname>).
+    Return string (ADDED    ==> host: <hostname> to group: <groupname>).
     '''
 
     zk = zkStartRw()
@@ -257,7 +257,7 @@ def deleteZnodeRecur(znodeStringSplited):
     '''
     Delete znode recursivelly for a given string <groupname> or <hosts:hostname> or <groupname:hostname>.
 
-    Return a string (DELETED||ERROR  ==> [host: <hostname> || group: <groupname>]).
+    Return string (DELETED||ERROR  ==> [host: <hostname> || group: <groupname>]).
     '''
 
     zk = zkStartRw()
@@ -319,7 +319,7 @@ def updateZnode(znodeDict):
     '''
     Update znode with hostvars.
 
-    Return a string (ERROR ... || UPDATED ... || NOT UPDATED ...).
+    Return string (ERROR ... || UPDATED ... || NOT UPDATED ...).
     '''
     
     zk = zkStartRw()
@@ -368,7 +368,7 @@ def renameZnode(znodeRenameStringSplited):
     '''
     Rename znode.
 
-    Return a string (ERROR ... || RENAMED ... || NOT RENAMED ...).
+    Return string (ERROR ... || RENAMED ... || NOT RENAMED ...).
     '''
     
     zk = zkStartRw()
@@ -383,7 +383,7 @@ def renameZnode(znodeRenameStringSplited):
         Find a corresponding group in groups for oldName, rename host with newName
         and delete that host.
 
-        Return a string (ERROR ...||RENAMED ...).
+        Return string (ERROR ...||RENAMED ...).
         '''
 
         ## find a group where host resides and create newPath in that group
@@ -639,21 +639,23 @@ def ansibleHostAccess(hostName):
     zk = zkStartRo()
 
     hostPath = "{0}/hosts/{1}".format(cfg.aPath, hostName)
-    
-    if zk.exists(hostPath) is None:
-        zk.stop()    
-        return "ERROR  ==> no such host: {0} !!!".format(hostName)
 
-    else:
-        varList = zk.get_children('{0}'.format(hostPath))
+    try:
+        if zk.exists(hostPath) is None:
+            return "ERROR  ==> no such host: {0} !!!".format(hostName)
+
+        else:
+            varList = zk.get_children('{0}'.format(hostPath))
       
-        varDict = {}
-        for var in varList:
-            varDict[var]  = zk.get('{0}/{1}'.format(hostPath, var))[0]
+            varDict = {}
+            for var in varList:
+                varDict[var]  = zk.get('{0}/{1}'.format(hostPath, var))[0]
 
-        zk.stop()                
-        return varDict
- 
+            return varDict
+
+    finally:
+        zk.stop()   
+        
     
 def main():
     '''
