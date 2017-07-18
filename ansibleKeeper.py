@@ -97,6 +97,16 @@ def zkStartRw():
     return zk
     
 
+class SyntaxError(object):
+    ''' Class for handling errors '''
+    
+    def __init__(self, msg):
+        self.msg = msg
+
+    def format(self):
+        return self.msg
+    
+
 def splitZnodeVarString(znodeVarString):
     '''
     Parse string for commandline opts: <-A|-U>.
@@ -165,8 +175,8 @@ def splitRenameZnodeString(renameZnodeString):
 
     ## check if len of splited list is not 3
     if len(renameZnodeString.split(':')) is not 3:
-        return "SYNTAX ERROR --> {0} <-- no valid number of keywords [keyword:keyword1:newkeyword1]".format(renameZnodeString)
-    
+        return SyntaxError("{0} <-- no valid number of keywords [keyword:keyword1:newkeyword1]".format(renameZnodeString))
+      
     if 'hosts:' in renameZnodeString:
         oldHostName    = renameZnodeString.split(':')[1]
         newHostName    = renameZnodeString.split(':')[2]
@@ -184,7 +194,7 @@ def splitRenameZnodeString(renameZnodeString):
         return [(oldGroupName, oldGroupPath), (newGroupName, newGroupPath)]
 
     else:
-        return "SYNTAX ERROR --> {0} <-- no valid keywords [groups|hosts] found".format(renameZnodeString)
+        return SyntaxError("{0} <-- no valid keywords [groups|hosts] found".format(renameZnodeString))
     
 
 def addHostWithHostvars(znodeDict):
