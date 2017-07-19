@@ -105,6 +105,16 @@ class SyntaxError(object):
 
     def format(self):
         return self.msg
+
+
+class CommonError(object):
+    ''' Class for handling errors '''
+    
+    def __init__(self, msg):
+        self.msg = msg
+
+    def format(self):
+        return self.msg
     
 
 def splitZnodeVarString(znodeVarString):
@@ -214,10 +224,10 @@ def addHostWithHostvars(znodeDict):
 
     try:
         if zk.exists(hostPath):
-            return "ERROR  ==> host: {0} exists !!!".format(hostName, groupName)
+            return CommonError("host: {0} exists !!!".format(hostName, groupName))
 
         elif zk.exists(hostGroupPath):
-            return "ERROR  ==> host: {0} in group {1} exists !!!".format(hostName, groupName)
+            return CommonError("host: {0} in group {1} exists !!!".format(hostName, groupName))
 
         else:
             zk.ensure_path(hostPath)
@@ -228,7 +238,7 @@ def addHostWithHostvars(znodeDict):
                 varVal  = znodeDict[groupName][hostName][key]
                 zk.create(varPath, varVal)
 
-            return "ADDED   ==> host: {0} to group: {1}".format(hostName, groupName)
+            return "ADDED  ==> host: {0} to group: {1}".format(hostName, groupName)
 
     finally:
         zk.stop()    
@@ -238,7 +248,7 @@ def addHostToGroup(znodeStringSplited):
     '''
     Add host to group.
 
-    Return string (ADDED    ==> host: <hostname> to group: <groupname>).
+    Return string (ADDED  ==> host: <hostname> to group: <groupname>).
     '''
 
     zk = zkStartRw()
@@ -254,7 +264,7 @@ def addHostToGroup(znodeStringSplited):
             return "ERROR  ==> host: {0} does not exist !!! Could not add non-existent host: {0} to group: {1}".format(hostName, groupName)
         
         zk.ensure_path(hostGroupPath)
-        return "ADDED   ==> host: {0} to group: {1}".format(hostName, groupName)
+        return "ADDED  ==> host: {0} to group: {1}".format(hostName, groupName)
 
     finally:
         zk.stop()
