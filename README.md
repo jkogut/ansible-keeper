@@ -89,6 +89,28 @@ Usage
 
 ### Read the manual
 Run `./ansibleKeeper.py -h` and read the help. 
+```
+Usage: ansibleKeeper.py [opts] <args>
+
+Options:
+  --version    show program's version number and exit
+  -h, --help   show this help message and exit
+  -A A         add host with hostvars:
+	           <groupname1:newhostname1,var1:value1,var2:value2,var3:value3>
+  -G G         add host to hostgroup: <groupname:hostname>
+  -D D         delete host or group recursively: <groupname1:hostname1> or
+	           <groupname1> or <hosts:hostname1>
+  -U U         update host variables with comma separated hostvars:
+               <groupname1:hostname1,var1:newvalue1,var2:newvalue2>
+  -R R         rename existing hostname or groupname:
+               <groups:oldgroupname:newgroupname> or
+			   <hosts:oldhostname:newhostname>
+  -S S         show host variables for a given host or group:
+               <groupname1:hostname1> or <groupname1>
+  -I I         inventory mode: groups|all|ansible dumps inventory in json
+               format from zookeeper
+  --host=HOST  ansible compliant option for hostvars access: --host hostname
+```
 
 
 ### Add some hosts
