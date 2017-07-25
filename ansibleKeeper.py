@@ -10,7 +10,7 @@ __status__     = "Beta"
 
 
 import json
-from optparse import OptionParser
+from optparse import OptionParser,OptionGroup
 from kazoo.client import KazooClient
 
 
@@ -42,7 +42,7 @@ def oParser():
     parser = OptionParser(usage="usage: %prog [opts] <args>",
                           version="%prog 0.0.1")
     parser.add_option("-A", nargs = 1,
-                      help="add host with hostvars: groupname1:newhostname1,var1:value1,var2:value2,var3:value3")
+                      help="add host with hostvars: groupname1:newhostname1,var1:value1,var2:value2,var3:value3\n")
     parser.add_option("-G", nargs = 1,
                       help="add host to hostgroup: groupname:hostname")
     parser.add_option("-D", nargs = 1,
@@ -58,6 +58,10 @@ def oParser():
     parser.add_option("--host", nargs = 1,
                       help="ansible compliant option for hostvars access: --host hostname")
 
+    group = OptionGroup(parser, "Example usage",
+                        "ansibleKeeper.py -A flink:flink-master01,lan_ip:10.1.1.1")
+                        
+    parser.add_option_group(group)
     
     (opts, args) = parser.parse_args()
     
