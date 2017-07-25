@@ -1,5 +1,5 @@
 # ansible-keeper
-1;2802;0cKeep ansible inventory in zookeeper:  http://zookeeper.apache.org/
+Keep ansible inventory in zookeeper:  http://zookeeper.apache.org/
 
 
 ### Table of Contents
