@@ -119,8 +119,17 @@ class CommonError(object):
 
     def format(self):
         return self.msg
-    
+  
 
+class ArgError(object):
+    def __init__(self, tp, format_args):
+        self.tp = tp
+        self.format_args = format_args
+
+    def format(self):
+        return self.tp, self.format_args
+                                            
+    
 def splitZnodeVarString(znodeVarString):
     '''
     Parse string for commandline opts: <-A|-U>.
@@ -187,10 +196,15 @@ def splitRenameZnodeString(renameZnodeString):
     ## example output: [("newgroupname","/ansible_zk/groups/newgroupname"),
     ##                  ("newhostname","/ansible_zk/hosts/newhostname")]
 
+    ERROR_MSGS = {
+        'NO_VALID_KEYWORDS_NUMBER':"{0} <-- no valid number of keywords [keyword:keyword1:newkeyword1]".format(renameZnodeString),
+        'NO_VALID_KEYWORDS_STRING':"{0} <-- no valid keywords [groups|hosts] found".format(renameZnodeString)
+    }
+
     ## check if len of splited list is not 3
     if len(renameZnodeString.split(':')) is not 3:
-        return SyntaxError("{0} <-- no valid number of keywords [keyword:keyword1:newkeyword1]".format(renameZnodeString))
-      
+       return ArgError('NO_VALID_KEYWORDS_NUMBER', ERROR_MSGS['NO_VALID_KEYWORDS_NUMBER']).format()
+    
     if 'hosts:' in renameZnodeString:
         oldHostName    = renameZnodeString.split(':')[1]
         newHostName    = renameZnodeString.split(':')[2]
@@ -208,9 +222,9 @@ def splitRenameZnodeString(renameZnodeString):
         return [(oldGroupName, oldGroupPath), (newGroupName, newGroupPath)]
 
     else:
-        return SyntaxError("{0} <-- no valid keywords [groups|hosts] found".format(renameZnodeString))
-    
+        return ArgError('NO_VALID_KEYWORDS_STRING', ERROR_MSGS['NO_VALID_KEYWORDS_STRING']).format()
 
+    
 def addHostWithHostvars(znodeDict):
     '''
     Add existing znode to new group.
@@ -383,7 +397,7 @@ def updateZnode(znodeDict):
         
 def renameZnode(znodeRenameStringSplited):
     '''
-    Rename znode.
+    Rename znode for a given tuple of ((oldName, oldPath), (newName, newPath)).
 
     Return string (ERROR ... || RENAMED ... || NOT RENAMED ...).
     '''
@@ -708,8 +722,11 @@ def main():
 
     if oParser()['renameMode'] is not None:
         znodeRenameStringSplited = splitRenameZnodeString(oParser()['renameMode'])
-        print renameZnode(znodeRenameStringSplited)
-        
+        if type(znodeRenameStringSplited) is list:
+            print renameZnode(znodeRenameStringSplited)
+        else:
+            print znodeRenameStringSplited
+            
     if oParser()['showMode'] is not None:
         znodeStringSplited = splitZnodeString(oParser()['showMode'])
         print json.dumps(showHostVars(znodeStringSplited))
