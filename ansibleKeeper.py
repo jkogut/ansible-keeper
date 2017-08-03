@@ -687,6 +687,13 @@ def main():
     Main logic
     '''
 
+    zk  = zkStartRw()
+    try:
+        assert type(zk).__name__ == 'KazooClient'
+
+    finally:
+        zk.stop()
+        
     ## options for ansible only 
     if oParser()['ansibleHost'] is not None:
         print json.dumps(ansibleHostAccess(oParser()['ansibleHost']))
