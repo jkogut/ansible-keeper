@@ -101,33 +101,23 @@ def zkStartRw():
     return zk
     
 
-class SyntaxError(object):
-    ''' Class for handling errors '''
-    
-    def __init__(self, msg):
-        self.msg = msg
-
-    def format(self):
-        return self.msg
-
-
-class CommonError(object):
-    ''' Class for handling errors '''
-    
-    def __init__(self, msg):
-        self.msg = msg
-
-    def format(self):
-        return self.msg
-  
+ 
 
 class ArgError(object):
+    ''' Class for handling errors '''
+
     def __init__(self, tp, format_args):
         self.tp = tp
         self.format_args = format_args
 
     def format(self):
         return self.tp, self.format_args
+
+
+class CommonInformer(ArgError):
+    ''' Class for message informing '''
+    
+    pass
                                             
     
 def splitZnodeVarString(znodeVarString):
@@ -236,6 +226,10 @@ def addHostWithHostvars(znodeDict):
         'HOST_EXISTS': "host: {0} exists !!!".format(hostName),
         'HOST_EXISTS_IN_GROUP': "host: {0} in group {1} exists !!!".format(hostName, groupName)
     }
+
+    COMMON_MSGS = {
+        'ADDED_HOST_TO_GROUP': "ADDED  ==> host: {0} to group: {1}".format(hostName, groupName)
+    }
     
     zk = zkStartRw()
     
@@ -261,7 +255,7 @@ def addHostWithHostvars(znodeDict):
                 varVal  = znodeDict[groupName][hostName][key]
                 zk.create(varPath, varVal)
 
-            return "ADDED  ==> host: {0} to group: {1}".format(hostName, groupName)
+            return CommonInformer('ADDED_HOST_TO_GROUP',ERROR_MSGS['ADDED_HOST_TO_GROUP']).format()
 
     finally:
         zk.stop()    
@@ -278,6 +272,10 @@ def addHostToGroup(znodeStringSplited):
         'HOST_EXISTS_IN_GROUP': "ERROR  ==> host: {0} in group {1} exists !!!".format(hostName, groupName),
         'HOST_DOES_NOT_EXIST': "ERROR  ==> host: {0} does not exist !!! Could not add non-existent host: {0} to group: {1}".format(hostName, groupName)
     }
+
+    COMMON_MSGS = {
+        'ADDED_HOST_TO_GROUP': "ADDED  ==> host: {0} to group: {1}".format(hostName, groupName)
+    }
     
     zk = zkStartRw()
 
@@ -292,7 +290,7 @@ def addHostToGroup(znodeStringSplited):
             return ArgError('HOST_DOES_NOT_EXIST',ERROR_MSGS['HOST_DOES_NOT_EXIST']).format()
         
         zk.ensure_path(hostGroupPath)
-        return "ADDED  ==> host: {0} to group: {1}".format(hostName, groupName)
+        return CommonInformer('ADDED_HOST_TO_GROUP',ERROR_MSGS['ADDED_HOST_TO_GROUP']).format()
 
     finally:
         zk.stop()
