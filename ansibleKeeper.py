@@ -233,7 +233,7 @@ def addHostWithHostvars(znodeDict):
     '''
 
     ERROR_MSGS = {
-        'HOST_EXISTS': "host: {0} exists !!!".format(hostName)
+        'HOST_EXISTS': "host: {0} exists !!!".format(hostName),
         'HOST_EXISTS_IN_GROUP': "host: {0} in group {1} exists !!!".format(hostName, groupName)
     }
     
@@ -274,6 +274,11 @@ def addHostToGroup(znodeStringSplited):
     Return string (ADDED  ==> host: hostname to group: groupname).
     '''
 
+    ERROR_MSGS = {
+        'HOST_EXISTS_IN_GROUP': "ERROR  ==> host: {0} in group {1} exists !!!".format(hostName, groupName),
+        'HOST_DOES_NOT_EXIST': "ERROR  ==> host: {0} does not exist !!! Could not add non-existent host: {0} to group: {1}".format(hostName, groupName)
+    }
+    
     zk = zkStartRw()
 
     groupName, groupPath              = znodeStringSplited[0]
@@ -281,10 +286,10 @@ def addHostToGroup(znodeStringSplited):
 
     try:
         if zk.exists(hostGroupPath):
-            return "ERROR  ==> host: {0} in group {1} exists !!!".format(hostName, groupName)
+            return ArgError('HOST_EXISTS_IN_GROUP',ERROR_MSGS['HOST_EXISTS_IN_GROUP']).format()
 
         if zk.exists(hostPath) is None:
-            return "ERROR  ==> host: {0} does not exist !!! Could not add non-existent host: {0} to group: {1}".format(hostName, groupName)
+            return ArgError('HOST_DOES_NOT_EXIST',ERROR_MSGS['HOST_DOES_NOT_EXIST']).format()
         
         zk.ensure_path(hostGroupPath)
         return "ADDED  ==> host: {0} to group: {1}".format(hostName, groupName)
