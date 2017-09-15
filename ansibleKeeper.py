@@ -371,6 +371,15 @@ def updateZnode(znodeDict):
 
     Return string (ERROR ... || UPDATED ... || NOT UPDATED ...).
     '''
+
+
+    # COMMON_MSGS = {
+    #     'DELETED_HOST_IN_GROUP': "DELETED ==> host: {0} in group: {1}".format(hostName, groupName),
+    #     'DELETED_GROUP': "DELETED ==> group: {0}".format(groupName),
+    #     'DELETED_HOST': "DELETED ==> host: {0}".format(hostName)
+
+    # }
+
     
     zk = zkStartRw()
     
@@ -379,9 +388,17 @@ def updateZnode(znodeDict):
     hostPath    = "{0}/hosts/{1}".format(cfg.aPath, hostName)
     hostVarList = zk.get_children(hostPath)
 
+    ERROR_MSGS = {
+        'HOST_DOES_NOT_EXIST': "ERROR  ==> could not update host: {0} that does not exist !!!".format(hostName)
+        # 'HOST_DOES_NOT_EXISTS_IN_GROUP': "ERROR  ==> could not delete host: {0} that does not exist in group: {1} !!!".format(hostName, groupName),
+        # 'GROUP_DOES_NOT_EXIST': "ERROR  ==> could not delete group: {0} that does not exist !!!".format(groupName)
+    }
+
+    
     try:
         if zk.exists(hostPath) is None:
-            return "ERROR  ==> host: {0} does not exist !!!".format(hostName)
+#            return ArgError('HOST_DOES_NOT_EXIST',ERROR_MSGS['HOST_DOES_NOT_EXIST']).format()
+            return "ERROR  ==> could not update host: {0} that does not exist !!!".format(hostName)
 
         for hostVar in hostVarList:
             if zk.exists("{0}/{1}".format(hostPath, hostVar)) is None: 
@@ -712,7 +729,8 @@ def main():
 
     finally:
         zk.stop()
-        
+
+   
     ## options for ansible only 
     if oParser()['ansibleHost'] is not None:
         print json.dumps(ansibleHostAccess(oParser()['ansibleHost']))
