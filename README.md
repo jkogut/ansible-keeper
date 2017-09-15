@@ -21,6 +21,7 @@ Motivation
 6. *Import/Export of ansible inventory TOML file (not yet implemented)* 
 7. *AWS Dynamic inventory integration (not yet implemented)* 
 
+
 Install
 -------
 
@@ -51,8 +52,11 @@ cfg.aPath      = '/ansible-test'
 
 Tests
 -----
+*Tested on: Ubuntu 16.04 LTS as a ansible-keeper client accessing Zookeeper 3.4.9 cluster installed on CentOS 7.2*
+
 Install `py.test` and run test_ansibleKeeper.
 Test will check your zookeeper cluster connectivity and `ansibleKeeper.py` code.  
+
 
 ```python
 py.test -v -l test_ansibleKeeper.py
