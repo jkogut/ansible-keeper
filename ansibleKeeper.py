@@ -219,6 +219,14 @@ def addHostWithHostvars(znodeDict):
 
     Return string (ADDED    ==> host: hostname to group: groupname).
     '''
+  
+    zk = zkStartRw()
+
+    groupName      = znodeDict.keys()[0]
+    hostName       = znodeDict[groupName].keys()[0]
+    groupPath      = "{0}/groups/{1}".format(cfg.aPath, groupName)
+    hostPath       = "{0}/hosts/{1}".format(cfg.aPath, hostName)
+    hostGroupPath  = "{0}/{1}".format(groupPath, hostName)
 
     ERROR_MSGS = {
         'HOST_EXISTS': "host: {0} exists !!!".format(hostName),
@@ -228,14 +236,6 @@ def addHostWithHostvars(znodeDict):
     COMMON_MSGS = {
         'ADDED_HOST_TO_GROUP': "ADDED  ==> host: {0} to group: {1}".format(hostName, groupName)
     }
-    
-    zk = zkStartRw()
-    
-    groupName      = znodeDict.keys()[0]
-    hostName       = znodeDict[groupName].keys()[0]
-    groupPath      = "{0}/groups/{1}".format(cfg.aPath, groupName)
-    hostPath       = "{0}/hosts/{1}".format(cfg.aPath, hostName)
-    hostGroupPath  = "{0}/{1}".format(groupPath, hostName)
 
     try:
         if zk.exists(hostPath):
@@ -253,7 +253,7 @@ def addHostWithHostvars(znodeDict):
                 varVal  = znodeDict[groupName][hostName][key]
                 zk.create(varPath, varVal)
 
-            return CommonInformer('ADDED_HOST_TO_GROUP',ERROR_MSGS['ADDED_HOST_TO_GROUP']).format()
+            return CommonInformer('ADDED_HOST_TO_GROUP',COMMON_MSGS['ADDED_HOST_TO_GROUP']).format()
 
     finally:
         zk.stop()    
