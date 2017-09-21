@@ -266,6 +266,11 @@ def addHostToGroup(znodeStringSplited):
     Return string (ADDED  ==> host: hostname to group: groupname).
     '''
 
+    zk = zkStartRw()
+
+    groupName, groupPath              = znodeStringSplited[0]
+    hostName, hostPath, hostGroupPath = znodeStringSplited[1]
+
     ERROR_MSGS = {
         'HOST_EXISTS_IN_GROUP': "ERROR  ==> host: {0} in group {1} exists !!!".format(hostName, groupName),
         'HOST_DOES_NOT_EXIST': "ERROR  ==> host: {0} does not exist !!! Could not add non-existent host: {0} to group: {1}".format(hostName, groupName)
@@ -274,12 +279,8 @@ def addHostToGroup(znodeStringSplited):
     COMMON_MSGS = {
         'ADDED_HOST_TO_GROUP': "ADDED  ==> host: {0} to group: {1}".format(hostName, groupName)
     }
+
     
-    zk = zkStartRw()
-
-    groupName, groupPath              = znodeStringSplited[0]
-    hostName, hostPath, hostGroupPath = znodeStringSplited[1]
-
     try:
         if zk.exists(hostGroupPath):
             return ArgError('HOST_EXISTS_IN_GROUP',ERROR_MSGS['HOST_EXISTS_IN_GROUP']).format()
@@ -288,7 +289,7 @@ def addHostToGroup(znodeStringSplited):
             return ArgError('HOST_DOES_NOT_EXIST',ERROR_MSGS['HOST_DOES_NOT_EXIST']).format()
         
         zk.ensure_path(hostGroupPath)
-        return CommonInformer('ADDED_HOST_TO_GROUP',ERROR_MSGS['ADDED_HOST_TO_GROUP']).format()
+        return CommonInformer('ADDED_HOST_TO_GROUP',COMMON_MSGS['ADDED_HOST_TO_GROUP']).format()
 
     finally:
         zk.stop()
