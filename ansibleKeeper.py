@@ -44,7 +44,7 @@ def oParser():
     parser.add_option("-A", nargs = 1,
                       help="add host with hostvars: groupname1:newhostname1,var1:value1,var2:value2,var3:value3\n")
     parser.add_option("-G", nargs = 1,
-                      help="add host to hostgroup: groupname:hostname")
+                      help="add existing host to hostgroup: groupname:hostname")
     parser.add_option("-D", nargs = 1,
                       help="delete host or group recursively: groupname1:hostname1 or groupname1 or hosts:hostname1")
     parser.add_option("-U", nargs = 1,
@@ -279,8 +279,7 @@ def addHostToGroup(znodeStringSplited):
     COMMON_MSGS = {
         'ADDED_HOST_TO_GROUP': "ADDED  ==> host: {0} to group: {1}".format(hostName, groupName)
     }
-
-    
+  
     try:
         if zk.exists(hostGroupPath):
             return ArgError('HOST_EXISTS_IN_GROUP',ERROR_MSGS['HOST_EXISTS_IN_GROUP']).format()
@@ -302,19 +301,6 @@ def deleteZnodeRecur(znodeStringSplited):
     Return string (DELETED||ERROR  ==> [host: hostname || group: groupname]).
     '''
 
-    ERROR_MSGS = {
-        'HOST_DOES_NOT_EXIST': "ERROR  ==> could not delete host: {0} that does not exist !!!".format(hostName),
-        'HOST_DOES_NOT_EXISTS_IN_GROUP': "ERROR  ==> could not delete host: {0} that does not exist in group: {1} !!!".format(hostName, groupName),
-        'GROUP_DOES_NOT_EXIST': "ERROR  ==> could not delete group: {0} that does not exist !!!".format(groupName)
-    }
-
-    COMMON_MSGS = {
-        'DELETED_HOST_IN_GROUP': "DELETED ==> host: {0} in group: {1}".format(hostName, groupName),
-        'DELETED_GROUP': "DELETED ==> group: {0}".format(groupName),
-        'DELETED_HOST': "DELETED ==> host: {0}".format(hostName)
-
-    }
-
     zk = zkStartRw()
 
     try:
@@ -323,6 +309,20 @@ def deleteZnodeRecur(znodeStringSplited):
             groupName, groupPath              = znodeStringSplited[0]
             hostName, hostPath, hostGroupPath = znodeStringSplited[1]
 
+            ERROR_MSGS = {
+                'HOST_DOES_NOT_EXIST': "ERROR  ==> could not delete host: {0} that does not exist !!!".format(hostName),
+                'HOST_DOES_NOT_EXISTS_IN_GROUP': "ERROR  ==> could not delete host: {0} that does not exist in group: {1} !!!".format(hostName, groupName),
+                'GROUP_DOES_NOT_EXIST': "ERROR  ==> could not delete group: {0} that does not exist !!!".format(groupName)
+            }
+
+            COMMON_MSGS = {
+                'DELETED_HOST_IN_GROUP': "DELETED ==> host: {0} in group: {1}".format(hostName, groupName),
+                'DELETED_GROUP': "DELETED ==> group: {0}".format(groupName),
+                'DELETED_HOST': "DELETED ==> host: {0}".format(hostName)
+                
+            }
+
+            
             if zk.exists(hostPath) is None:
                 return ArgError('HOST_DOES_NOT_EXIST',ERROR_MSGS['HOST_DOES_NOT_EXIST']).format()
 
