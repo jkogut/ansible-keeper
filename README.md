@@ -1,6 +1,8 @@
 # ansible-keeper
 Keep ansible inventory in zookeeper:  http://zookeeper.apache.org/
 
+[![Build Status](https://travis-ci.org/jkogut/ansible-keeper.svg?branch=master)](https://travis-ci.org/jkogut/ansible-keeper)
+
 
 ### Table of Contents
 **[Motivation](#motivation)**<br>
