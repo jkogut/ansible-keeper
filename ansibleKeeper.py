@@ -25,7 +25,7 @@ class OurConfig(object):
 
 cfg = OurConfig()
 
-cfg.zkServers  = 'zoo1.dmz:2181,zoo2.dmz:2181,zoo3.dmz:2181'
+cfg.zkServers  = 'localhost:2181'
 cfg.aPath      = '/ansible-test'
 
 #################################################
