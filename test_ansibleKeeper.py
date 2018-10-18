@@ -147,277 +147,280 @@ class TestConfig(object):
         try:
             assert ro_zk.exists(cfg.aPath) is not None
 
+        except AssertionError as error:
+            print("{0} BasePrefixZnode {1} exists !!!").format(error, cfg.aPath)
+            
         finally:
             ro_zk.stop()
 
             
             
-class TestReadWrite(object):
-    '''
-    Suite of tests where read-write zookeeper client connection is required.
-    '''
+# class TestReadWrite(object):
+#     '''
+#     Suite of tests where read-write zookeeper client connection is required.
+#     '''
 
-    @pytest.fixture
-    def rw_zk(self):
-        '''
-        Fixture for zookeeper client connection in read-write mode. 
-        '''
+#     @pytest.fixture
+#     def rw_zk(self):
+#         '''
+#         Fixture for zookeeper client connection in read-write mode. 
+#         '''
 
-        ## example server list string 'zoo1.dmz:2181,zoo2.dmz:2181,zoo3.dmz:2181'    
-        zk = KazooClient(hosts=cfg.zkServers)
-        zk.start()
+#         ## example server list string 'zoo1.dmz:2181,zoo2.dmz:2181,zoo3.dmz:2181'    
+#         zk = KazooClient(hosts=cfg.zkServers)
+#         zk.start()
         
-        return zk
+#         return zk
 
                 
-    def test_addHostWithHostvars(self, rw_zk):
-        '''
-        Test if hostname-znode added with addHostWithHostvars(var) exists.
-        '''
+#     def test_addHostWithHostvars(self, rw_zk):
+#         '''
+#         Test if hostname-znode added with addHostWithHostvars(var) exists.
+#         '''
 
-        ## 1. check if Znode provided with test config exists
-        ## 2. run addHostWithHostvars(var) function
-        ## 3. check hostname value against tested values (from tst.testDict)
-        ## 4. run twice deleteZnodeRecur(var) to remove hostname from groupname and hosts group 
+#         ## 1. check if Znode provided with test config exists
+#         ## 2. run addHostWithHostvars(var) function
+#         ## 3. check hostname value against tested values (from tst.testDict)
+#         ## 4. run twice deleteZnodeRecur(var) to remove hostname from groupname and hosts group 
     
-        if rw_zk.exists(tst.hostPath) is not None:
-            rw_zk.delete(tst.hostPath, recursive=True)
-            rw_zk.stop()
+#         if rw_zk.exists(tst.hostPath) is not None:
+#             rw_zk.delete(tst.hostPath, recursive=True)
+#             rw_zk.stop()
 
-        addHostWithHostvars(tst.oneDict)
+#         addHostWithHostvars(tst.oneDict)
 
-        try:
-            assert rw_zk.exists(tst.hostPath) ## is not None
+#         try:
+#             assert rw_zk.exists(tst.hostPath) ## is not None
 
-        finally:
-            rw_zk.stop()
+#         finally:
+#             rw_zk.stop()
             
-        deleteZnodeRecur(splitZnodeString(tst.groupHostStr))
-        deleteZnodeRecur(splitZnodeString(tst.hostHostStr))
+#         deleteZnodeRecur(splitZnodeString(tst.groupHostStr))
+#         deleteZnodeRecur(splitZnodeString(tst.hostHostStr))
 
         
-    def test_addHostToGroup(self, rw_zk):
-        '''
-        Test if hostname-znode added with addHostToGroup(var) exists.
-        '''
+#     def test_addHostToGroup(self, rw_zk):
+#         '''
+#         Test if hostname-znode added with addHostToGroup(var) exists.
+#         '''
 
-        ## 1. check if Znode provided with test config exists
-        ## 2. run addHostWithHostvars(var) and addHostToGroup(var) functions
-        ## 3. check if hostname added with addHostToGroup exists
-        ## 4. run twice deleteZnodeRecur(var) to remove hostname from groupname and hosts group
+#         ## 1. check if Znode provided with test config exists
+#         ## 2. run addHostWithHostvars(var) and addHostToGroup(var) functions
+#         ## 3. check if hostname added with addHostToGroup exists
+#         ## 4. run twice deleteZnodeRecur(var) to remove hostname from groupname and hosts group
     
-        if rw_zk.exists(tst.groupPath) is not None:
-            rw_zk.delete(tst.groupPath, recursive=True)
-            rw_zk.stop()
+#         if rw_zk.exists(tst.groupPath) is not None:
+#             rw_zk.delete(tst.groupPath, recursive=True)
+#             rw_zk.stop()
 
-        addHostWithHostvars(tst.oneDict)
-        addHostToGroup(splitZnodeString(tst.groupHostStr))
+#         addHostWithHostvars(tst.oneDict)
+#         addHostToGroup(splitZnodeString(tst.groupHostStr))
 
-        try:
-            assert rw_zk.exists(tst.hostGroupPath) ## is not None
+#         try:
+#             assert rw_zk.exists(tst.hostGroupPath) ## is not None
 
-        finally:
-            rw_zk.stop()
+#         finally:
+#             rw_zk.stop()
             
-        deleteZnodeRecur(splitZnodeString(tst.groupHostStr))
-        deleteZnodeRecur(splitZnodeString(tst.hostHostStr))
+#         deleteZnodeRecur(splitZnodeString(tst.groupHostStr))
+#         deleteZnodeRecur(splitZnodeString(tst.hostHostStr))
 
                 
-    def test_deleteZnodeRecur(self, rw_zk):
-        '''
-        Test that znode deleted with deleteZnodeRecur(var) does not exist.
-        '''
+#     def test_deleteZnodeRecur(self, rw_zk):
+#         '''
+#         Test that znode deleted with deleteZnodeRecur(var) does not exist.
+#         '''
 
-        ## 1. run addHostWithHostvars(var) function to add example Znode provided in test config
-        ## 2. run twice deleteZnodeRecur(var) function to delete given Znode provided in test config
-        ## 3. check Znode path against that string 
+#         ## 1. run addHostWithHostvars(var) function to add example Znode provided in test config
+#         ## 2. run twice deleteZnodeRecur(var) function to delete given Znode provided in test config
+#         ## 3. check Znode path against that string 
 
-        addHostWithHostvars(tst.oneDict)
-        deleteZnodeRecur(splitZnodeString(tst.groupHostStr))
-        deleteZnodeRecur(splitZnodeString(tst.hostHostStr))
+#         addHostWithHostvars(tst.oneDict)
+#         deleteZnodeRecur(splitZnodeString(tst.groupHostStr))
+#         deleteZnodeRecur(splitZnodeString(tst.hostHostStr))
 
-        try:
-            assert rw_zk.exists(tst.hostPath) is None
-            assert rw_zk.exists(tst.hostGroupPath) is None
+#         try:
+#             assert rw_zk.exists(tst.hostPath) is None
+#             assert rw_zk.exists(tst.hostGroupPath) is None
 
-        finally:
-            rw_zk.stop()
-
-
-    def test_deleteZnodeHostExistance(self):
-        '''
-        Test that deleteZnodeRecur() will inform us that we want to delete nonexistent Znode from hosts group.
-        '''
-
-        errStringHost  = 'ERROR  ==> could not delete host: {0} that does not exist !!!'.format(tst.hostName)
-
-        assert deleteZnodeRecur(splitZnodeString(tst.hostHostStr)) == errStringHost
+#         finally:
+#             rw_zk.stop()
 
 
-    def test_deleteZnodeHostInGroupExistance(self):
-        '''
-        Test that deleteZnodeRecur() will inform us that we want to delete nonexistent Znode from groups/groupname group.
-        '''
+#     def test_deleteZnodeHostExistance(self):
+#         '''
+#         Test that deleteZnodeRecur() will inform us that we want to delete nonexistent Znode from hosts group.
+#         '''
 
-        errStringGroup  = 'ERROR  ==> could not delete host: {0} that does not exist in group: {1} !!!'.format(tst.hostName, tst.groupName)
+#         errStringHost  = 'ERROR  ==> could not delete host: {0} that does not exist !!!'.format(tst.hostName)
 
-        addHostWithHostvars(tst.oneDict)
-        deleteZnodeRecur(splitZnodeString(tst.groupHostStr))
+#         assert deleteZnodeRecur(splitZnodeString(tst.hostHostStr)) == errStringHost
 
-        assert deleteZnodeRecur(splitZnodeString(tst.groupHostStr)) == errStringGroup
 
-        deleteZnodeRecur(splitZnodeString(tst.hostHostStr))
+#     def test_deleteZnodeHostInGroupExistance(self):
+#         '''
+#         Test that deleteZnodeRecur() will inform us that we want to delete nonexistent Znode from groups/groupname group.
+#         '''
 
-        
-    def test_deleteZnodeRecurGroup(self, rw_zk):
-        '''
-        Test that znode deleted with deleteZnodeRecur(var) for groupname does not exist.
-        '''
+#         errStringGroup  = 'ERROR  ==> could not delete host: {0} that does not exist in group: {1} !!!'.format(tst.hostName, tst.groupName)
 
-        ## 1. run addHostWithHostvars(var) function to create given Znode provided in tst.oneDict 
-        ## 2. run deleteZnodeRecur(var) function to delete given Znode provided in tst.groupName
-        ## 3. check Znode path against that string
-        ## 4. delete hostname Znode in hosts group with deleteZnodeRecur(var)
+#         addHostWithHostvars(tst.oneDict)
+#         deleteZnodeRecur(splitZnodeString(tst.groupHostStr))
 
-        addHostWithHostvars(tst.oneDict)
-        deleteZnodeRecur(splitZnodeString(tst.groupName))
+#         assert deleteZnodeRecur(splitZnodeString(tst.groupHostStr)) == errStringGroup
 
-        try:
-            assert rw_zk.exists(tst.groupPath) is None
-
-        finally:
-            rw_zk.stop()
-            
-        deleteZnodeRecur(splitZnodeString(tst.hostHostStr))
+#         deleteZnodeRecur(splitZnodeString(tst.hostHostStr))
 
         
-    def test_showHostVarsOneHost(self):
-        '''
-        Test showHostVars() function for group with one host.
-        '''
+#     def test_deleteZnodeRecurGroup(self, rw_zk):
+#         '''
+#         Test that znode deleted with deleteZnodeRecur(var) for groupname does not exist.
+#         '''
 
-        ## 1. run addHostWithHostvars(var) function to create given Znode with vars provided in tst.oneDict 
-        ## 2. test showHostVars(var) against vars and values provided in tst.oneDict 
-        ## 3. run twice deleteZnodeRecur(var) function to delete given Znodes provided in tst.hostHostStr 
+#         ## 1. run addHostWithHostvars(var) function to create given Znode provided in tst.oneDict 
+#         ## 2. run deleteZnodeRecur(var) function to delete given Znode provided in tst.groupName
+#         ## 3. check Znode path against that string
+#         ## 4. delete hostname Znode in hosts group with deleteZnodeRecur(var)
 
-        addHostWithHostvars(tst.oneDict)
+#         addHostWithHostvars(tst.oneDict)
+#         deleteZnodeRecur(splitZnodeString(tst.groupName))
 
-        testList = [(tst.hostHostStr,{tst.hostName:tst.varDict}),(tst.groupName, tst.oneDict[tst.groupName])]
-    
-        for val in testList:
-            assert showHostVars(splitZnodeString(val[0])) == val[1]
-    
-        deleteZnodeRecur(splitZnodeString(tst.groupHostStr))
-        deleteZnodeRecur(splitZnodeString(tst.hostHostStr))
+#         try:
+#             assert rw_zk.exists(tst.groupPath) is None
 
+#         finally:
+#             rw_zk.stop()
+            
+#         deleteZnodeRecur(splitZnodeString(tst.hostHostStr))
 
-    def test_showHostVarsMultipleHosts(self):
-        '''
-        Test showHostVars() function for group with multiple hosts.
-        '''
-
-        ## 1. run addHostWithHostvars(var) function to create given Znode with vars provided in tst.oneDict 
-        ## 2. test showHostVars(var) against vars and values provided in tst.testDict 
-        ## 3. run deleteZnodeRecur(var) function to delete test group provided in tst.hostHostStr 
-        ## 4. run deleteZnodeRecur(var) function to delete all hosts provided in tst.testDict
         
-        for hostname in tst.testDict[tst.groupName].keys():
-            tmpDict = {tst.groupName : { hostname : tst.testDict[tst.groupName][hostname] }}
-            addHostWithHostvars(tmpDict)
+#     def test_showHostVarsOneHost(self):
+#         '''
+#         Test showHostVars() function for group with one host.
+#         '''
 
-        testList = [(tst.hostHostStr, {tst.hostName:tst.varDict}),(tst.groupName, tst.testDict[tst.groupName])]
+#         ## 1. run addHostWithHostvars(var) function to create given Znode with vars provided in tst.oneDict 
+#         ## 2. test showHostVars(var) against vars and values provided in tst.oneDict 
+#         ## 3. run twice deleteZnodeRecur(var) function to delete given Znodes provided in tst.hostHostStr 
+
+#         addHostWithHostvars(tst.oneDict)
+
+#         testList = [(tst.hostHostStr,{tst.hostName:tst.varDict}),(tst.groupName, tst.oneDict[tst.groupName])]
     
-        for val in testList:
-            assert showHostVars(splitZnodeString(val[0])) == val[1]
+#         for val in testList:
+#             assert showHostVars(splitZnodeString(val[0])) == val[1]
+    
+#         deleteZnodeRecur(splitZnodeString(tst.groupHostStr))
+#         deleteZnodeRecur(splitZnodeString(tst.hostHostStr))
 
-        ## delete all hosts in group created with addHostWithHostvars(var)    
-        deleteZnodeRecur(splitZnodeString(tst.groupName))
-        for hostname in  tst.testDict[tst.groupName].keys():
-            tmpHostStr = "hosts:{}".format(hostname)
-            deleteZnodeRecur(splitZnodeString(tmpHostStr))
+
+#     def test_showHostVarsMultipleHosts(self):
+#         '''
+#         Test showHostVars() function for group with multiple hosts.
+#         '''
+
+#         ## 1. run addHostWithHostvars(var) function to create given Znode with vars provided in tst.oneDict 
+#         ## 2. test showHostVars(var) against vars and values provided in tst.testDict 
+#         ## 3. run deleteZnodeRecur(var) function to delete test group provided in tst.hostHostStr 
+#         ## 4. run deleteZnodeRecur(var) function to delete all hosts provided in tst.testDict
+        
+#         for hostname in tst.testDict[tst.groupName].keys():
+#             tmpDict = {tst.groupName : { hostname : tst.testDict[tst.groupName][hostname] }}
+#             addHostWithHostvars(tmpDict)
+
+#         testList = [(tst.hostHostStr, {tst.hostName:tst.varDict}),(tst.groupName, tst.testDict[tst.groupName])]
+    
+#         for val in testList:
+#             assert showHostVars(splitZnodeString(val[0])) == val[1]
+
+#         ## delete all hosts in group created with addHostWithHostvars(var)    
+#         deleteZnodeRecur(splitZnodeString(tst.groupName))
+#         for hostname in  tst.testDict[tst.groupName].keys():
+#             tmpHostStr = "hosts:{}".format(hostname)
+#             deleteZnodeRecur(splitZnodeString(tmpHostStr))
             
         
-    def test_updateSingleZnode(self, rw_zk):
-        '''
-        Test updated Znode with updateZnode(var) for one host.
-        '''
+#     def test_updateSingleZnode(self, rw_zk):
+#         '''
+#         Test updated Znode with updateZnode(var) for one host.
+#         '''
 
-        ## 1. run addHostWithHostvars(var) function to create given Znode provided in tst.oneDict
-        ## 2. run updateZnode(var) function to update given Znode provided in tst.updateDict
-        ## 3. check updated results against tst.updateDict
-        ## 4. run deleteZnodeRecur(var) function to delete test group provided in tst.hostHostStr 
-        ## 5. run deleteZnodeRecur(var) function to delete all hosts provided in tst.testDict
+#         ## 1. run addHostWithHostvars(var) function to create given Znode provided in tst.oneDict
+#         ## 2. run updateZnode(var) function to update given Znode provided in tst.updateDict
+#         ## 3. check updated results against tst.updateDict
+#         ## 4. run deleteZnodeRecur(var) function to delete test group provided in tst.hostHostStr 
+#         ## 5. run deleteZnodeRecur(var) function to delete all hosts provided in tst.testDict
     
-        addHostWithHostvars(tst.oneDict)
-        updateZnode(tst.oneUpdateDict)
+#         addHostWithHostvars(tst.oneDict)
+#         updateZnode(tst.oneUpdateDict)
 
-        for key in tst.updateDict[tst.groupName][tst.hostName].keys():
-            zkGet       = rw_zk.get('{0}/{1}'.format(tst.hostPath, key))[0]
-            updateValue = tst.updateDict[tst.groupName][tst.hostName][key]
+#         for key in tst.updateDict[tst.groupName][tst.hostName].keys():
+#             zkGet       = rw_zk.get('{0}/{1}'.format(tst.hostPath, key))[0]
+#             updateValue = tst.updateDict[tst.groupName][tst.hostName][key]
 
-            assert zkGet == updateValue
+#             assert zkGet == updateValue
 
-        rw_zk.stop()
+#         rw_zk.stop()
             
-        ## delete all hosts in group created with addHostWithHostvars(var)    
-        deleteZnodeRecur(splitZnodeString(tst.groupName))
-        for hostname in  tst.testDict[tst.groupName].keys():
-            tmpHostStr = "hosts:{}".format(hostname)
-            deleteZnodeRecur(splitZnodeString(tmpHostStr))
+#         ## delete all hosts in group created with addHostWithHostvars(var)    
+#         deleteZnodeRecur(splitZnodeString(tst.groupName))
+#         for hostname in  tst.testDict[tst.groupName].keys():
+#             tmpHostStr = "hosts:{}".format(hostname)
+#             deleteZnodeRecur(splitZnodeString(tmpHostStr))
 
 
-    def test_renameHostname(self, rw_zk):
-        '''
-        Test if renameZnode(var) works properly for new hostname.
-        '''
+#     def test_renameHostname(self, rw_zk):
+#         '''
+#         Test if renameZnode(var) works properly for new hostname.
+#         '''
 
-        ## 1. run addHostWithHostvars(var) function to create given Znode provided in tst.oneDict
-        ## 2. run renameZnode(var) function to rename given hostname provided in tst.renameDict
-        ## 3. check updated results against tst.renameDict
-        ## 4. run deleteZnodeRecur(var) function to delete test group provided in tst.hostHostStr 
-        ## 5. run deleteZnodeRecur(var) function to delete all hosts provided in tst.testDict
+#         ## 1. run addHostWithHostvars(var) function to create given Znode provided in tst.oneDict
+#         ## 2. run renameZnode(var) function to rename given hostname provided in tst.renameDict
+#         ## 3. check updated results against tst.renameDict
+#         ## 4. run deleteZnodeRecur(var) function to delete test group provided in tst.hostHostStr 
+#         ## 5. run deleteZnodeRecur(var) function to delete all hosts provided in tst.testDict
     
-        addHostWithHostvars(tst.oneDict)
-        renameZnode(splitRenameZnodeString(tst.renameHostStr))
+#         addHostWithHostvars(tst.oneDict)
+#         renameZnode(splitRenameZnodeString(tst.renameHostStr))
         
-        try:
-            assert rw_zk.exists('{}'.format(tst.hostPath)) is None
-            assert rw_zk.exists('{}'.format(tst.renameHostPath)) is not None
+#         try:
+#             assert rw_zk.exists('{}'.format(tst.hostPath)) is None
+#             assert rw_zk.exists('{}'.format(tst.renameHostPath)) is not None
             
-        finally:
-            rw_zk.stop()
+#         finally:
+#             rw_zk.stop()
             
-        ## delete all hosts in group created with addHostWithHostvars(var)    
-        deleteRenameHostStr = "hosts:{}".format(tst.renameHostName)
+#         ## delete all hosts in group created with addHostWithHostvars(var)    
+#         deleteRenameHostStr = "hosts:{}".format(tst.renameHostName)
 
-        deleteZnodeRecur(splitZnodeString(tst.groupName))
-        deleteZnodeRecur(splitZnodeString(deleteRenameHostStr))
+#         deleteZnodeRecur(splitZnodeString(tst.groupName))
+#         deleteZnodeRecur(splitZnodeString(deleteRenameHostStr))
 
 
-    def test_renameGroupname(self, rw_zk):
-        '''
-        Test if renameZnode(var) works properly for new groupname.
-        '''
+#     def test_renameGroupname(self, rw_zk):
+#         '''
+#         Test if renameZnode(var) works properly for new groupname.
+#         '''
 
-        ## 1. run addHostWithHostvars(var) function to create given Znode provided in tst.oneDict
-        ## 2. run renameZnode(var) function to rename given groupname provided in tst.renameDict
-        ## 3. check updated results against tst.renameDict
-        ## 4. run deleteZnodeRecur(var) function to delete test group provided in tst.hostHostStr 
-        ## 5. run deleteZnodeRecur(var) function to delete all hosts provided in tst.testDict
+#         ## 1. run addHostWithHostvars(var) function to create given Znode provided in tst.oneDict
+#         ## 2. run renameZnode(var) function to rename given groupname provided in tst.renameDict
+#         ## 3. check updated results against tst.renameDict
+#         ## 4. run deleteZnodeRecur(var) function to delete test group provided in tst.hostHostStr 
+#         ## 5. run deleteZnodeRecur(var) function to delete all hosts provided in tst.testDict
     
-        addHostWithHostvars(tst.oneDict)
-        renameZnode(splitRenameZnodeString(tst.renameGroupStr))
+#         addHostWithHostvars(tst.oneDict)
+#         renameZnode(splitRenameZnodeString(tst.renameGroupStr))
         
-        try:
-            assert rw_zk.exists('{}'.format(tst.groupPath)) is None
-            assert rw_zk.exists('{}'.format(tst.renameGroupPath)) is not None
+#         try:
+#             assert rw_zk.exists('{}'.format(tst.groupPath)) is None
+#             assert rw_zk.exists('{}'.format(tst.renameGroupPath)) is not None
             
-        finally:
-            rw_zk.stop()
+#         finally:
+#             rw_zk.stop()
             
-        ## delete all hosts in group created with addHostWithHostvars(var)    
-        deleteZnodeRecur(splitZnodeString(tst.renameGroupName))
-        deleteZnodeRecur(splitZnodeString(tst.hostHostStr))
+#         ## delete all hosts in group created with addHostWithHostvars(var)    
+#         deleteZnodeRecur(splitZnodeString(tst.renameGroupName))
+#         deleteZnodeRecur(splitZnodeString(tst.hostHostStr))
 
         
             
@@ -460,20 +463,20 @@ class TestSplitters(object):
             assert splitZnodeVarString(varDict['string']) == varDict['output']
 
             
-    def test_splitRenameZnodeVarString(self):
-        '''
-        Test for splitRenameZnodeVarString() parser.
-        '''
+    # def test_splitRenameZnodeVarString(self):
+    #     '''
+    #     Test for splitRenameZnodeVarString() parser.
+    #     '''
 
-        testTup = ({"string":tst.renameGroupStr,
-                    "output":[(tst.groupName, tst.groupPath),(tst.renameGroupName, tst.renameGroupPath)]},
-                   {"string":tst.renameHostStr,
-                    "output":[(tst.hostName, tst.hostPath),(tst.renameHostName, tst.renameHostPath)]},
-                   {"string":"groups:newgroup",
-                    "output":"SYNTAX ERROR --> groups:newgroup <-- no valid number of keywords [keyword:keyword1:newkeyword1]"},
-                   {"string":"group:oldgroup:newgroup",
-                    "output":"SYNTAX ERROR --> group:oldgroup:newgroup <-- no valid keywords [groups|hosts] found"}
-        )
+    #     testTup = ({"string":tst.renameGroupStr,
+    #                 "output":[(tst.groupName, tst.groupPath),(tst.renameGroupName, tst.renameGroupPath)]},
+    #                {"string":tst.renameHostStr,
+    #                 "output":[(tst.hostName, tst.hostPath),(tst.renameHostName, tst.renameHostPath)]},
+    #                {"string":"groups:newgroup",
+    #                 "output":"SYNTAX ERROR --> groups:newgroup <-- no valid number of keywords [keyword:keyword1:newkeyword1]"},
+    #                {"string":"group:oldgroup:newgroup",
+    #                 "output":"SYNTAX ERROR --> group:oldgroup:newgroup <-- no valid keywords [groups|hosts] found"}
+    #     )
 
-        for renameDict in testTup:
-            assert splitRenameZnodeString(renameDict['string']) == renameDict['output']
+    #     for renameDict in testTup:
+    #         assert splitRenameZnodeString(renameDict['string']) == renameDict['output']
