@@ -145,10 +145,10 @@ class TestConfig(object):
         '''
 
         try:
-            assert ro_zk.exists(cfg.aPath) is not None
+            assert type(ro_zk.exists(cfg.aPath)) is not None
 
-        except AssertionError as error:
-            print("{0} BasePrefixZnode {1} exists !!!").format(error, cfg.aPath)
+        # except AssertionError as error:
+        #     print("{0} BasePrefixZnode {1} exists !!!").format(error, cfg.aPath)
             
         finally:
             ro_zk.stop()
