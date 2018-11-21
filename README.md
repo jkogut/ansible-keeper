@@ -2,7 +2,7 @@
 Keep ansible inventory in zookeeper:  http://zookeeper.apache.org/
 
 [![Build Status](https://travis-ci.org/jkogut/ansible-keeper.svg?branch=master)](https://travis-ci.org/jkogut/ansible-keeper)
-
+[![MIT license](http://img.shields.io/badge/license-MIT-brightgreen.svg)](http://opensource.org/licenses/MIT)
 
 ### Table of Contents
 **[Motivation](#motivation)**<br>
